@@ -64,7 +64,7 @@ class Signal <T_rv(Args...)> : public Observer
         Observer::remove(key);
     }
 
-    using function_t  = function<T_rv(Args...)>;
+    using function_t  = Function<T_rv(Args...)>;
 
     public: //------------------------------------------------------------------
 
@@ -85,6 +85,23 @@ class Signal <T_rv(Args...)> : public Observer
     {
         auto delegate = function_t::template bind<T, mem_ptr>(instance);
         sfinae_con<T>(delegate, instance);
+    }
+
+//------------------------------------------------------------------------------
+
+    template <typename T, T_rv (T::*mem_ptr)(Args...)>
+    void connect(T& instance)
+    {
+        auto delegate = function_t::template
+            bind<T, mem_ptr>(std::addressof(instance));
+        sfinae_con<T>(delegate, std::addressof(instance));
+    }
+    template <typename T, T_rv (T::*mem_ptr)(Args...) const>
+    void connect(T& instance)
+    {
+        auto delegate = function_t::template
+            bind<T, mem_ptr>(std::addressof(instance));
+        sfinae_con<T>(delegate, std::addressof(instance));
     }
 
 //------------------------------------------------------------------------------
@@ -110,6 +127,23 @@ class Signal <T_rv(Args...)> : public Observer
 
 //------------------------------------------------------------------------------
 
+    template <typename T, T_rv (T::*mem_ptr)(Args...)>
+    void disconnect(T& instance)
+    {
+        auto delegate = function_t::template
+            bind<T, mem_ptr>(std::addressof(instance));
+        sfinae_dis<T>(delegate, std::addressof(instance));
+    }
+    template <typename T, T_rv (T::*mem_ptr)(Args...) const>
+    void disconnect(T& instance)
+    {
+        auto delegate = function_t::template
+            bind<T, mem_ptr>(std::addressof(instance));
+        sfinae_dis<T>(delegate, std::addressof(instance));
+    }
+
+//------------------------------------------------------------------------------
+
     void operator()(Args&&... args)
     {
         for (auto const& slot : tracked_connections)
@@ -118,7 +152,7 @@ class Signal <T_rv(Args...)> : public Observer
         }
     }
     template <typename Accumulator>
-    void accumulate(Accumulator&& lambda)
+    void accumulate(Args&&... args, Accumulator&& lambda)
     {
         for (auto const& slot : tracked_connections)
         {
