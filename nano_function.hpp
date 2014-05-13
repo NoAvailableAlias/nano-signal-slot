@@ -9,8 +9,8 @@ namespace Nano
 
 typedef std::pair<std::uintptr_t, std::uintptr_t> delegate_key_t;
 
-template <typename T_rv> class function;
-template <typename T_rv, typename... Args> class function<T_rv(Args...)>
+template <typename T_rv> class Function;
+template <typename T_rv, typename... Args> class Function<T_rv(Args...)>
 {
     typedef T_rv (*sig_t)(void*, Args...);
 
@@ -18,13 +18,13 @@ template <typename T_rv, typename... Args> class function<T_rv(Args...)>
     sig_t m_stub_ptr;
 
     template <typename I, typename F>
-    function (I&& this_ptr, F&& stub_ptr):
+    Function (I&& this_ptr, F&& stub_ptr):
         m_this_ptr { std::forward<I>(this_ptr) },
         m_stub_ptr { std::forward<F>(stub_ptr) } {}
 
     template <typename T> friend class Signal;
 
-    function (delegate_key_t const& _key):
+    Function (delegate_key_t const& _key):
         m_this_ptr { reinterpret_cast<void*>(std::get<0>(_key)) },
         m_stub_ptr { reinterpret_cast<sig_t>(std::get<1>(_key)) } {}
 
@@ -33,20 +33,20 @@ template <typename T_rv, typename... Args> class function<T_rv(Args...)>
 //------------------------------------------------------------------------------
 
     template <T_rv (*fun_ptr)(Args...)>
-    static inline function bind()
+    static inline Function bind()
     {
         return { nullptr, [](void* , Args... args) {
         return (*fun_ptr)(std::forward<Args>(args)...); }};
     }
     template <typename T, T_rv (T::*mem_ptr)(Args...)>
-    static inline function bind(T* pointer)
+    static inline Function bind(T* pointer)
     {
         return { pointer, [](void* this_ptr, Args... args) {
         return (static_cast<T*>(this_ptr)->*mem_ptr)
             (std::forward<Args>(args)...); }};
     }
     template <typename T, T_rv (T::*mem_ptr)(Args...) const>
-    static inline function bind(T* pointer)
+    static inline Function bind(T* pointer)
     {
         return { pointer, [](void* this_ptr, Args... args) {
         return (static_cast<T*>(this_ptr)->*mem_ptr)
