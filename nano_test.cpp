@@ -8,15 +8,15 @@ struct Foo : public Nano::Observer
     {
         std::cout << "Hello, World!" << std::endl;
     }
-    void action(std::size_t a) const
+    long action(std::size_t a) const
     {
-        std::cout << __LINE__ << ", " << a << std::endl;
+        return __LINE__ ^ a;
     }
 };
 
-void action(std::size_t a)
+long action(std::size_t a)
 {
-    std::cout << __LINE__ << ", " << a << std::endl;
+    return __LINE__ ^ a;
 }
 
 int main()
@@ -25,7 +25,7 @@ int main()
 
     // Declare Nano::Signals using function signature syntax
     Nano::Signal<void()> signal_one;
-    Nano::Signal<void(std::size_t)> signal_two;
+    Nano::Signal<long(std::size_t)> signal_two;
 
     // Connect member functions to Nano::Signals
     signal_one.connect<Foo, &Foo::action>(&foo);
@@ -36,17 +36,22 @@ int main()
 
     // Emit Signals
     signal_one();
-    signal_two(__LINE__);
+
+    // Emit Signals and accumulate SRVs
+    signal_two.accumulate(__LINE__, [](long srv)
+    {
+        std::cout << srv << ", " << __LINE__ << std::endl;
+    });
 
     // Disconnect a member function from a Nano::Signal
-    signal_two.disconnect<Foo, &Foo::action>(&foo);
+    signal_two.disconnect<Foo, &Foo::action>(foo);
 
     // Disconnect a free function from a Nano::Signal
     signal_two.disconnect<action>();
 
     std::cout << "\n\tAfter Disconnect\n" << std::endl;
 
-    // Emit again to test disconnect
+    // Emit again to test disconnects
     signal_one();
     signal_two(__LINE__);
 
