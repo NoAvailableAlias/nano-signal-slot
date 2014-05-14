@@ -3,7 +3,6 @@ nano-signal-slot
 
 Pure C++11 Signals and Slots
 
-
 #### Declare
 ```
 // Declare Nano::Signals using function signature syntax
@@ -50,4 +49,18 @@ signal_two.disconnect<Foo, &Foo::action(foo);
 
 // Disconnect a free function from a Nano::Signal
 signal_two.disconnect<action>();
+```
+
+#### Connection Management
+
+_To utilize automatic connection management you must inherit from Nano::Observer_
+
+```
+struct Foo : public Nano::Observer
+{
+    void action() const
+    {
+        std::cout << "Hello, World!" << std::endl;
+    }
+	...
 ```
