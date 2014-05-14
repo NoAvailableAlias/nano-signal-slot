@@ -29,10 +29,7 @@ class Observer
     {
         for (auto const& connection : tracked_connections)
         {
-            if (auto const& subject = std::get<1>(connection))
-            {
-                subject->remove(std::get<0>(connection));
-            }
+            std::get<1> (connection)->remove(std::get<0>(connection));
         }
     }
 };
@@ -57,7 +54,7 @@ class Signal <T_rv(Args...)> : public Observer
     }
     template <typename T> void sfinae_con(delegate_key_t const& key, ...)
     {
-        Observer::insert(key, nullptr);
+        Observer::insert(key, this);
     }
     template <typename T> void sfinae_dis(delegate_key_t const& key, ...)
     {
@@ -72,7 +69,7 @@ class Signal <T_rv(Args...)> : public Observer
     void connect()
     {
         auto delegate = function_t::template bind<fun_ptr>();
-        Observer::insert(delegate, nullptr);
+        Observer::insert(delegate, this);
     }
     template <typename T, T_rv (T::*mem_ptr)(Args...)>
     void connect(T* instance)
