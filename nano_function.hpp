@@ -1,8 +1,8 @@
 #ifndef NANO_FUNCTION_HPP
 #define NANO_FUNCTION_HPP
 
+#include <functional>
 #include <cstdint>
-#include <utility>
 
 namespace Nano
 {
