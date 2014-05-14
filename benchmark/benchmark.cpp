@@ -1,7 +1,7 @@
 #include "benchmark.hpp"
 
-//#include "bs1_benchmark.hpp"
-//#include "bs2_benchmark.hpp"
+#include "bs1_benchmark.hpp"
+#include "bs2_benchmark.hpp"
 
 #include "evl_benchmark.hpp"
 //#include "evf_benchmark.hpp"
@@ -17,6 +17,7 @@
 #include <numeric>
 #include <vector>
 
+// default to 4 seconds
 std::size_t g_limit = Timer_u(Limit_u(4)).count();
 
 int main(int argc, char* argv[])
@@ -42,23 +43,12 @@ int main(int argc, char* argv[])
     {
         for (auto R : ratios)
         {
+            records["Bs1"].emplace_back(Bs1::combined(N, R));
+            records["Bs2"].emplace_back(Bs2::combined(N, R));
             records["Nss"].emplace_back(Nss::combined(N, R));
-        }
-        for (auto R : ratios)
-        {
             records["Evl"].emplace_back(Evl::combined(N, R));
-        }
-        for (auto R : ratios)
-        {
-            // Benchmark::Evf causing an internal compiler error
             //records["Evf"].emplace_back(Evf::combined(N, R));
-        }
-        for (auto R : ratios)
-        {
             records["Evs"].emplace_back(Evs::combined(N, R));
-        }
-        for (auto R : ratios)
-        {
             records["Jls"].emplace_back(Jls::combined(N, R));
         }
     }
