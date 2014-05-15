@@ -2,9 +2,8 @@
 
 #include "bs1_benchmark.hpp"
 #include "bs2_benchmark.hpp"
-
 #include "evl_benchmark.hpp"
-//#include "evf_benchmark.hpp"
+#include "evf_benchmark.hpp"
 #include "evs_benchmark.hpp"
 #include "jls_benchmark.hpp"
 #include "nss_benchmark.hpp"
@@ -14,50 +13,54 @@
 
 #include <unordered_map>
 #include <iostream>
+#include <iomanip>
 #include <numeric>
 #include <vector>
 
-// default to 4 seconds
+// default to 4 seconds because 32 bit
 std::size_t g_limit = Timer_u(Limit_u(4)).count();
 
 int main(int argc, char* argv[])
 {
     using namespace Benchmark;
 
-    using std::cout;
-    using std::endl;
-
-    std::unordered_map<const char*, std::vector<double>> records;
-
     jl::StaticSignalConnectionAllocator<c_jlsignal_max> signal_con_allocator;
     jl::StaticObserverConnectionAllocator<c_jlsignal_max> observer_con_allocator;
     jl::SignalBase::SetCommonConnectionAllocator(&signal_con_allocator);
     jl::SignalObserver::SetCommonConnectionAllocator(&observer_con_allocator);
 
-    std::size_t ratios[] = { 75, 50, 25 };
+    std::unordered_map<const char*, std::vector<double>> records;
 
     std::size_t start_n = round_2_down(8);
-    std::size_t maximum_n = round_2_up(256);
+    std::size_t maximum_n = round_2_up(128);
 
-    for (std::size_t N = start_n; N <= maximum_n; N *= 2)
+    try
     {
-        for (auto R : ratios)
+        for (std::size_t N = start_n; N <= maximum_n; N *= 2)
         {
-            records["Bs1"].emplace_back(Bs1::combined(N, R));
-            records["Bs2"].emplace_back(Bs2::combined(N, R));
-            records["Nss"].emplace_back(Nss::combined(N, R));
-            records["Evl"].emplace_back(Evl::combined(N, R));
-            //records["Evf"].emplace_back(Evf::combined(N, R));
-            records["Evs"].emplace_back(Evs::combined(N, R));
-            records["Jls"].emplace_back(Jls::combined(N, R));
+            for (auto R : { 75, 50, 25 }) // emission ratio
+            {
+                records["Boost Signals"].emplace_back(Bs1::combined(N, R));
+                records["Boost Signals2"].emplace_back(Bs2::combined(N, R));
+                records["Nano-signal-slot"].emplace_back(Nss::combined(N, R));
+                records["EvilTwin Observer"].emplace_back(Evl::combined(N, R));
+                records["EvilTwin Thread Safe"].emplace_back(Evs::combined(N, R));
+                records["EvilTwin Fork"].emplace_back(Evf::combined(N, R));
+                records["Jl_signal"].emplace_back(Jls::combined(N, R));
+            }
+        }
+        for (auto const& record : records)
+        {
+            std::vector<double> const& data = record.second;
+            std::cout << std::setw(25) << std::left << record.first
+                << std::right << " [higher score is better]: "
+                << std::accumulate(std::begin(data), std::end(data), 1.0)
+                / (double) data.size() << std::endl;
         }
     }
-    for (auto const& record : records)
+    catch (std::exception const& error)
     {
-        std::vector<double> const& data = record.second;
-        cout << record.first << " average relative performance: " <<
-            std::accumulate(std::begin(data), std::end(data), 1.0) /
-            (double) data.size() << endl;
+        std::cerr << error.what() << std::endl;
     }
     std::cin.get();
 }
