@@ -3,11 +3,13 @@
 
 #include <functional>
 #include <cstdint>
+#include <array>
 
 namespace Nano
 {
 
-typedef std::pair<std::uintptr_t, std::uintptr_t> delegate_key_t;
+//typedef std::pair<std::uintptr_t, std::uintptr_t> delegate_key_t;
+typedef std::array<std::uintptr_t, 2> delegate_key_t;
 
 template <typename T_rv> class Function;
 template <typename T_rv, typename... Args> class Function<T_rv(Args...)>
@@ -76,7 +78,7 @@ template <typename T_rv, typename... Args> class Function<T_rv(Args...)>
 
 } // namespace Nano ------------------------------------------------------------
 
-namespace std // std::hash specialization
+namespace std // std specializations
 {
 
 template <> struct hash<Nano::delegate_key_t>
@@ -84,6 +86,22 @@ template <> struct hash<Nano::delegate_key_t>
     inline std::size_t operator()(Nano::delegate_key_t const& key) const
     {
         return std::get<0>(key) ^ std::get<1>(key);
+    }
+};
+
+template <> struct less<Nano::delegate_key_t>
+{
+    inline bool operator()(Nano::delegate_key_t const& lhs,
+                           Nano::delegate_key_t const& rhs) const
+    {
+        std::size_t x = lhs[0] ^ rhs[0];
+        std::size_t y = lhs[1] ^ rhs[1];
+
+        if ((x < y) && (x < (x ^ y)))
+        {
+            return lhs[1] < rhs[1];
+        }
+        return lhs[0] < rhs[0];
     }
 };
 
