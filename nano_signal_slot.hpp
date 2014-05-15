@@ -27,9 +27,17 @@ class Observer
 
    ~Observer()
     {
-        for (auto const& connection : tracked_connections)
+        auto iter = std::cbegin(tracked_connections);
+        auto stop = std::cend(tracked_connections);
+
+        while (iter != stop)
         {
-            std::get<1> (connection)->remove(std::get<0>(connection));
+            auto const& delegate_key = iter->first;
+            auto const& subject = iter->second;
+
+            std::advance(iter, 1);
+
+            subject->remove(delegate_key);
         }
     }
 };
@@ -156,7 +164,6 @@ class Signal <T_rv(Args...)> : public Observer
             lambda(function_t (std::get<0>(slot))(std::forward<Args>(args)...));
         }
     }
-
 };
 
 } // namespace Nano ------------------------------------------------------------
