@@ -11,14 +11,44 @@
 #include "lib/jl_signal/Signal.h"
 #include "lib/jl_signal/StaticSignalConnectionAllocators.h"
 
-#include <unordered_map>
 #include <iostream>
+#include <fstream>
 #include <iomanip>
 #include <numeric>
 #include <vector>
+#include <map>
 
-// default to 4 seconds because 32 bit
+using Table = std::map<const char*, std::vector<double>>;
+using DataBase = std::map<const char*, Table>;
+
 std::size_t g_limit = Timer_u(Limit_u(4)).count();
+//std::size_t g_limit = 10000000;
+
+//------------------------------------------------------------------------------
+
+void outputReport(DataBase const& records, std::ostream& ost)
+{
+    for (auto const& table : records)
+    {
+        auto tableName = table.first;
+
+        ost << "\n    " << tableName << ":";
+
+        for (auto const& record : table.second)
+        {
+            auto recordName = record.first;
+            auto data = record.second;
+
+            ost << "\n ++ " << std::setw(40) << std::setfill('_')
+                << recordName << ": " << std::setprecision(2) << std::fixed
+                << std::accumulate(std::begin(data), std::end(data), 1.0)
+                / (double) data.size();
+        }
+        ost << std::endl;
+    }
+}
+
+//------------------------------------------------------------------------------
 
 int main(int argc, char* argv[])
 {
@@ -29,38 +59,87 @@ int main(int argc, char* argv[])
     jl::SignalBase::SetCommonConnectionAllocator(&signal_con_allocator);
     jl::SignalObserver::SetCommonConnectionAllocator(&observer_con_allocator);
 
-    std::unordered_map<const char*, std::vector<double>> records;
+    DataBase records;
 
     std::size_t start_n = round_2_down(8);
-    std::size_t maximum_n = round_2_up(128);
+    std::size_t maximum_n = round_2_up(64);
 
-    try
+    for (std::size_t N = start_n; N <= maximum_n; N *= 2)
     {
-        for (std::size_t N = start_n; N <= maximum_n; N *= 2)
-        {
-            for (auto R : { 75, 50, 25 }) // emission ratio
-            {
-                records["Boost Signals"].emplace_back(Bs1::combined(N, R));
-                records["Boost Signals2"].emplace_back(Bs2::combined(N, R));
-                records["Nano-signal-slot"].emplace_back(Nss::combined(N, R));
-                records["EvilTwin Observer"].emplace_back(Evl::combined(N, R));
-                records["EvilTwin Thread Safe"].emplace_back(Evs::combined(N, R));
-                records["EvilTwin Fork"].emplace_back(Evf::combined(N, R));
-                records["Jl_signal"].emplace_back(Jls::combined(N, R));
-            }
-        }
-        for (auto const& record : records)
-        {
-            std::vector<double> const& data = record.second;
-            std::cout << std::setw(25) << std::left << record.first
-                << std::right << " [higher score is better]: "
-                << std::accumulate(std::begin(data), std::end(data), 1.0)
-                / (double) data.size() << std::endl;
-        }
+        std::cout << N << ", " << __LINE__ << std::endl;
+
+        auto& bs1 = records["Boost Signals"];
+        bs1["construction"].emplace_back(Bs1::construction(N));
+        bs1["destruction"].emplace_back(Bs1::destruction(N));
+        bs1["connection"].emplace_back(Bs1::connection(N));
+        bs1["emission"].emplace_back(Bs1::emission(N));
+        bs1["combined"].emplace_back(Bs1::combined(N));
+
+        std::cout << N << ", " << __LINE__ << std::endl;
+
+        auto& bs2 = records["Boost Signals2"];
+        bs2["construction"].emplace_back(Bs2::construction(N));
+        bs2["destruction"].emplace_back(Bs2::destruction(N));
+        bs2["connection"].emplace_back(Bs2::connection(N));
+        bs2["emission"].emplace_back(Bs2::emission(N));
+        bs2["combined"].emplace_back(Bs2::combined(N));
+        
+        std::cout << N << ", " << __LINE__ << std::endl;
+
+        auto& nss = records["Nano-signal-slot"];
+        nss["construction"].emplace_back(Nss::construction(N));
+        nss["destruction"].emplace_back(Nss::destruction(N));
+        nss["connection"].emplace_back(Nss::connection(N));
+        nss["emission"].emplace_back(Nss::emission(N));
+        nss["combined"].emplace_back(Nss::combined(N));
+        
+        std::cout << N << ", " << __LINE__ << std::endl;
+
+        auto& evl = records["EvilTwin Observer"];
+        evl["construction"].emplace_back(Evl::construction(N));
+        evl["destruction"].emplace_back(Evl::destruction(N));
+        evl["connection"].emplace_back(Evl::connection(N));
+        evl["emission"].emplace_back(Evl::emission(N));
+        evl["combined"].emplace_back(Evl::combined(N));
+        
+        std::cout << N << ", " << __LINE__ << std::endl;
+
+        auto& evs = records["EvilTwin Thread Safe"];
+        evs["construction"].emplace_back(Evs::construction(N));
+        evs["destruction"].emplace_back(Evs::destruction(N));
+        evs["connection"].emplace_back(Evs::connection(N));
+        evs["emission"].emplace_back(Evs::emission(N));
+        evs["combined"].emplace_back(Evs::combined(N));
+        
+        std::cout << N << ", " << __LINE__ << std::endl;
+
+        auto& evf = records["EvilTwin Fork"];
+        evf["construction"].emplace_back(Evf::construction(N));
+        evf["destruction"].emplace_back(Evf::destruction(N));
+        evf["connection"].emplace_back(Evf::connection(N));
+        evf["emission"].emplace_back(Evf::emission(N));
+        evf["combined"].emplace_back(Evf::combined(N));
+        
+        std::cout << N << ", " << __LINE__ << std::endl;
+
+        auto& jls = records["Jl_signal"];
+        jls["construction"].emplace_back(Jls::construction(N));
+        jls["destruction"].emplace_back(Jls::destruction(N));
+        jls["connection"].emplace_back(Jls::connection(N));
+        jls["emission"].emplace_back(Jls::emission(N));
+        jls["combined"].emplace_back(Jls::combined(N));
     }
-    catch (std::exception const& error)
+    if (auto ofs = std::ofstream("report.txt", std::ios::app))
     {
-        std::cerr << error.what() << std::endl;
+        outputReport(records, ofs);
+        outputReport(records, std::cout);
+
+        ofs << "\n//--------------------------------------"
+            << "----------------------------------------\n" << std::endl;
+    }
+    else
+    {
+        std::cerr << "ofstream error" << std::endl;
     }
     std::cin.get();
 }
