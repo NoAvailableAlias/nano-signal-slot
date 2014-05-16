@@ -3,7 +3,6 @@
 
 #include "nano_function.hpp"
 
-//#include <unordered_map>
 #include <map>
 
 namespace Nano
@@ -11,7 +10,6 @@ namespace Nano
 
 class Observer
 {
-    //std::unordered_map<delegate_key_t, Observer*> tracked_connections;
     std::map<delegate_key_t, Observer*> tracked_connections;
 
     template <typename T> friend class Signal;
