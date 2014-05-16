@@ -1,14 +1,12 @@
 #ifndef NANO_FUNCTION_HPP
 #define NANO_FUNCTION_HPP
 
-#include <functional>
 #include <cstdint>
 #include <array>
 
 namespace Nano
 {
 
-//typedef std::pair<std::uintptr_t, std::uintptr_t> delegate_key_t;
 typedef std::array<std::uintptr_t, 2> delegate_key_t;
 
 template <typename T_rv> class Function;
@@ -78,16 +76,8 @@ template <typename T_rv, typename... Args> class Function<T_rv(Args...)>
 
 } // namespace Nano ------------------------------------------------------------
 
-namespace std // std specializations
+namespace std // std specialization
 {
-
-template <> struct hash<Nano::delegate_key_t>
-{
-    inline std::size_t operator()(Nano::delegate_key_t const& key) const
-    {
-        return std::get<0>(key) ^ std::get<1>(key);
-    }
-};
 
 template <> struct less<Nano::delegate_key_t>
 {
