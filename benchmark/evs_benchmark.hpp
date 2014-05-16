@@ -36,11 +36,16 @@ class Evs
     {
         std::size_t count = 1, elapsed = 0;
 
+        using std::placeholders::_1;
+
         for (; elapsed < g_limit; ++count)
         {
             timer.reset();
             std::unique_ptr<Subject> subject(new Subject);
             std::vector<Foo> foo_array(N);
+            auto& foo = foo_array.back();
+            foo.reg.emplace_front(subject->connect
+                (std::bind(&Foo::handler, &foo, _1)));
             elapsed += timer.count<Timer_u>();
         }
         return N / std::chrono::duration_cast<Delta_u>

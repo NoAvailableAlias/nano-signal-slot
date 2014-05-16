@@ -38,6 +38,7 @@ class Jls : public jl::SignalObserver
             timer.reset();
             std::unique_ptr<Subject> subject(new Subject);
             std::vector<Foo> foo_array(N);
+            subject->Connect(&foo_array.back(), &Foo::handler);
             elapsed += timer.count<Timer_u>();
         }
         return N / std::chrono::duration_cast<Delta_u>
@@ -154,7 +155,7 @@ class Jls : public jl::SignalObserver
                 auto& foo = foo_array[index];
                 subject.Connect(&foo, &Foo::handler);
             }
-            subject(rng);
+            subject.Emit(rng);
         }
         return N / std::chrono::duration_cast<Delta_u>
             (Timer_u(g_limit / count)).count();

@@ -39,6 +39,7 @@ class Bs2 : public boost::signals2::trackable
             timer.reset();
             std::unique_ptr<Subject> subject(new Subject);
             std::vector<Foo> foo_array(N);
+            subject->connect(boost::bind(&Foo::handler, &foo_array.back(), _1));
             elapsed += timer.count<Timer_u>();
         }
         return N / std::chrono::duration_cast<Delta_u>

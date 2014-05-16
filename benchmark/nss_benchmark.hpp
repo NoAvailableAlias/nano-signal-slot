@@ -38,6 +38,7 @@ class Nss : public Nano::Observer
             timer.reset();
             std::unique_ptr<Subject> subject(new Subject);
             std::vector<Foo> foo_array(N);
+            subject->connect<Foo, &Foo::handler>(foo_array.back());
             elapsed += timer.count<Timer_u>();
         }
         return N / std::chrono::duration_cast<Delta_u>
