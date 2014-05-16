@@ -106,7 +106,7 @@ _*Higher score is better*. N / milliseconds per sample._
  ++ ________________________________ emission: 37238.94
  ++ ________________________________ combined: 3601.91
 
-     amc522 Signal11:
+    amc522 Signal11:
  ++ ____________________________ construction: 4108.51
  ++ _____________________________ destruction: 461.25
  ++ ______________________________ connection: 261.12
