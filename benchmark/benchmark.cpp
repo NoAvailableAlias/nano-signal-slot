@@ -3,7 +3,6 @@
 #include "bs1_benchmark.hpp"
 #include "bs2_benchmark.hpp"
 #include "evl_benchmark.hpp"
-#include "evf_benchmark.hpp"
 #include "evs_benchmark.hpp"
 #include "jls_benchmark.hpp"
 #include "nss_benchmark.hpp"
@@ -110,15 +109,6 @@ int main(int argc, char* argv[])
         evs["connection"].emplace_back(Evs::connection(N));
         evs["emission"].emplace_back(Evs::emission(N));
         evs["combined"].emplace_back(Evs::combined(N));
-        
-        std::cout << N << ", " << __LINE__ << std::endl;
-
-        auto& evf = records["EvilTwin Fork"];
-        evf["construction"].emplace_back(Evf::construction(N));
-        evf["destruction"].emplace_back(Evf::destruction(N));
-        evf["connection"].emplace_back(Evf::connection(N));
-        evf["emission"].emplace_back(Evf::emission(N));
-        evf["combined"].emplace_back(Evf::combined(N));
         
         std::cout << N << ", " << __LINE__ << std::endl;
 
