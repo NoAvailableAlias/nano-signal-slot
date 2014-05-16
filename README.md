@@ -68,7 +68,7 @@ struct Foo : public Nano::Observer
 Performance
 -----------
 
-_*Higher score is better*_. _N / milliseconds per sample._
+**_Higher score is better._** _N / milliseconds per sample._
 
 ```
     Boost Signals: (deprecated)
