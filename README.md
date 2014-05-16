@@ -41,7 +41,7 @@ signal_two.accumulate(__LINE__, [](long srv)
 
 #### Disconnect
 
-_Additionally use the convenience overload for references._
+_Additionally test the convenience overload for references._
 
 ```
 // Disconnect a member function from a Nano::Signal
@@ -68,7 +68,7 @@ struct Foo : public Nano::Observer
 Performance
 -----------
 
-_*Higher score is better*. N / milliseconds per sample._
+_*Higher score is better*_. _N / milliseconds per sample._
 
 ```
     Boost Signals: (deprecated)
