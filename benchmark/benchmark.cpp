@@ -3,9 +3,9 @@
 #include "bs1_benchmark.hpp"
 #include "bs2_benchmark.hpp"
 #include "evl_benchmark.hpp"
-#include "evs_benchmark.hpp"
 #include "jls_benchmark.hpp"
 #include "nss_benchmark.hpp"
+#include "s11_benchmark.hpp"
 
 #include "lib/jl_signal/Signal.h"
 #include "lib/jl_signal/StaticSignalConnectionAllocators.h"
@@ -85,15 +85,6 @@ int main(int argc, char* argv[])
         
         std::cout << N << ", " << __LINE__ << std::endl;
 
-        auto& nss = records["Nano-signal-slot"];
-        nss["construction"].emplace_back(Nss::construction(N));
-        nss["destruction"].emplace_back(Nss::destruction(N));
-        nss["connection"].emplace_back(Nss::connection(N));
-        nss["emission"].emplace_back(Nss::emission(N));
-        nss["combined"].emplace_back(Nss::combined(N));
-        
-        std::cout << N << ", " << __LINE__ << std::endl;
-
         auto& evl = records["EvilTwin Observer"];
         evl["construction"].emplace_back(Evl::construction(N));
         evl["destruction"].emplace_back(Evl::destruction(N));
@@ -103,21 +94,30 @@ int main(int argc, char* argv[])
         
         std::cout << N << ", " << __LINE__ << std::endl;
 
-        auto& evs = records["EvilTwin Thread Safe"];
-        evs["construction"].emplace_back(Evs::construction(N));
-        evs["destruction"].emplace_back(Evs::destruction(N));
-        evs["connection"].emplace_back(Evs::connection(N));
-        evs["emission"].emplace_back(Evs::emission(N));
-        evs["combined"].emplace_back(Evs::combined(N));
-        
-        std::cout << N << ", " << __LINE__ << std::endl;
-
         auto& jls = records["Jl_signal"];
         jls["construction"].emplace_back(Jls::construction(N));
         jls["destruction"].emplace_back(Jls::destruction(N));
         jls["connection"].emplace_back(Jls::connection(N));
         jls["emission"].emplace_back(Jls::emission(N));
         jls["combined"].emplace_back(Jls::combined(N));
+
+        std::cout << N << ", " << __LINE__ << std::endl;
+
+        auto& nss = records["Nano-signal-slot"];
+        nss["construction"].emplace_back(Nss::construction(N));
+        nss["destruction"].emplace_back(Nss::destruction(N));
+        nss["connection"].emplace_back(Nss::connection(N));
+        nss["emission"].emplace_back(Nss::emission(N));
+        nss["combined"].emplace_back(Nss::combined(N));
+
+        std::cout << N << ", " << __LINE__ << std::endl;
+
+        auto& s11 = records["amc522 Signal11"];
+        s11["construction"].emplace_back(S11::construction(N));
+        s11["destruction"].emplace_back(S11::destruction(N));
+        s11["connection"].emplace_back(S11::connection(N));
+        s11["emission"].emplace_back(S11::emission(N));
+        s11["combined"].emplace_back(S11::combined(N));
     }
     if (auto ofs = std::ofstream("report.txt", std::ios::app))
     {
