@@ -24,6 +24,14 @@ typedef std::chrono::seconds Limit_u;
 typedef std::chrono::nanoseconds Timer_u;
 typedef std::chrono::duration<double, std::milli> Delta_u;
 
+// Functors
+struct IncrementFill
+{
+    std::size_t i;
+    IncrementFill ( ) : i(0) { }
+    std::size_t operator()() { return i++; }
+};
+
 // Global Free Functions
 std::size_t round_2_up(std::size_t n)
 {
