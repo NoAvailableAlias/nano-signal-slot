@@ -45,7 +45,7 @@ _Additionally test the convenience overload for references._
 
 ```
 // Disconnect a member function from a Nano::Signal
-signal_two.disconnect<Foo, &Foo::action(foo);
+signal_two.disconnect<Foo, &Foo::action>(foo);
 
 // Disconnect a free function from a Nano::Signal
 signal_two.disconnect<action>();
@@ -113,3 +113,9 @@ Performance
  ++ ________________________________ emission: 24959.07
  ++ ________________________________ combined: 182.35
  ```
+
+ #### Notes
+
+ Unordered_map was outperformed by std::map in each category
+ except emission by a small margin. The z-order comparator
+ seems to show a slim benefit over the default std::less.
