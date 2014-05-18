@@ -21,7 +21,7 @@ using Table = std::map<const char*, std::vector<double>>;
 using DataBase = std::map<const char*, Table>;
 
 std::size_t g_limit = Timer_u(Limit_u(4)).count();
-//std::size_t g_limit = 10000000;
+//std::size_t g_limit = 40000000;
 
 //------------------------------------------------------------------------------
 
@@ -62,6 +62,9 @@ int main(int argc, char* argv[])
 
     std::size_t start_n = round_2_down(8);
     std::size_t maximum_n = round_2_up(64);
+
+    std::cout << "Paused. Set Priority: " << std::endl;
+    std::cin.get();
 
     for (std::size_t N = start_n; N <= maximum_n; N *= 2)
     {
@@ -131,5 +134,7 @@ int main(int argc, char* argv[])
     {
         std::cerr << "ofstream error" << std::endl;
     }
+
+    std::cout << "\nBenchmarks Completed." << std::endl;
     std::cin.get();
 }
