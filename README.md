@@ -112,10 +112,10 @@ Performance
  ++ ______________________________ connection: 261.12
  ++ ________________________________ emission: 24959.07
  ++ ________________________________ combined: 182.35
- ```
+```
 
- #### Notes
+#### Notes
 
- Unordered_map was outperformed by std::map in each category
- except emission by a small margin. The z-order comparator
- seems to show a slim benefit over the default std::less.
+Unordered_map was outperformed by std::map in each category
+except emission by a small margin.<br>
+The z-order comparator seems to show a slim benefit over the default std::less.
