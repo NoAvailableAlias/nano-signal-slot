@@ -1,6 +1,7 @@
 #include "nano_signal_slot.hpp"
 
 #include <iostream>
+#include <random>
 
 struct Foo : public Nano::Observer
 {
@@ -23,6 +24,8 @@ int main()
 {
     Foo foo;
 
+    std::size_t sig_arg = 9001;
+
     // Declare Nano::Signals using function signature syntax
     Nano::Signal<void()> signal_one;
     Nano::Signal<long(std::size_t)> signal_two;
@@ -36,8 +39,9 @@ int main()
 
     // Emit Signals
     signal_one();
+    signal_two(sig_arg);
 
-    // Emit Signals and accumulate SRVs
+    // Emit Signals and accumulate SRVs (signal return values)
     signal_two.accumulate(__LINE__, [](long srv)
     {
         std::cout << srv << ", " << __LINE__ << std::endl;
