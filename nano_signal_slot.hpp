@@ -33,11 +33,11 @@ class Observer
         while (iter != stop)
         {
             auto const& delegate_key = iter->first;
-            auto const& subject = iter->second;
+            auto const& observer = iter->second;
 
             std::advance(iter, 1);
 
-            subject->remove(delegate_key);
+            observer->remove(delegate_key);
         }
     }
 };
@@ -71,7 +71,9 @@ class Signal <T_rv(Args...)> : public Observer
 
     using function_t  = Function<T_rv(Args...)>;
 
-    public: //------------------------------------------------------------------
+    public:
+    
+//------------------------------------------------------------------------------
 
     template <T_rv (*fun_ptr)(Args...)>
     void connect()
@@ -149,7 +151,7 @@ class Signal <T_rv(Args...)> : public Observer
 
 //------------------------------------------------------------------------------
 
-    void operator()(Args&&... args)
+    void operator()(Args... args)
     {
         for (auto const& slot : tracked_connections)
         {
@@ -157,7 +159,7 @@ class Signal <T_rv(Args...)> : public Observer
         }
     }
     template <typename Accumulator>
-    void accumulate(Args&&... args, Accumulator&& lambda)
+    void accumulate(Args... args, Accumulator&& lambda)
     {
         for (auto const& slot : tracked_connections)
         {
