@@ -3,6 +3,7 @@
 
 #include "nano_function.hpp"
 
+#include <iterator>
 #include <map>
 
 namespace Nano
@@ -27,8 +28,8 @@ class Observer
 
    ~Observer()
     {
-        auto iter = std::cbegin(tracked_connections);
-        auto stop = std::cend(tracked_connections);
+        auto iter = std::begin(tracked_connections);
+        auto stop = std::end(tracked_connections);
 
         while (iter != stop)
         {
