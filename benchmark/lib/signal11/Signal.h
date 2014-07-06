@@ -124,6 +124,8 @@ namespace Signal11 {
 			assert((head == nullptr && link == nullptr) || (head != nullptr && link != nullptr));
 		}
 
+		ConnectionRef(const ConnectionRef&) = default;
+
 		ConnectionRef(ConnectionRef &&other)
 			:_link(std::move(other._link))
 		{
