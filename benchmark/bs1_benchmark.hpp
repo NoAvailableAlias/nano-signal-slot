@@ -1,6 +1,8 @@
 #ifndef BS1_BENCHMARK_HPP
 #define BS1_BENCHMARK_HPP
 
+#define BOOST_SIGNALS_NO_DEPRECATION_WARNING
+
 #include <boost/signals.hpp>
 #include <boost/bind.hpp>
 
