@@ -122,7 +122,7 @@ int main(int argc, char* argv[])
         s11["emission"].emplace_back(S11::emission(N));
         s11["combined"].emplace_back(S11::combined(N));
     }
-    if (auto ofs = std::ofstream("report.txt", std::ios::app))
+    if (std::ofstream ofs{"report.txt", std::ios::app})
     {
         outputReport(records, ofs);
         outputReport(records, std::cout);
