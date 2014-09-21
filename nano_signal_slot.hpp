@@ -2,172 +2,129 @@
 #define NANO_SIGNAL_SLOT_HPP
 
 #include "nano_function.hpp"
-
-#include <map>
+#include "nano_observer.hpp"
 
 namespace Nano
 {
 
-class Observer
-{
-    std::map<delegate_key_t, Observer*> tracked_connections;
-
-    template <typename T> friend class Signal;
-
-    void insert(delegate_key_t const& key, Observer* instance)
-    {
-        tracked_connections.emplace(key, instance);
-    }
-    void remove(delegate_key_t const& key)
-    {
-        tracked_connections.erase(key);
-    }
-
-    protected:
-
-   ~Observer()
-    {
-        auto iter = std::cbegin(tracked_connections);
-        auto stop = std::cend(tracked_connections);
-
-        while (iter != stop)
-        {
-            auto const& delegate_key = iter->first;
-            auto const& observer = iter->second;
-
-            std::advance(iter, 1);
-
-            observer->remove(delegate_key);
-        }
-    }
-};
-
-//------------------------------------------------------------------------------
-
 template <typename T_rv> class Signal;
 template <typename T_rv, typename... Args>
-class Signal <T_rv(Args...)> : public Observer
+class Signal<T_rv(Args...)> : private Observer
 {
+
+//-----------------------------------------------------------------------PRIVATE
+
     template <typename T>
-    void sfinae_con(delegate_key_t const& key, typename T::Observer* instance)
+    void insert_sfinae(DelegateKey const& key, typename T::Observer* instance)
     {
         Observer::insert(key, instance);
         instance->insert(key, this);
     }
     template <typename T>
-    void sfinae_dis(delegate_key_t const& key, typename T::Observer* instance)
+    void remove_sfinae(DelegateKey const& key, typename T::Observer* instance)
     {
         Observer::remove(key);
         instance->remove(key);
     }
-    template <typename T> void sfinae_con(delegate_key_t const& key, ...)
+    template <typename T>
+    void insert_sfinae(DelegateKey const& key, ...)
     {
-        Observer::insert(key, this);
+        Observer::insert(key);
     }
-    template <typename T> void sfinae_dis(delegate_key_t const& key, ...)
+    template <typename T>
+    void remove_sfinae(DelegateKey const& key, ...)
     {
         Observer::remove(key);
     }
 
-    using function_t  = Function<T_rv(Args...)>;
-
     public:
+
+    using Function = Function<T_rv(Args...)>;
     
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------CONNECT
 
     template <T_rv (*fun_ptr)(Args...)>
     void connect()
     {
-        auto delegate = function_t::template bind<fun_ptr>();
-        Observer::insert(delegate, this);
+        Observer::insert(Function::template bind<fun_ptr>());
     }
+
     template <typename T, T_rv (T::*mem_ptr)(Args...)>
     void connect(T* instance)
     {
-        auto delegate = function_t::template bind<T, mem_ptr>(instance);
-        sfinae_con<T>(delegate, instance);
+        auto delegate  = Function::template bind<T, mem_ptr>(instance);
+        insert_sfinae<T>(delegate, instance);
     }
     template <typename T, T_rv (T::*mem_ptr)(Args...) const>
     void connect(T* instance)
     {
-        auto delegate = function_t::template bind<T, mem_ptr>(instance);
-        sfinae_con<T>(delegate, instance);
+        auto delegate  = Function::template bind<T, mem_ptr>(instance);
+        insert_sfinae<T>(delegate, instance);
     }
-
-//------------------------------------------------------------------------------
-
+    
     template <typename T, T_rv (T::*mem_ptr)(Args...)>
     void connect(T& instance)
     {
-        auto delegate = function_t::template
-            bind<T, mem_ptr>(std::addressof(instance));
-        sfinae_con<T>(delegate, std::addressof(instance));
+        connect<T, mem_ptr>(std::addressof(instance));
     }
     template <typename T, T_rv (T::*mem_ptr)(Args...) const>
     void connect(T& instance)
     {
-        auto delegate = function_t::template
-            bind<T, mem_ptr>(std::addressof(instance));
-        sfinae_con<T>(delegate, std::addressof(instance));
+        connect<T, mem_ptr>(std::addressof(instance));
     }
-
-//------------------------------------------------------------------------------
+    
+//--------------------------------------------------------------------DISCONNECT
 
     template <T_rv (*fun_ptr)(Args...)>
     void disconnect()
     {
-        auto delegate = function_t::template bind<fun_ptr>();
-        Observer::remove(delegate);
+        Observer::remove(Function::template bind<fun_ptr>());
     }
+
     template <typename T, T_rv (T::*mem_ptr)(Args...)>
     void disconnect(T* instance)
     {
-        auto delegate = function_t::template bind<T, mem_ptr>(instance);
-        sfinae_dis<T>(delegate, instance);
+        auto delegate  = Function::template bind<T, mem_ptr>(instance);
+        remove_sfinae<T>(delegate, instance);
     }
     template <typename T, T_rv (T::*mem_ptr)(Args...) const>
     void disconnect(T* instance)
     {
-        auto delegate = function_t::template bind<T, mem_ptr>(instance);
-        sfinae_dis<T>(delegate, instance);
+        auto delegate  = Function::template bind<T, mem_ptr>(instance);
+        remove_sfinae<T>(delegate, instance);
     }
-
-//------------------------------------------------------------------------------
-
+    
     template <typename T, T_rv (T::*mem_ptr)(Args...)>
     void disconnect(T& instance)
     {
-        auto delegate = function_t::template
-            bind<T, mem_ptr>(std::addressof(instance));
-        sfinae_dis<T>(delegate, std::addressof(instance));
+        disconnect<T, mem_ptr>(std::addressof(instance));
     }
     template <typename T, T_rv (T::*mem_ptr)(Args...) const>
     void disconnect(T& instance)
     {
-        auto delegate = function_t::template
-            bind<T, mem_ptr>(std::addressof(instance));
-        sfinae_dis<T>(delegate, std::addressof(instance));
+        disconnect<T, mem_ptr>(std::addressof(instance));
     }
+    
+//--------------------------------------------------------------------------EMIT
 
-//------------------------------------------------------------------------------
-
-    void operator()(Args... args)
+    void operator() (Args... args)
     {
         for (auto const& slot : tracked_connections)
         {
-            function_t (std::get<0>(slot))(std::forward<Args>(args)...);
+            Function(std::get<0>(slot))(std::forward<Args>(args)...);
         }
     }
     template <typename Accumulator>
-    void accumulate(Args... args, Accumulator&& lambda)
+    void operator() (Args... args, Accumulator sink)
     {
         for (auto const& slot : tracked_connections)
         {
-            lambda(function_t (std::get<0>(slot))(std::forward<Args>(args)...));
+            sink(Function(std::get<0>(slot))(std::forward<Args>(args)...));
         }
     }
+
 };
 
 } // namespace Nano ------------------------------------------------------------
 
-#endif // NANO_SIGNAL_SLOT_HPP_2_514
+#endif // NANO_SIGNAL_SLOT_HPP
