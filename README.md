@@ -86,7 +86,6 @@ Performance
 **_Higher score is better._** _N / milliseconds per sample._
 
 _Boost Signals is deprecated._
-
 _Jl_signal uses a custom static allocator to achieve high performance._
 
 ```
@@ -105,5 +104,4 @@ _Jl_signal uses a custom static allocator to achieve high performance._
 #### Notes
 
 Trying to profile why construction time is so lousy.
-
 Working on refactoring benchmarks and report generation.
