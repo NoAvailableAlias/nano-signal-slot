@@ -7,7 +7,7 @@ Pure C++11 Signals and Slots
 ```
 // #include "nano_function.hpp" // Nano::Function, Nano::DelegateKey
 // #include "nano_observer.hpp" // Nano::Observer
-#include "nano_signal_slot.hpp" // Include all
+#include "nano_signal_slot.hpp" // Nano::Signal / All the above
 ```
 
 #### Declare
@@ -54,7 +54,7 @@ signal_one("how are you gentlemen", [&](bool srv)
 _Additionally test convenience overloads for references._
 
 ```
-// Disconnect member functions from a Nano::Signal
+// Disconnect member functions from Nano::Signals
 signal_one.disconnect<Foo, &Foo::handler_a>(foo);
 signal_two.disconnect<Foo, &Foo::handler_b>(foo);
 
@@ -85,6 +85,10 @@ Performance
 
 **_Higher score is better._** _N / milliseconds per sample._
 
+_Boost Signals is deprecated._
+
+_Jl_signal uses a custom static allocator to achieve high performance._
+
 ```
 + ------------------------------------------------------------------------- +
 | Library           | construct | destruct | connect  | emit     | combined |
@@ -101,4 +105,5 @@ Performance
 #### Notes
 
 Trying to profile why construction time is so lousy.
+
 Working on refactoring benchmarks and report generation.
