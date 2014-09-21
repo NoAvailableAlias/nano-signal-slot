@@ -24,7 +24,7 @@ class Bs2 : public boost::signals2::trackable
     using Subject = boost::signals2::signal<void(Rng_t&)>;
     using Foo = Benchmark::Bs2;
 
-    static chrono_timer timer;
+    static chrono_timer s_timer;
 
     public:
 
@@ -32,18 +32,20 @@ class Bs2 : public boost::signals2::trackable
 
     NOINLINE(static double construction(std::size_t N))
     {
-        std::size_t count = 1, elapsed = 0;
+        std::size_t count = 1;
+        std::size_t elapsed = 0;
+        const std::size_t limit = g_limit;
 
-        for (; elapsed < g_limit; ++count)
+        for (; elapsed < limit; ++count)
         {
-            timer.reset();
+            s_timer.reset();
+
             std::unique_ptr<Subject> subject(new Subject);
             std::vector<Foo> foo_array(N);
-            subject->connect(boost::bind(&Foo::handler, &foo_array.back(), _1));
-            elapsed += timer.count<Timer_u>();
+
+            elapsed += s_timer.count<Timer_u>();
         }
-        return N / std::chrono::duration_cast<Delta_u>
-            (Timer_u(g_limit / count)).count();
+        return testsize_over_dt(N, limit, count);
     }
 
 //------------------------------------------------------------------------------
@@ -51,14 +53,16 @@ class Bs2 : public boost::signals2::trackable
     NOINLINE(static double destruction(std::size_t N))
     {
         Rng_t rng;
-        std::size_t count = 1, elapsed = 0;
+        std::size_t count = 1;
+        std::size_t elapsed = 0;
+        const std::size_t limit = g_limit;
 
         std::vector<std::size_t> randomized(N);
         std::generate(randomized.begin(), randomized.end(), IncrementFill());
-        std::shuffle(randomized.begin(), randomized.end(), rng);
 
-        for (; elapsed < g_limit; ++count)
+        for (; elapsed < limit; ++count)
         {
+            std::shuffle(randomized.begin(), randomized.end(), rng);
             {
                 std::unique_ptr<Subject> subject(new Subject);
                 std::vector<Foo> foo_array(N);
@@ -68,12 +72,11 @@ class Bs2 : public boost::signals2::trackable
                     auto& foo = foo_array[index];
                     subject->connect(boost::bind(&Foo::handler, &foo, _1));
                 }
-                timer.reset();
+                s_timer.reset();
             }
-            elapsed += timer.count<Timer_u>();
+            elapsed += s_timer.count<Timer_u>();
         }
-        return N / std::chrono::duration_cast<Delta_u>
-            (Timer_u(g_limit / count)).count();
+        return testsize_over_dt(N, limit, count);
     }
 
 //------------------------------------------------------------------------------
@@ -81,27 +84,29 @@ class Bs2 : public boost::signals2::trackable
     NOINLINE(static double connection(std::size_t N))
     {
         Rng_t rng;
-        std::size_t count = 1, elapsed = 0;
+        std::size_t count = 1;
+        std::size_t elapsed = 0;
+        const std::size_t limit = g_limit;
 
         std::vector<std::size_t> randomized(N);
         std::generate(randomized.begin(), randomized.end(), IncrementFill());
-        std::shuffle(randomized.begin(), randomized.end(), rng);
 
-        for (; elapsed < g_limit; ++count)
+        for (; elapsed < limit; ++count)
         {
+            std::shuffle(randomized.begin(), randomized.end(), rng);
+
             Subject subject;
             std::vector<Foo> foo_array(N);
 
-            timer.reset();
+            s_timer.reset();
             for (auto index : randomized)
             {
                 auto& foo = foo_array[index];
                 subject.connect(boost::bind(&Foo::handler, &foo, _1));
             }
-            elapsed += timer.count<Timer_u>();
+            elapsed += s_timer.count<Timer_u>();
         }
-        return N / std::chrono::duration_cast<Delta_u>
-            (Timer_u(g_limit / count)).count();
+        return testsize_over_dt(N, limit, count);
     }
 
 //------------------------------------------------------------------------------
@@ -109,14 +114,17 @@ class Bs2 : public boost::signals2::trackable
     NOINLINE(static double emission(std::size_t N))
     {
         Rng_t rng;
-        std::size_t count = 1, elapsed = 0;
+        std::size_t count = 1;
+        std::size_t elapsed = 0;
+        const std::size_t limit = g_limit;
 
         std::vector<std::size_t> randomized(N);
         std::generate(randomized.begin(), randomized.end(), IncrementFill());
-        std::shuffle(randomized.begin(), randomized.end(), rng);
 
-        for (; elapsed < g_limit; ++count)
+        for (; elapsed < limit; ++count)
         {
+            std::shuffle(randomized.begin(), randomized.end(), rng);
+
             Subject subject;
             std::vector<Foo> foo_array(N);
 
@@ -125,12 +133,11 @@ class Bs2 : public boost::signals2::trackable
                 auto& foo = foo_array[index];
                 subject.connect(boost::bind(&Foo::handler, &foo, _1));
             }
-            timer.reset();
+            s_timer.reset();
             subject(rng);
-            elapsed += timer.count<Timer_u>();
+            elapsed += s_timer.count<Timer_u>();
         }
-        return N / std::chrono::duration_cast<Delta_u>
-            (Timer_u(g_limit / count)).count();
+        return testsize_over_dt(N, limit, count);
     }
 
 //------------------------------------------------------------------------------
@@ -139,14 +146,15 @@ class Bs2 : public boost::signals2::trackable
     {
         Rng_t rng;
         std::size_t count = 1;
+        const std::size_t limit = g_limit;
 
         std::vector<std::size_t> randomized(N);
         std::generate(randomized.begin(), randomized.end(), IncrementFill());
         std::shuffle(randomized.begin(), randomized.end(), rng);
 
-        timer.reset();
+        s_timer.reset();
 
-        for (; g_limit > timer.count<Timer_u>(); ++count)
+        for (; s_timer.count<Timer_u>() < limit; ++count)
         {
             Subject subject;
             std::vector<Foo> foo_array(N);
@@ -158,12 +166,11 @@ class Bs2 : public boost::signals2::trackable
             }
             subject(rng);
         }
-        return N / std::chrono::duration_cast<Delta_u>
-            (Timer_u(g_limit / count)).count();
+        return testsize_over_dt(N, limit, count);
     }
 };
 
-chrono_timer Bs2::timer;
+chrono_timer Bs2::s_timer;
 
 } // namespace Benchmark -------------------------------------------------------
 

@@ -1,13 +1,9 @@
 #ifndef OBSERVER_FORK_HPP
 #define OBSERVER_FORK_HPP
 
-#include <memory>
-#include <functional>
 #include <forward_list>
-
-/**
-EvilTwin observer fork created by ApEk
-*/
+#include <functional>
+#include <memory>
 
 namespace Nano
 {
@@ -20,7 +16,7 @@ using UniversalRef = std::weak_ptr<void>;
 
 class Observer
 {
-    UniversalPtr m_heart { this, [](void*){} };
+    UniversalPtr m_heart { nullptr, [](void*){} };
 
     protected:
 
@@ -32,10 +28,10 @@ class Observer
         auto position = m_slots.before_begin();
         UniversalRef weak_heart = m_heart;
 
-        return { this, [position, weak_heart](void* self)
+        return { nullptr, [this, position, weak_heart](void*)
         {
             if (!weak_heart.expired())
-            static_cast<Observer*>(self)->m_slots.erase_after(position);
+                this->m_slots.erase_after(position);
         }};
     }
 };

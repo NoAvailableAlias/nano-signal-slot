@@ -4,6 +4,7 @@
 #include <forward_list>
 #include <functional>
 #include <iostream>
+#include <memory>
 #include <mutex>
 
 namespace Nano
