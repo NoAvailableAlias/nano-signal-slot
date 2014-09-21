@@ -3,52 +3,66 @@ nano-signal-slot
 
 Pure C++11 Signals and Slots
 
+#### Include
+```
+// #include "nano_function.hpp" // Nano::Function, Nano::DelegateKey
+// #include "nano_observer.hpp" // Nano::Observer
+#include "nano_signal_slot.hpp" // Include all
+```
+
 #### Declare
 ```
 // Declare Nano::Signals using function signature syntax
-Nano::Signal<void()> signal_one;
-Nano::Signal<long(std::size_t)> signal_two;
+Nano::Signal<bool(const char*)> signal_one;
+Nano::Signal<bool(const char*, std::size_t)> signal_two;
 ```
 
 #### Connect
 
-_The correct overload is selected based on the Nano::Signal template signature._
-
 ```
 // Connect member functions to Nano::signals;
-signal_one.connect<Foo, &Foo::action>(&foo);
-signal_two.connect<Foo, &Foo::action>(&foo);
+signal_one.connect<Foo, &Foo::handler_a>(&foo);
+signal_two.connect<Foo, &Foo::handler_b>(&foo);
 
-// Connect a free function to a Nano::Signal
-signal_two.connect<action>();
+// Connect a static member function
+signal_one.connect<Foo::handler_c>();
+
+// Connect a free function
+signal_two.connect<handler_d>();
 ```
 
 #### Emit
 
-_The supplied lambda can be much more complex than the example shown._
+_Additionally test signal return value support._
 
 ```
 // Emit Signals
-signal_one();
-signal_two(__LINE__);
+signal_one("we get signal");
+signal_two("main screen turn on", __LINE__);
+
+std::vector<bool> status;
 
 // Emit Signals and accumulate SRVs (signal return values)
-signal_two.accumulate(__LINE__, [](long srv)
+signal_one("how are you gentlemen", [&](bool srv)
 {
-	std::cout << srv << ", " << __LINE__ << std::endl;
+	status.push_back(srv);
 });
 ```
 
 #### Disconnect
 
-_Additionally test the convenience overload for references._
+_Additionally test convenience overloads for references._
 
 ```
-// Disconnect a member function from a Nano::Signal
-signal_two.disconnect<Foo, &Foo::action>(foo);
+// Disconnect member functions from a Nano::Signal
+signal_one.disconnect<Foo, &Foo::handler_a>(foo);
+signal_two.disconnect<Foo, &Foo::handler_b>(foo);
 
-// Disconnect a free function from a Nano::Signal
-signal_two.disconnect<action>();
+// Disconnect a static member function
+signal_one.disconnect<Foo::handler_c>();
+
+// Disconnect a free function
+signal_two.disconnect<handler_c>();
 ```
 
 #### Connection Management
@@ -58,9 +72,10 @@ _To utilize automatic connection management you must inherit from Nano::Observer
 ```
 struct Foo : public Nano::Observer
 {
-    void action() const
+    bool handler_a(const char* e) const
     {
-        std::cout << "Hello, World!" << std::endl;
+        std::cout << e << std::endl;
+        return true;
     }
 	...
 ```
@@ -71,51 +86,19 @@ Performance
 **_Higher score is better._** _N / milliseconds per sample._
 
 ```
-    Boost Signals: (deprecated)
- ++ ____________________________ construction: 326.21
- ++ _____________________________ destruction: 121.02
- ++ ______________________________ connection: 33.79
- ++ ________________________________ emission: 3780.28
- ++ ________________________________ combined: 23.15
-
-    Boost Signals2:
- ++ ____________________________ construction: 563.19
- ++ _____________________________ destruction: 219.17
- ++ ______________________________ connection: 118.44
- ++ ________________________________ emission: 2871.86
- ++ ________________________________ combined: 63.00
-
-    Nano-signal-slot:
- ++ ____________________________ construction: 1531.24
- ++ _____________________________ destruction: 592.65
- ++ ______________________________ connection: 524.19
- ++ ________________________________ emission: 24807.65
- ++ ________________________________ combined: 202.63
-
-    EvilTwin Observer:
- ++ ____________________________ construction: 8771.42
- ++ _____________________________ destruction: 330.50
- ++ ______________________________ connection: 117.09
- ++ ________________________________ emission: 14300.20
- ++ ________________________________ combined: 78.71
-
-    Jl_signal: (static allocator)
- ++ ____________________________ construction: 28809.69
- ++ _____________________________ destruction: 4958.82
- ++ ______________________________ connection: 29102.97
- ++ ________________________________ emission: 37238.94
- ++ ________________________________ combined: 3601.91
-
-    amc522 signal11:
- ++ ____________________________ construction: 4108.51
- ++ _____________________________ destruction: 461.25
- ++ ______________________________ connection: 261.12
- ++ ________________________________ emission: 24959.07
- ++ ________________________________ combined: 182.35
++ ------------------------------------------------------------------------- +
+| Library           | construct | destruct | connect  | emit     | combined |
++ ------------------------------------------------------------------------- +
+| Jl_signal         | 21264.33  | 4909.49  | 37937.84 | 38921.39 | 3519.61  |
+| Nano-signal-slot  | 1088.15   | 583.51   | 467.42   | 25978.73 | 200.12   |
+| Boost Signals     | 749.66    | 145.48   | 42.71    | 3802.59  | 28.96    |
+| Boost Signals2    | 476.02    | 215.67   | 126.20   | 3025.00  | 66.19    |
+| EvilTwin Observer | 22412.09  | 367.78   | 151.76   | 17171.24 | 94.64    |
+| amc522 Signal11   | 26091.52  | 543.57   | 421.58   | 30927.73 | 251.47   |
++ ------------------------------------------------------------------------- +
 ```
 
 #### Notes
 
-Unordered_map was outperformed by std::map in each category
-except emission by a small margin.<br>
-The z-order comparator seems to show a slim benefit over the default std::less.
+Trying to profile why construction time is so lousy.
+Working on refactoring benchmarks and report generation.
