@@ -148,6 +148,7 @@ class Bs1 : public boost::signals::trackable
     {
         Rng_t rng;
         std::size_t count = 1;
+        std::size_t elapsed = 0;
         const std::size_t limit = g_limit;
 
         std::vector<std::size_t> randomized(N);
@@ -156,7 +157,7 @@ class Bs1 : public boost::signals::trackable
 
         s_timer.reset();
 
-        for (; s_timer.count<Timer_u>() < limit; ++count)
+        for (; elapsed < limit; ++count, elapsed += s_timer.count<Timer_u>())
         {
             Subject subject;
             std::vector<Foo> foo_array(N);

@@ -3,14 +3,17 @@
 
 #include "benchmark.hpp"
 
+#include "asg_benchmark.hpp"
 #include "bs1_benchmark.hpp"
 #include "bs2_benchmark.hpp"
-//#include "evf_benchmark.hpp"
+#include "evf_benchmark.hpp"
 #include "evl_benchmark.hpp"
-//#include "evs_benchmark.hpp"
+#include "evs_benchmark.hpp"
 #include "jls_benchmark.hpp"
 #include "nss_benchmark.hpp"
-#include "s11_benchmark.hpp"
+#include "psg_benchmark.hpp"
+#include "sss_benchmark.hpp"
+#include "wsg_benchmark.hpp"
 
 #include "lib/jl_signal/Signal.h"
 #include "lib/jl_signal/StaticSignalConnectionAllocators.h"
@@ -26,7 +29,7 @@
 const char* construction = "construct";
 const char* destruction = "destruct";
 const char* connection = "connect";
-const char* emission = "emit";
+const char* emission = "emission";
 const char* combined = "combined";
 
 using ImmediateResults = std::map<const char*, std::vector<double>>;
@@ -34,8 +37,8 @@ using RelativeResults = std::map<const char*, double>;
 using ImmediateData = std::map<const char*, ImmediateResults>;
 using RelativeData = std::map<const char*, RelativeResults>;
 
-std::size_t g_limit = Timer_u(Limit_u(4)).count();
-//std::size_t g_limit = 100000;
+//std::size_t g_limit = Timer_u(Limit_u(4)).count();
+std::size_t g_limit = 100000;
 
 void outputReports(ImmediateData const&);
 template <typename T> void outputReportTxt(ImmediateData const&, T&);
@@ -62,6 +65,33 @@ int main(int argc, char* argv[])
 
     for(std::size_t N = start_n; N <= maximum_n; N *= 2)
     {
+        std::cout << "size: " << N << ", line: " << __LINE__ << std::endl;
+
+        auto& wsg = records["winglot Signals"];
+        wsg[construction].emplace_back(Wsg::construction(N));
+        wsg[destruction].emplace_back(Wsg::destruction(N));
+        wsg[connection].emplace_back(Wsg::connection(N));
+        wsg[emission].emplace_back(Wsg::emission(N));
+        wsg[combined].emplace_back(Wsg::combined(N));
+
+        std::cout << "size: " << N << ", line: " << __LINE__ << std::endl;
+
+        auto& sss = records["supergrover sigslot"];
+        sss[construction].emplace_back(Sss::construction(N));
+        sss[destruction].emplace_back(Sss::destruction(N));
+        sss[connection].emplace_back(Sss::connection(N));
+        sss[emission].emplace_back(Sss::emission(N));
+        sss[combined].emplace_back(Sss::combined(N));
+
+        std::cout << "size: " << N << ", line: " << __LINE__ << std::endl;
+
+        auto& psg = records["pbhogan Signals"];
+        psg[construction].emplace_back(Psg::construction(N));
+        psg[destruction].emplace_back(Psg::destruction(N));
+        psg[connection].emplace_back(Psg::connection(N));
+        psg[emission].emplace_back(Psg::emission(N));
+        psg[combined].emplace_back(Psg::combined(N));
+
         std::cout << "size: " << N << ", line: " << __LINE__ << std::endl;
 
         auto& jls = records["Jl_signal"];
@@ -107,9 +137,9 @@ int main(int argc, char* argv[])
         evl[emission].emplace_back(Evl::emission(N));
         evl[combined].emplace_back(Evl::combined(N));
 
-        /*std::cout << "size: " << N << ", line: " << __LINE__ << std::endl;
+        std::cout << "size: " << N << ", line: " << __LINE__ << std::endl;
 
-        auto& evf = records["EvilTwin Observer Fork"];
+        auto& evf = records["EvilTwin Obs Fork"];
         evf[construction].emplace_back(Evf::construction(N));
         evf[destruction].emplace_back(Evf::destruction(N));
         evf[connection].emplace_back(Evf::connection(N));
@@ -118,21 +148,21 @@ int main(int argc, char* argv[])
         
         std::cout << "size: " << N << ", line: " << __LINE__ << std::endl;
 
-        auto& evs = records["EvilTwin Observer Safe"];
+        auto& evs = records["EvilTwin Obs Safe"];
         evs[construction].emplace_back(Evs::construction(N));
         evs[destruction].emplace_back(Evs::destruction(N));
         evs[connection].emplace_back(Evs::connection(N));
         evs[emission].emplace_back(Evs::emission(N));
-        evs[combined].emplace_back(Evs::combined(N));*/
+        evs[combined].emplace_back(Evs::combined(N));
         
         std::cout << "size: " << N << ", line: " << __LINE__ << std::endl;
 
         auto& s11 = records["amc522 Signal11"];
-        s11[construction].emplace_back(S11::construction(N));
-        s11[destruction].emplace_back(S11::destruction(N));
-        s11[connection].emplace_back(S11::connection(N));
-        s11[emission].emplace_back(S11::emission(N));
-        s11[combined].emplace_back(S11::combined(N));
+        s11[construction].emplace_back(Asg::construction(N));
+        s11[destruction].emplace_back(Asg::destruction(N));
+        s11[connection].emplace_back(Asg::connection(N));
+        s11[emission].emplace_back(Asg::emission(N));
+        s11[combined].emplace_back(Asg::combined(N));
     }
     outputReports(records);
 

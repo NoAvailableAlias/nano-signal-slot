@@ -157,19 +157,20 @@ class Evl
 
     NOINLINE(static double combined(std::size_t N))
     {
+        using std::placeholders::_1;
+
         Rng_t rng;
         std::size_t count = 1;
+        std::size_t elapsed = 0;
         const std::size_t limit = g_limit;
 
         std::vector<std::size_t> randomized(N);
         std::generate(randomized.begin(), randomized.end(), IncrementFill());
         std::shuffle(randomized.begin(), randomized.end(), rng);
-        
-        using std::placeholders::_1;
 
         s_timer.reset();
 
-        for (; s_timer.count<Timer_u>() < limit; ++count)
+        for (; elapsed < limit; ++count, elapsed += s_timer.count<Timer_u>())
         {
             Subject subject;
             std::vector<Foo> foo_array(N);
