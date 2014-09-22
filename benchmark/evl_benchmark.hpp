@@ -170,7 +170,7 @@ class Evl
 
         s_timer.reset();
 
-        for (; elapsed < limit; ++count, elapsed += s_timer.count<Timer_u>())
+        for (; elapsed < limit; ++count, elapsed = s_timer.count<Timer_u>())
         {
             Subject subject;
             std::vector<Foo> foo_array(N);
