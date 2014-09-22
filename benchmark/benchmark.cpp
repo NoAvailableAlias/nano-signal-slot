@@ -38,7 +38,7 @@ using ImmediateData = std::map<const char*, ImmediateResults>;
 using RelativeData = std::map<const char*, RelativeResults>;
 
 //std::size_t g_limit = Timer_u(Limit_u(4)).count();
-std::size_t g_limit = 100000;
+std::size_t g_limit = 10000000;
 
 void outputReports(ImmediateData const&);
 template <typename T> void outputReportTxt(ImmediateData const&, T&);
@@ -65,7 +65,9 @@ int main(int argc, char* argv[])
 
     for(std::size_t N = start_n; N <= maximum_n; N *= 2)
     {
-        std::cout << "size: " << N << ", line: " << __LINE__ << std::endl;
+        std::cout << "[Test Size: " << N << "] BEGIN\n" << std::endl;
+
+        std::cout << "[Line: " << __LINE__ << "]" << std::endl;
 
         auto& wsg = records["winglot Signals"];
         wsg[construction].emplace_back(Wsg::construction(N));
@@ -74,7 +76,7 @@ int main(int argc, char* argv[])
         wsg[emission].emplace_back(Wsg::emission(N));
         wsg[combined].emplace_back(Wsg::combined(N));
 
-        std::cout << "size: " << N << ", line: " << __LINE__ << std::endl;
+        std::cout << "[Line: " << __LINE__ << "]" << std::endl;
 
         auto& sss = records["supergrover sigslot"];
         sss[construction].emplace_back(Sss::construction(N));
@@ -83,7 +85,7 @@ int main(int argc, char* argv[])
         sss[emission].emplace_back(Sss::emission(N));
         sss[combined].emplace_back(Sss::combined(N));
 
-        std::cout << "size: " << N << ", line: " << __LINE__ << std::endl;
+        std::cout << "[Line: " << __LINE__ << "]" << std::endl;
 
         auto& psg = records["pbhogan Signals"];
         psg[construction].emplace_back(Psg::construction(N));
@@ -92,7 +94,7 @@ int main(int argc, char* argv[])
         psg[emission].emplace_back(Psg::emission(N));
         psg[combined].emplace_back(Psg::combined(N));
 
-        std::cout << "size: " << N << ", line: " << __LINE__ << std::endl;
+        std::cout << "[Line: " << __LINE__ << "]" << std::endl;
 
         auto& jls = records["Jl_signal"];
         jls[construction].emplace_back(Jls::construction(N));
@@ -101,7 +103,7 @@ int main(int argc, char* argv[])
         jls[emission].emplace_back(Jls::emission(N));
         jls[combined].emplace_back(Jls::combined(N));
 
-        std::cout << "size: " << N << ", line: " << __LINE__ << std::endl;
+        std::cout << "[Line: " << __LINE__ << "]" << std::endl;
 
         auto& nss = records["Nano-signal-slot"];
         nss[construction].emplace_back(Nss::construction(N));
@@ -110,7 +112,7 @@ int main(int argc, char* argv[])
         nss[emission].emplace_back(Nss::emission(N));
         nss[combined].emplace_back(Nss::combined(N));
 
-        std::cout << "size: " << N << ", line: " << __LINE__ << std::endl;
+        std::cout << "[Line: " << __LINE__ << "]" << std::endl;
 
         auto& bs1 = records["Boost Signals"];
         bs1[construction].emplace_back(Bs1::construction(N));
@@ -119,7 +121,7 @@ int main(int argc, char* argv[])
         bs1[emission].emplace_back(Bs1::emission(N));
         bs1[combined].emplace_back(Bs1::combined(N));
 
-        std::cout << "size: " << N << ", line: " << __LINE__ << std::endl;
+        std::cout << "[Line: " << __LINE__ << "]" << std::endl;
 
         auto& bs2 = records["Boost Signals2"];
         bs2[construction].emplace_back(Bs2::construction(N));
@@ -128,7 +130,7 @@ int main(int argc, char* argv[])
         bs2[emission].emplace_back(Bs2::emission(N));
         bs2[combined].emplace_back(Bs2::combined(N));
         
-        std::cout << "size: " << N << ", line: " << __LINE__ << std::endl;
+        std::cout << "[Line: " << __LINE__ << "]" << std::endl;
 
         auto& evl = records["EvilTwin Observer"];
         evl[construction].emplace_back(Evl::construction(N));
@@ -137,7 +139,7 @@ int main(int argc, char* argv[])
         evl[emission].emplace_back(Evl::emission(N));
         evl[combined].emplace_back(Evl::combined(N));
 
-        std::cout << "size: " << N << ", line: " << __LINE__ << std::endl;
+        std::cout << "[Line: " << __LINE__ << "]" << std::endl;
 
         auto& evf = records["EvilTwin Obs Fork"];
         evf[construction].emplace_back(Evf::construction(N));
@@ -146,7 +148,7 @@ int main(int argc, char* argv[])
         evf[emission].emplace_back(Evf::emission(N));
         evf[combined].emplace_back(Evf::combined(N));
         
-        std::cout << "size: " << N << ", line: " << __LINE__ << std::endl;
+        std::cout << "[Line: " << __LINE__ << "]" << std::endl;
 
         auto& evs = records["EvilTwin Obs Safe"];
         evs[construction].emplace_back(Evs::construction(N));
@@ -155,7 +157,7 @@ int main(int argc, char* argv[])
         evs[emission].emplace_back(Evs::emission(N));
         evs[combined].emplace_back(Evs::combined(N));
         
-        std::cout << "size: " << N << ", line: " << __LINE__ << std::endl;
+        std::cout << "[Line: " << __LINE__ << "]" << std::endl;
 
         auto& s11 = records["amc522 Signal11"];
         s11[construction].emplace_back(Asg::construction(N));
@@ -163,13 +165,15 @@ int main(int argc, char* argv[])
         s11[connection].emplace_back(Asg::connection(N));
         s11[emission].emplace_back(Asg::emission(N));
         s11[combined].emplace_back(Asg::combined(N));
+
+        std::cout << "\n[Test Size: " << N << "] END" << std::endl;
     }
     outputReports(records);
 
     std::size_t numImplementations = records.size();
     std::size_t numOperations = records.begin()->second.size();
-    std::size_t numSamples = records.begin()->second.begin()->second.size();
-    std::size_t numBenchmarks = numImplementations * numOperations * numSamples;
+    std::size_t numRounds = records.begin()->second.begin()->second.size();
+    std::size_t numBenchmarks = numImplementations * numOperations * numRounds;
 
     std::cout << "\n" << numBenchmarks << " Benchmarks Completed: [paused]" << std::endl;
     std::cin.get();
