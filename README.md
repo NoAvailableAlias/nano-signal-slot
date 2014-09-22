@@ -85,23 +85,26 @@ Performance
 
 **_Higher score is better._** _N / milliseconds per sample._
 
-_Boost Signals is deprecated._
 _Jl_signal uses a custom static allocator to achieve high performance._
 
 ```
-+ ------------------------------------------------------------------------- +
-| Library           | construct | destruct | connect  | emit     | combined |
-+ ------------------------------------------------------------------------- +
-| Jl_signal         | 21264.33  | 4909.49  | 37937.84 | 38921.39 | 3519.61  |
-| Nano-signal-slot  | 1088.15   | 583.51   | 467.42   | 25978.73 | 200.12   |
-| Boost Signals     | 749.66    | 145.48   | 42.71    | 3802.59  | 28.96    |
-| Boost Signals2    | 476.02    | 215.67   | 126.20   | 3025.00  | 66.19    |
-| EvilTwin Observer | 22412.09  | 367.78   | 151.76   | 17171.24 | 94.64    |
-| amc522 Signal11   | 26091.52  | 543.57   | 421.58   | 30927.73 | 251.47   |
-+ ------------------------------------------------------------------------- +
++ --------------------------------------------------------------------------- +
+| Library             | construct | destruct | connect  | emission | combined |
++ --------------------------------------------------------------------------- +
+| winglot Signals     | 439.66    | 271.25   | 226.25   | 28643.18 | 97.85    |
+| supergrover sigslot | 916.06    | 252.85   | 162.25   | 41284.94 | 84.25    |
+| pbhogan Signals     | 18771.80  | 496.66   | 270.05   | 26793.79 | 176.05   |
+| Jl_signal           | 12575.26  | 3862.32  | 31880.96 | 31977.62 | 3185.01  |
+| Nano-signal-slot    | 761.69    | 504.66   | 362.85   | 23792.49 | 179.45   |
+| Boost Signals       | 513.07    | 152.05   | 51.45    | 4012.94  | 35.65    |
+| Boost Signals2      | 434.66    | 225.85   | 94.05    | 3517.20  | 64.45    |
+| EvilTwin Observer   | 12198.71  | 318.06   | 156.05   | 16857.98 | 89.85    |
+| EvilTwin Obs Fork   | 11107.54  | 288.25   | 158.45   | 15775.01 | 103.85   |
+| EvilTwin Obs Safe   | 13377.51  | 302.85   | 162.65   | 271.45   | 62.25    |
+| amc522 Signal11     | 19439.56  | 764.87   | 304.05   | 24487.60 | 172.45   |
++ --------------------------------------------------------------------------- +
 ```
 
 #### Notes
 
 Trying to profile why construction time is so lousy.
-Working on refactoring benchmarks and report generation.
