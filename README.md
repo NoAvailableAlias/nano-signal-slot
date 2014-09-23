@@ -91,20 +91,21 @@ _Jl_signal uses a custom static allocator to achieve high performance._
 + --------------------------------------------------------------------------- +
 | Library             | construct | destruct | connect  | emission | combined |
 + --------------------------------------------------------------------------- +
-| winglot Signals     | 439.66    | 271.25   | 226.25   | 28643.18 | 97.85    |
-| supergrover sigslot | 916.06    | 252.85   | 162.25   | 41284.94 | 84.25    |
-| pbhogan Signals     | 18771.80  | 496.66   | 270.05   | 26793.79 | 176.05   |
-| Jl_signal           | 12575.26  | 3862.32  | 31880.96 | 31977.62 | 3185.01  |
-| Nano-signal-slot    | 761.69    | 504.66   | 362.85   | 23792.49 | 179.45   |
-| Boost Signals       | 513.07    | 152.05   | 51.45    | 4012.94  | 35.65    |
-| Boost Signals2      | 434.66    | 225.85   | 94.05    | 3517.20  | 64.45    |
-| EvilTwin Observer   | 12198.71  | 318.06   | 156.05   | 16857.98 | 89.85    |
-| EvilTwin Obs Fork   | 11107.54  | 288.25   | 158.45   | 15775.01 | 103.85   |
-| EvilTwin Obs Safe   | 13377.51  | 302.85   | 162.65   | 271.45   | 62.25    |
-| amc522 Signal11     | 19439.56  | 764.87   | 304.05   | 24487.60 | 172.45   |
+| winglot Signals     | 470.81    | 329.68   | 246.02   | 31944.04 | 96.85    |
+| supergrover sigslot | 918.46    | 254.33   | 148.30   | 37727.78 | 81.25    |
+| pbhogan Signals     | 16399.81  | 553.96   | 269.53   | 29835.24 | 173.83   |
+| Jl_signal           | 15296.13  | 4025.32  | 40392.97 | 39481.30 | 3177.38  |
+| Nano-signal-slot    | 799.94    | 556.61   | 431.29   | 26245.77 | 174.92   |
+| Boost Signals       | 630.12    | 147.00   | 49.39    | 3217.17  | 30.99    |
+| Boost Signals2      | 412.91    | 215.09   | 136.11   | 2984.64  | 67.29    |
+| EvilTwin Observer   | 17271.50  | 355.72   | 150.76   | 16164.93 | 94.39    |
+| EvilTwin Obs Fork   | 19876.86  | 387.07   | 166.73   | 16128.42 | 101.95   |
+| EvilTwin Obs Safe   | 15401.88  | 364.32   | 157.25   | 347.11   | 60.92    |
+| amc522 Signal11     | 24835.87  | 708.51   | 276.50   | 29602.83 | 178.17   |
 + --------------------------------------------------------------------------- +
 ```
 
 #### Notes
 
-Trying to profile why construction time is so lousy.
+Trying to profile why construction time is so lousy. Also, it seems odd to me that Nano-signal-slot
+performs better in the destruction benchmark than a majority of others considering the complexity.
