@@ -3,7 +3,6 @@
 
 #include "lib/eviltwin/observer.hpp"
 
-#include "chrono_timer.hpp"
 #include "benchmark.hpp"
 
 #include <forward_list>
@@ -70,13 +69,13 @@ class Evl
         {
             std::shuffle(randomized.begin(), randomized.end(), rng);
             {
-                std::unique_ptr<Subject> subject(new Subject);
+                Subject subject;
                 std::vector<Foo> foo_array(N);
 
                 for (auto index : randomized)
                 {
                     auto& foo = foo_array[index];
-                    foo.reg.emplace_front(subject->registerObserver
+                    foo.reg.emplace_front(subject.registerObserver
                         (std::bind(&Foo::handler, &foo, _1)));
                 }
                 s_timer.reset();
@@ -184,6 +183,35 @@ class Evl
             subject(rng);
         }
         return testsize_over_dt(N, limit, count);
+    }
+
+//------------------------------------------------------------------------------
+
+    NOINLINE(static std::size_t test(std::size_t N))
+    {
+        using std::placeholders::_1;
+
+        Rng_t rng;
+
+        std::vector<std::size_t> randomized(N);
+        std::generate(randomized.begin(), randomized.end(), IncrementFill());
+
+        for (auto i = N; i != 0; --i)
+        {
+            std::shuffle(randomized.begin(), randomized.end(), rng);
+
+            Subject subject;
+            std::vector<Foo> foo_array(N);
+
+            for (auto index : randomized)
+            {
+                auto& foo = foo_array[index];
+                foo.reg.emplace_front(subject.registerObserver
+                    (std::bind(&Foo::handler, &foo, _1)));
+            }
+            subject(rng);
+        }
+        return rng();
     }
 };
 

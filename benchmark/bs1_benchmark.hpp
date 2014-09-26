@@ -6,7 +6,6 @@
 #include <boost/signals.hpp>
 #include <boost/bind.hpp>
 
-#include "chrono_timer.hpp"
 #include "benchmark.hpp"
 
 #include <algorithm>
@@ -66,13 +65,13 @@ class Bs1 : public boost::signals::trackable
         {
             std::shuffle(randomized.begin(), randomized.end(), rng);
             {
-                std::unique_ptr<Subject> subject(new Subject);
+                Subject subject;
                 std::vector<Foo> foo_array(N);
 
                 for (auto index : randomized)
                 {
                     auto& foo = foo_array[index];
-                    subject->connect(boost::bind(&Foo::handler, &foo, _1));
+                    subject.connect(boost::bind(&Foo::handler, &foo, _1));
                 }
                 s_timer.reset();
             }
@@ -170,6 +169,32 @@ class Bs1 : public boost::signals::trackable
             subject(rng);
         }
         return testsize_over_dt(N, limit, count);
+    }
+
+//------------------------------------------------------------------------------
+
+    NOINLINE(static std::size_t test(std::size_t N))
+    {
+        Rng_t rng;
+
+        std::vector<std::size_t> randomized(N);
+        std::generate(randomized.begin(), randomized.end(), IncrementFill());
+
+        for (auto i = N; i != 0; --i)
+        {
+            std::shuffle(randomized.begin(), randomized.end(), rng);
+
+            Subject subject;
+            std::vector<Foo> foo_array(N);
+
+            for (auto index : randomized)
+            {
+                auto& foo = foo_array[index];
+                subject.connect(boost::bind(&Foo::handler, &foo, _1));
+            }
+            subject(rng);
+        }
+        return rng();
     }
 };
 

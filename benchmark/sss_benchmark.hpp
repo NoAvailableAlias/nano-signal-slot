@@ -3,7 +3,6 @@
 
 #include "lib\supergrover\sigslot\src\signal.h"
 
-#include "chrono_timer.hpp"
 #include "benchmark.hpp"
 
 #include <algorithm>
@@ -63,13 +62,13 @@ class Sss : public SigSlotBase
         {
             std::shuffle(randomized.begin(), randomized.end(), rng);
             {
-                std::unique_ptr<Subject> subject(new Subject);
+                Subject subject;
                 std::vector<Foo> foo_array(N);
 
                 for (auto index : randomized)
                 {
                     auto& foo = foo_array[index];
-                    subject->bind(&Foo::handler, &foo);
+                    subject.bind(&Foo::handler, &foo);
                 }
                 s_timer.reset();
             }
@@ -167,6 +166,32 @@ class Sss : public SigSlotBase
             subject.emit(rng);
         }
         return testsize_over_dt(N, limit, count);
+    }
+
+//------------------------------------------------------------------------------
+
+    NOINLINE(static std::size_t test(std::size_t N))
+    {
+        Rng_t rng;
+
+        std::vector<std::size_t> randomized(N);
+        std::generate(randomized.begin(), randomized.end(), IncrementFill());
+
+        for (auto i = N; i != 0; --i)
+        {
+            std::shuffle(randomized.begin(), randomized.end(), rng);
+
+            Subject subject;
+            std::vector<Foo> foo_array(N);
+
+            for (auto index : randomized)
+            {
+                auto& foo = foo_array[index];
+                subject.bind(&Foo::handler, &foo);
+            }
+            subject.emit(rng);
+        }
+        return rng();
     }
 };
 
