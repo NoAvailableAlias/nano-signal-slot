@@ -6,10 +6,12 @@
 #include <tuple>
 
 // "Friendly" macro definitions
-#if _MSC_VER >= 1400
+#ifdef _WIN32
 #define NOINLINE(s) __declspec(noinline) s
-#else
+#elif __unix__
 #define NOINLINE(s) s __attribute__ ((noinline))
+#else
+#define NOINLINE(s) s
 #endif
 
 // Globals
@@ -28,8 +30,7 @@ typedef std::chrono::duration<double, std::milli> Delta_u;
 // Functors
 struct IncrementFill
 {
-    std::size_t i;
-    IncrementFill ( ) : i(0) { }
+    std::size_t i = 0;
     std::size_t operator()() { return i++; }
 };
 
@@ -94,17 +95,54 @@ struct tee_stream<0>
         return t;
     }
 };
-
 template <typename ...Args, typename T>
 std::tuple<Args...>& operator<< (std::tuple<Args...>& t, T&& x)
 {
     return tee_stream<sizeof...(Args)>::print(t, std::forward<T>(x));
 }
-
 template <typename ...Args, typename T>
 std::tuple<Args...>& operator<< (std::tuple<Args...>&& t, T&& x)
 {
     return tee_stream<sizeof...(Args)>::print(t, std::forward<T>(x));
 }
+
+//------------------------------------------------------------------------------
+
+template <typename Iterator> struct RangeHelper
+{
+    Iterator lhs;
+    Iterator rhs;
+
+    Iterator cbegin() const { return lhs; }
+    Iterator begin() const { return lhs; }
+    Iterator cend() const { return rhs; }
+    Iterator end() const { return rhs; }
+};
+template <typename Iterator>
+static RangeHelper<Iterator> Range(Iterator lhs,
+                                   Iterator rhs)
+{
+    return { lhs, rhs };
+}
+
+//------------------------------------------------------------------------------
+
+class chrono_timer
+{
+    std::chrono::time_point<std::chrono::high_resolution_clock> m_start;
+
+    public:
+
+    void reset()
+    {
+        m_start = std::chrono::high_resolution_clock::now();
+    }
+    template <typename T>
+    std::size_t count() const
+    {
+        return std::chrono::duration_cast<T>
+          (std::chrono::high_resolution_clock::now() - m_start).count();
+    }
+};
 
 #endif // BENCHMARK_HPP
