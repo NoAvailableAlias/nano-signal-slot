@@ -100,12 +100,42 @@ _Jl_signal uses a custom static allocator to achieve high performance._
 | Boost Signals2      | 412.91    | 215.09   | 136.11   | 2984.64  | 67.29    |
 | EvilTwin Observer   | 17271.50  | 355.72   | 150.76   | 16164.93 | 94.39    |
 | EvilTwin Obs Fork   | 19876.86  | 387.07   | 166.73   | 16128.42 | 101.95   |
-| EvilTwin Obs Safe   | 15401.88  | 364.32   | 157.25   | 347.11   | 60.92    |
 | amc522 Signal11     | 24835.87  | 708.51   | 276.50   | 29602.83 | 178.17   |
 + --------------------------------------------------------------------------- +
 ```
 
-#### Notes
+Allocator
+---------
 
-Trying to profile why construction time is so lousy. Also, it seems odd to me that Nano-signal-slot
-performs better in the destruction benchmark than a majority of others considering the complexity.
+To utilize allocators in Nano-signal-slot, the only change needed is the following:
+
+Change
+```
+    std::map<DelegateKey, Observer*> tracked_connections;
+```
+To
+```
+    using Allocator = YourAllocator<std::map<DelegateKey, Observer*>::value_type>;
+    std::map<DelegateKey, Observer*, std::less<DelegateKey>, Allocator> tracked_connections;
+```
+_Note that YourAllocator must support the standard allocator model._
+
+Performance after plugging in a quick non-optimal pool allocator:
+
+```
++ -------------------------------------------------------------------------------- +
+| Library             |  construct |  destruct |  connect  |  emission |  combined |
++ -------------------------------------------------------------------------------- +
+| Jl_signal           |  9173.90   |  5550.51  |  38883.14 |  41184.04 |  2991.05  |
+| Nano-signal-slot    |  7218.18   |  4266.97  |  7709.92  |  26951.28 |  2057.92  |
+| supergrover sigslot |  942.15    |  221.36   |  124.91   |  37879.77 |  55.63    |
+| amc522 Signal11     |  3782.44   |  571.93   |  240.03   |  32860.31 |  136.79   |
+| pbhogan Signals     |  7539.47   |  476.00   |  263.59   |  25958.57 |  131.99   |
+| winglot Signals     |  373.53    |  275.41   |  247.12   |  28986.38 |  79.69    |
+| EvilTwin Observer   |  6782.33   |  306.73   |  70.25    |  20330.63 |  48.23    |
+| EvilTwin Obs Fork   |  3120.83   |  285.91   |  77.89    |  17777.30 |  55.03    |
+| Boost Signals       |  266.99    |  106.83   |  28.87    |  3770.69  |  17.95    |
+| Boost Signals2      |  260.35    |  167.05   |  72.05    |  3045.77  |  37.19    |
+| neosigslot          |  853.81    |  321.31   |  157.54   |  925.89   |  61.95    |
++ -------------------------------------------------------------------------------- +
+```
