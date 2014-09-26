@@ -170,7 +170,7 @@ class Nss : public Nano::Observer
 
 //------------------------------------------------------------------------------
 
-    NOINLINE(static std::size_t test(std::size_t N))
+    NOINLINE(static std::size_t validate(std::size_t N))
     {
         Rng_t rng;
 
