@@ -1,0 +1,22 @@
+neosigslot - files.txt
+
+Files required for basic synchronous signal/slot support:
+
+neolib.hpp
+signal.hpp
+slot.hpp
+signal_interface.hpp
+slot_interface.hpp
+locking_policy.hpp
+
+Extra files required for asynchronous signal/slot support allowing signal events to be posted from one thread to another:
+
+async_signal.hpp
+async_slot.hpp
+cstdint.hpp
+thread.cpp
+thread.hpp
+io_thread.cpp
+io_thread.hpp
+lockable.hpp
+timer.hpp
