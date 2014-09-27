@@ -36,6 +36,11 @@ struct IncrementFill
 
 //------------------------------------------------------------------------------
 
+inline double testsize_over_dt(std::size_t N, std::size_t limit, std::size_t count)
+{
+    return N / std::chrono::duration_cast<Delta_u>(Timer_u(limit / count)).count();
+}
+
 std::size_t round_2_up(std::size_t n)
 {
     if (n & (n - 1))
@@ -63,11 +68,6 @@ std::size_t round_2_down(std::size_t n)
         return n;
     }
     return n;
-}
-
-inline double testsize_over_dt(std::size_t N, std::size_t limit, std::size_t count)
-{
-    return N / std::chrono::duration_cast<Delta_u>(Timer_u(limit / count)).count();
 }
 
 //------------------------------------------------------------------------------

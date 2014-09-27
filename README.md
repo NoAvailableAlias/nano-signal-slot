@@ -88,20 +88,21 @@ Performance
 _Jl_signal uses a custom static allocator to achieve high performance._
 
 ```
-+ --------------------------------------------------------------------------- +
-| Library             | construct | destruct | connect  | emission | combined |
-+ --------------------------------------------------------------------------- +
-| winglot Signals     | 470.81    | 329.68   | 246.02   | 31944.04 | 96.85    |
-| supergrover sigslot | 918.46    | 254.33   | 148.30   | 37727.78 | 81.25    |
-| pbhogan Signals     | 16399.81  | 553.96   | 269.53   | 29835.24 | 173.83   |
-| Jl_signal           | 15296.13  | 4025.32  | 40392.97 | 39481.30 | 3177.38  |
-| Nano-signal-slot    | 799.94    | 556.61   | 431.29   | 26245.77 | 174.92   |
-| Boost Signals       | 630.12    | 147.00   | 49.39    | 3217.17  | 30.99    |
-| Boost Signals2      | 412.91    | 215.09   | 136.11   | 2984.64  | 67.29    |
-| EvilTwin Observer   | 17271.50  | 355.72   | 150.76   | 16164.93 | 94.39    |
-| EvilTwin Obs Fork   | 19876.86  | 387.07   | 166.73   | 16128.42 | 101.95   |
-| amc522 Signal11     | 24835.87  | 708.51   | 276.50   | 29602.83 | 178.17   |
-+ --------------------------------------------------------------------------- +
++ -------------------------------------------------------------------------------- +
+| Library             |  construct |  destruct |  connect  |  emission |  combined |
++ -------------------------------------------------------------------------------- +
+| Jl_signal           |  13621.97  |  6267.07  |  43055.01 |  41029.04 |  3560.67  |
+| amc522 Signal11     |  26042.47  |  902.47   |  572.37   |  32892.97 |  300.83   |
+| EvilTwin Obs Fork   |  24312.01  |  405.96   |  209.87   |  19649.00 |  101.13   |
+| pbhogan Signals     |  10563.03  |  529.66   |  261.47   |  29598.50 |  160.63   |
+| EvilTwin Observer   |  21806.37  |  358.08   |  151.01   |  18483.56 |  97.41    |
+| supergrover sigslot |  812.13    |  219.87   |  99.69    |  36957.01 |  57.67    |
+| winglot Signals     |  330.58    |  291.75   |  203.65   |  29737.04 |  73.87    |
+| Nano-signal-slot    |  1026.58   |  482.56   |  278.72   |  24285.34 |  125.63   |
+| Boost Signals       |  714.46    |  144.81   |  45.73    |  4208.69  |  31.27    |
+| Boost Signals2      |  800.15    |  268.77   |  129.43   |  2964.32  |  69.09    |
+| neosigslot          |  1064.29   |  373.64   |  164.65   |  736.85   |  75.07    |
++ -------------------------------------------------------------------------------- +
 ```
 
 Allocator
@@ -109,33 +110,33 @@ Allocator
 
 To utilize allocators in Nano-signal-slot, the only change needed is the following:
 
-Change
 ```
+    // Change
     std::map<DelegateKey, Observer*> tracked_connections;
 ```
-To
 ```
+    // To
     using Allocator = YourAllocator<std::map<DelegateKey, Observer*>::value_type>;
     std::map<DelegateKey, Observer*, std::less<DelegateKey>, Allocator> tracked_connections;
 ```
 _Note that YourAllocator must support the standard allocator model._
 
-Performance after plugging in a quick non-optimal pool allocator:
+#### Performance using Allocator
 
 ```
 + -------------------------------------------------------------------------------- +
 | Library             |  construct |  destruct |  connect  |  emission |  combined |
 + -------------------------------------------------------------------------------- +
-| Jl_signal           |  9173.90   |  5550.51  |  38883.14 |  41184.04 |  2991.05  |
-| Nano-signal-slot    |  7218.18   |  4266.97  |  7709.92  |  26951.28 |  2057.92  |
-| supergrover sigslot |  942.15    |  221.36   |  124.91   |  37879.77 |  55.63    |
-| amc522 Signal11     |  3782.44   |  571.93   |  240.03   |  32860.31 |  136.79   |
-| pbhogan Signals     |  7539.47   |  476.00   |  263.59   |  25958.57 |  131.99   |
-| winglot Signals     |  373.53    |  275.41   |  247.12   |  28986.38 |  79.69    |
-| EvilTwin Observer   |  6782.33   |  306.73   |  70.25    |  20330.63 |  48.23    |
-| EvilTwin Obs Fork   |  3120.83   |  285.91   |  77.89    |  17777.30 |  55.03    |
-| Boost Signals       |  266.99    |  106.83   |  28.87    |  3770.69  |  17.95    |
-| Boost Signals2      |  260.35    |  167.05   |  72.05    |  3045.77  |  37.19    |
-| neosigslot          |  853.81    |  321.31   |  157.54   |  925.89   |  61.95    |
+| Jl_signal           |  14424.43  |  6711.48  |  43139.61 |  39783.57 |  3940.62  |
+| Nano-signal-slot    |  26513.30  |  5376.19  |  8179.32  |  27180.79 |  2597.05  |
+| amc522 Signal11     |  27608.88  |  934.51   |  598.57   |  31598.73 |  314.26   |
+| EvilTwin Obs Fork   |  24071.42  |  403.41   |  192.20   |  19081.48 |  100.06   |
+| EvilTwin Observer   |  22076.84  |  362.93   |  158.25   |  19055.19 |  95.82    |
+| pbhogan Signals     |  10091.72  |  539.62   |  266.03   |  28799.46 |  161.86   |
+| supergrover sigslot |  825.57    |  218.69   |  105.17   |  38399.19 |  57.70    |
+| winglot Signals     |  336.90    |  295.14   |  201.78   |  31580.88 |  73.60    |
+| Boost Signals       |  744.24    |  148.17   |  44.89    |  4365.43  |  31.07    |
+| Boost Signals2      |  790.10    |  233.38   |  139.09   |  3285.30  |  68.57    |
+| neosigslot          |  1251.39   |  379.12   |  158.28   |  756.85   |  77.47    |
 + -------------------------------------------------------------------------------- +
 ```

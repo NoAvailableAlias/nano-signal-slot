@@ -53,7 +53,9 @@ int main(int argc, char* argv[])
     std::size_t start_n = round_2_down(8);
     std::size_t maximum_n = round_2_up(64);
 
-    std::cout << "Set CPU Priority: [paused]" << std::endl;
+    // Make sure to set process to High priority
+    // Make sure to set process cpu affinity to only one core
+    std::cout << "Change CPU priority now: [paused]" << std::endl;
     std::cin.get();
 
     // Make sure each implementation functions correctly
@@ -73,6 +75,8 @@ int main(int argc, char* argv[])
     auto start = std::chrono::system_clock::now();
     auto start_c = std::chrono::system_clock::to_time_t(start);
 
+    // Double the input size N for every iteration
+    // Timing is done in nanoseconds then converted to milliseconds
     for(std::size_t N = start_n; N <= maximum_n; N *= 2)
     {
         std::cout << "[Test Size: " << N << "] BEGIN\n" << std::endl;
