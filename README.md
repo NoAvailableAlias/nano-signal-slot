@@ -85,9 +85,6 @@ Performance
 
 **_Higher score is better._** _N / milliseconds per sample._
 
-**MSVC does preallocation in standard containers and throws off construction benchmarks.**
-**Any implementation that use non-standard containers will perform better in construction.**
-
 ```
 + -------------------------------------------------------------------------------- +
 | Library             |  construct |  destruct |  connect  |  emission |  combined |
@@ -98,13 +95,14 @@ Performance
 | pbhogan Signals     |  10563.03  |  529.66   |  261.47   |  29598.50 |  160.63   |
 | EvilTwin Observer   |  21806.37  |  358.08   |  151.01   |  18483.56 |  97.41    |
 | supergrover sigslot |  812.13    |  219.87   |  99.69    |  36957.01 |  57.67    |
-| winglot Signals     |  330.58    |  291.75   |  203.65   |  29737.04 |  73.87    |
+| * winglot Signals   |  330.58    |  291.75   |  203.65   |  29737.04 |  73.87    |
 | Nano-signal-slot    |  1026.58   |  482.56   |  278.72   |  24285.34 |  125.63   |
 | Boost Signals       |  714.46    |  144.81   |  45.73    |  4208.69  |  31.27    |
-| Boost Signals2      |  800.15    |  268.77   |  129.43   |  2964.32  |  69.09    |
-| neosigslot          |  1064.29   |  373.64   |  164.65   |  736.85   |  75.07    |
+| * Boost Signals2    |  800.15    |  268.77   |  129.43   |  2964.32  |  69.09    |
+| * neosigslot        |  1064.29   |  373.64   |  164.65   |  736.85   |  75.07    |
 + -------------------------------------------------------------------------------- +
 ```
+_* Library aims to be thread safe._
 
 Allocator
 ---------
@@ -120,9 +118,8 @@ To utilize allocators in Nano-signal-slot, the only change needed is the followi
     using Allocator = YourAllocator<std::map<DelegateKey, Observer*>::value_type>;
     std::map<DelegateKey, Observer*, std::less<DelegateKey>, Allocator> tracked_connections;
 ```
-_Note that YourAllocator must support the standard allocator model._
 
-#### Performance using Allocator
+#### Performance using an Allocator
 
 _Jl_signal uses a custom static allocator to achieve high performance._
 
@@ -137,9 +134,10 @@ _Jl_signal uses a custom static allocator to achieve high performance._
 | EvilTwin Observer   |  22076.84  |  362.93   |  158.25   |  19055.19 |  95.82    |
 | pbhogan Signals     |  10091.72  |  539.62   |  266.03   |  28799.46 |  161.86   |
 | supergrover sigslot |  825.57    |  218.69   |  105.17   |  38399.19 |  57.70    |
-| winglot Signals     |  336.90    |  295.14   |  201.78   |  31580.88 |  73.60    |
+| * winglot Signals   |  336.90    |  295.14   |  201.78   |  31580.88 |  73.60    |
 | Boost Signals       |  744.24    |  148.17   |  44.89    |  4365.43  |  31.07    |
-| Boost Signals2      |  790.10    |  233.38   |  139.09   |  3285.30  |  68.57    |
-| neosigslot          |  1251.39   |  379.12   |  158.28   |  756.85   |  77.47    |
+| * Boost Signals2    |  790.10    |  233.38   |  139.09   |  3285.30  |  68.57    |
+| * neosigslot        |  1251.39   |  379.12   |  158.28   |  756.85   |  77.47    |
 + -------------------------------------------------------------------------------- +
 ```
+_* Library aims to be thread safe._
