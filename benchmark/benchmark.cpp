@@ -241,7 +241,7 @@ void outputReport(ImmediateData const& records, T& ost)
         resultOrder[score] = OrderedResults { libName, &resultAverage[libName] };
     }
 
-    // Print output in cvs format
+    // Print output in csv format
 
     ost << "\nLibrary, " << construction << ", " << destruction << ", "
         << connection << ", " << emission << ", " << combined << "\n";

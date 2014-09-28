@@ -85,7 +85,8 @@ Performance
 
 **_Higher score is better._** _N / milliseconds per sample._
 
-_Jl_signal uses a custom static allocator to achieve high performance._
+**MSVC does preallocation in standard containers and throws off construction benchmarks.**
+**Any implementation that use non-standard containers will perform better in construction.**
 
 ```
 + -------------------------------------------------------------------------------- +
@@ -122,6 +123,8 @@ To utilize allocators in Nano-signal-slot, the only change needed is the followi
 _Note that YourAllocator must support the standard allocator model._
 
 #### Performance using Allocator
+
+_Jl_signal uses a custom static allocator to achieve high performance._
 
 ```
 + -------------------------------------------------------------------------------- +
