@@ -1,16 +1,16 @@
 #include "benchmark.hpp"
 
-#include "asg_benchmark.hpp"
-#include "bs1_benchmark.hpp"
-#include "bs2_benchmark.hpp"
-#include "evf_benchmark.hpp"
-#include "evl_benchmark.hpp"
-#include "jls_benchmark.hpp"
-#include "nls_benchmark.hpp"
-#include "nss_benchmark.hpp"
-#include "psg_benchmark.hpp"
-#include "sss_benchmark.hpp"
-#include "wsg_benchmark.hpp"
+#include "benchmark_asg.hpp"
+#include "benchmark_bs1.hpp"
+#include "benchmark_bs2.hpp"
+#include "benchmark_evf.hpp"
+#include "benchmark_evl.hpp"
+#include "benchmark_jls.hpp"
+#include "benchmark_nls.hpp"
+#include "benchmark_nss.hpp"
+#include "benchmark_psg.hpp"
+#include "benchmark_sss.hpp"
+#include "benchmark_wsg.hpp"
 
 #include "lib/jl_signal/Signal.h"
 #include "lib/jl_signal/StaticSignalConnectionAllocators.h"
@@ -30,10 +30,7 @@ const char* combined = "combined";
 using ImmediateResults = std::map<const char*, std::vector<double>>;
 using ImmediateData = std::map<const char*, ImmediateResults>;
 
-std::size_t g_limit = Timer_u(Limit_u(2)).count();
-//std::size_t g_limit = 100000000;
-//std::size_t g_limit = 10000000;
-//std::size_t g_limit = 1000000;
+std::size_t g_limit = Timer_u(Limit_u(4000)).count();
 
 template <typename T> void outputReport(ImmediateData const&, T&);
 
@@ -41,8 +38,6 @@ template <typename T> void outputReport(ImmediateData const&, T&);
 
 int main(int argc, char* argv[])
 {
-    using namespace Benchmark;
-
     jl::StaticSignalConnectionAllocator<c_jlsignal_max> signal_con_allocator;
     jl::StaticObserverConnectionAllocator<c_jlsignal_max> observer_con_allocator;
     jl::SignalBase::SetCommonConnectionAllocator(&signal_con_allocator);
@@ -50,33 +45,42 @@ int main(int argc, char* argv[])
 
     ImmediateData records;
 
-    std::size_t start_n = round_2_down(8);
-    std::size_t maximum_n = round_2_up(64);
+    std::size_t start_n = 8;
+    std::size_t maximum_n = 64;
 
-    // Make sure to set process to High priority
-    // Make sure to set process cpu affinity to only one core
+    std::cout << "Enter the time limit per sample [milliseconds]: ";
+    std::size_t limit;
+
+    if (!(std::cin >> limit))
+    {
+        std::cerr << "Invalid time limit entered!" << std::endl;
+        return 1;
+    }
+    g_limit = Timer_u(Limit_u(limit)).count();
+    std::cin.ignore();
+
+    // Make sure to set process to high priority and affinity to 1 core
     std::cout << "Change CPU priority now: [paused]" << std::endl;
     std::cin.get();
 
-    // Make sure each implementation functions correctly
-    // Prng state should return the same state for all tests
-    std::cout << Asg::validate(maximum_n) << " amc522 Signal11" << std::endl;
-    std::cout << Bs1::validate(maximum_n) << " Boost Signals" << std::endl;
-    std::cout << Bs2::validate(maximum_n) << " Boost Signals2" << std::endl;
-    std::cout << Evl::validate(maximum_n) << " EvilTwin Observer" << std::endl;
-    std::cout << Evf::validate(maximum_n) << " EvilTwin Observer Fork" << std::endl;
-    std::cout << Jls::validate(maximum_n) << " Jl_signal" << std::endl;
-    std::cout << Nls::validate(maximum_n) << " neosigslot" << std::endl;
-    std::cout << Nss::validate(maximum_n) << " Nano-signal-slot" << std::endl;
-    std::cout << Psg::validate(maximum_n) << " pbhogan Signals" << std::endl;
-    std::cout << Sss::validate(maximum_n) << " supergrover sigslot" << std::endl;
-    std::cout << Wsg::validate(maximum_n) << " winglot Signals\n" << std::endl;
+    Benchmark<Asg::Signal, Asg>::validation_assert(maximum_n);
+    Benchmark<Bs1::Signal, Bs1>::validation_assert(maximum_n);
+    Benchmark<Bs2::Signal, Bs2>::validation_assert(maximum_n);
+    Benchmark<Evf::Signal, Evf>::validation_assert(maximum_n);
+    Benchmark<Evl::Signal, Evl>::validation_assert(maximum_n);
+    Benchmark<Jls::Signal, Jls>::validation_assert(maximum_n);
+    Benchmark<Nls::Signal, Nls>::validation_assert(maximum_n);
+    Benchmark<Nss::Signal, Nss>::validation_assert(maximum_n);
+    Benchmark<Psg::Signal, Psg>::validation_assert(maximum_n);
+    Benchmark<Sss::Signal, Sss>::validation_assert(maximum_n);
+    Benchmark<Wsg::Signal, Wsg>::validation_assert(maximum_n);
 
     auto start = std::chrono::system_clock::now();
     auto start_c = std::chrono::system_clock::to_time_t(start);
 
+    //--------------------------------------------------------------------------
+
     // Double the input size N for every iteration
-    // Timing is done in nanoseconds then converted to milliseconds
     for(std::size_t N = start_n; N <= maximum_n; N *= 2)
     {
         std::cout << "[Test Size: " << N << "] BEGIN\n" << std::endl;
@@ -84,104 +88,106 @@ int main(int argc, char* argv[])
         std::cout << "[Line: " << __LINE__ << "]" << std::endl;
 
         auto& asg = records["amc522 Signal11"];
-        asg[construction].emplace_back(Asg::construction(N));
-        asg[destruction].emplace_back(Asg::destruction(N));
-        asg[connection].emplace_back(Asg::connection(N));
-        asg[emission].emplace_back(Asg::emission(N));
-        asg[combined].emplace_back(Asg::combined(N));
+        asg[construction].push_back(Benchmark<Asg::Signal, Asg>::construction(N));
+        asg[destruction].push_back(Benchmark<Asg::Signal, Asg>::destruction(N));
+        asg[connection].push_back(Benchmark<Asg::Signal, Asg>::connection(N));
+        asg[emission].push_back(Benchmark<Asg::Signal, Asg>::emission(N));
+        asg[combined].push_back(Benchmark<Asg::Signal, Asg>::combined(N));
 
         std::cout << "[Line: " << __LINE__ << "]" << std::endl;
 
         auto& bs1 = records["Boost Signals"];
-        bs1[construction].emplace_back(Bs1::construction(N));
-        bs1[destruction].emplace_back(Bs1::destruction(N));
-        bs1[connection].emplace_back(Bs1::connection(N));
-        bs1[emission].emplace_back(Bs1::emission(N));
-        bs1[combined].emplace_back(Bs1::combined(N));
+        bs1[construction].push_back(Benchmark<Bs1::Signal, Bs1>::construction(N));
+        bs1[destruction].push_back(Benchmark<Bs1::Signal, Bs1>::destruction(N));
+        bs1[connection].push_back(Benchmark<Bs1::Signal, Bs1>::connection(N));
+        bs1[emission].push_back(Benchmark<Bs1::Signal, Bs1>::emission(N));
+        bs1[combined].push_back(Benchmark<Bs1::Signal, Bs1>::combined(N));
 
         std::cout << "[Line: " << __LINE__ << "]" << std::endl;
 
         auto& bs2 = records["Boost Signals2"];
-        bs2[construction].emplace_back(Bs2::construction(N));
-        bs2[destruction].emplace_back(Bs2::destruction(N));
-        bs2[connection].emplace_back(Bs2::connection(N));
-        bs2[emission].emplace_back(Bs2::emission(N));
-        bs2[combined].emplace_back(Bs2::combined(N));
-
-        std::cout << "[Line: " << __LINE__ << "]" << std::endl;
-
-        auto& evl = records["EvilTwin Observer"];
-        evl[construction].emplace_back(Evl::construction(N));
-        evl[destruction].emplace_back(Evl::destruction(N));
-        evl[connection].emplace_back(Evl::connection(N));
-        evl[emission].emplace_back(Evl::emission(N));
-        evl[combined].emplace_back(Evl::combined(N));
+        bs2[construction].push_back(Benchmark<Bs2::Signal, Bs2>::construction(N));
+        bs2[destruction].push_back(Benchmark<Bs2::Signal, Bs2>::destruction(N));
+        bs2[connection].push_back(Benchmark<Bs2::Signal, Bs2>::connection(N));
+        bs2[emission].push_back(Benchmark<Bs2::Signal, Bs2>::emission(N));
+        bs2[combined].push_back(Benchmark<Bs2::Signal, Bs2>::combined(N));
 
         std::cout << "[Line: " << __LINE__ << "]" << std::endl;
 
         auto& evf = records["EvilTwin Obs Fork"];
-        evf[construction].emplace_back(Evf::construction(N));
-        evf[destruction].emplace_back(Evf::destruction(N));
-        evf[connection].emplace_back(Evf::connection(N));
-        evf[emission].emplace_back(Evf::emission(N));
-        evf[combined].emplace_back(Evf::combined(N));
+        evf[construction].push_back(Benchmark<Evf::Signal, Evf>::construction(N));
+        evf[destruction].push_back(Benchmark<Evf::Signal, Evf>::destruction(N));
+        evf[connection].push_back(Benchmark<Evf::Signal, Evf>::connection(N));
+        evf[emission].push_back(Benchmark<Evf::Signal, Evf>::emission(N));
+        evf[combined].push_back(Benchmark<Evf::Signal, Evf>::combined(N));
+
+        std::cout << "[Line: " << __LINE__ << "]" << std::endl;
+
+        auto& evl = records["EvilTwin Observer"];
+        evl[construction].push_back(Benchmark<Evl::Signal, Evl>::construction(N));
+        evl[destruction].push_back(Benchmark<Evl::Signal, Evl>::destruction(N));
+        evl[connection].push_back(Benchmark<Evl::Signal, Evl>::connection(N));
+        evl[emission].push_back(Benchmark<Evl::Signal, Evl>::emission(N));
+        evl[combined].push_back(Benchmark<Evl::Signal, Evl>::combined(N));
 
         std::cout << "[Line: " << __LINE__ << "]" << std::endl;
 
         auto& jls = records["Jl_signal"];
-        jls[construction].emplace_back(Jls::construction(N));
-        jls[destruction].emplace_back(Jls::destruction(N));
-        jls[connection].emplace_back(Jls::connection(N));
-        jls[emission].emplace_back(Jls::emission(N));
-        jls[combined].emplace_back(Jls::combined(N));
+        jls[construction].push_back(Benchmark<Jls::Signal, Jls>::construction(N));
+        jls[destruction].push_back(Benchmark<Jls::Signal, Jls>::destruction(N));
+        jls[connection].push_back(Benchmark<Jls::Signal, Jls>::connection(N));
+        jls[emission].push_back(Benchmark<Jls::Signal, Jls>::emission(N));
+        jls[combined].push_back(Benchmark<Jls::Signal, Jls>::combined(N));
 
         std::cout << "[Line: " << __LINE__ << "]" << std::endl;
 
         auto& nls = records["neosigslot"];
-        nls[construction].emplace_back(Nls::construction(N));
-        nls[destruction].emplace_back(Nls::destruction(N));
-        nls[connection].emplace_back(Nls::connection(N));
-        nls[emission].emplace_back(Nls::emission(N));
-        nls[combined].emplace_back(Nls::combined(N));
+        nls[construction].push_back(Benchmark<Nls::Signal, Nls>::construction(N));
+        nls[destruction].push_back(Benchmark<Nls::Signal, Nls>::destruction(N));
+        nls[connection].push_back(Benchmark<Nls::Signal, Nls>::connection(N));
+        nls[emission].push_back(Benchmark<Nls::Signal, Nls>::emission(N));
+        nls[combined].push_back(Benchmark<Nls::Signal, Nls>::combined(N));
 
         std::cout << "[Line: " << __LINE__ << "]" << std::endl;
 
         auto& nss = records["Nano-signal-slot"];
-        nss[construction].emplace_back(Nss::construction(N));
-        nss[destruction].emplace_back(Nss::destruction(N));
-        nss[connection].emplace_back(Nss::connection(N));
-        nss[emission].emplace_back(Nss::emission(N));
-        nss[combined].emplace_back(Nss::combined(N));
+        nss[construction].push_back(Benchmark<Nss::Signal, Nss>::construction(N));
+        nss[destruction].push_back(Benchmark<Nss::Signal, Nss>::destruction(N));
+        nss[connection].push_back(Benchmark<Nss::Signal, Nss>::connection(N));
+        nss[emission].push_back(Benchmark<Nss::Signal, Nss>::emission(N));
+        nss[combined].push_back(Benchmark<Nss::Signal, Nss>::combined(N));
 
         std::cout << "[Line: " << __LINE__ << "]" << std::endl;
 
         auto& psg = records["pbhogan Signals"];
-        psg[construction].emplace_back(Psg::construction(N));
-        psg[destruction].emplace_back(Psg::destruction(N));
-        psg[connection].emplace_back(Psg::connection(N));
-        psg[emission].emplace_back(Psg::emission(N));
-        psg[combined].emplace_back(Psg::combined(N));
+        psg[construction].push_back(Benchmark<Psg::Signal, Psg>::construction(N));
+        psg[destruction].push_back(Benchmark<Psg::Signal, Psg>::destruction(N));
+        psg[connection].push_back(Benchmark<Psg::Signal, Psg>::connection(N));
+        psg[emission].push_back(Benchmark<Psg::Signal, Psg>::emission(N));
+        psg[combined].push_back(Benchmark<Psg::Signal, Psg>::combined(N));
         
         std::cout << "[Line: " << __LINE__ << "]" << std::endl;
 
         auto& sss = records["supergrover sigslot"];
-        sss[construction].emplace_back(Sss::construction(N));
-        sss[destruction].emplace_back(Sss::destruction(N));
-        sss[connection].emplace_back(Sss::connection(N));
-        sss[emission].emplace_back(Sss::emission(N));
-        sss[combined].emplace_back(Sss::combined(N));
+        sss[construction].push_back(Benchmark<Sss::Signal, Sss>::construction(N));
+        sss[destruction].push_back(Benchmark<Sss::Signal, Sss>::destruction(N));
+        sss[connection].push_back(Benchmark<Sss::Signal, Sss>::connection(N));
+        sss[emission].push_back(Benchmark<Sss::Signal, Sss>::emission(N));
+        sss[combined].push_back(Benchmark<Sss::Signal, Sss>::combined(N));
 
         std::cout << "[Line: " << __LINE__ << "]" << std::endl;
 
         auto& wsg = records["winglot Signals"];
-        wsg[construction].emplace_back(Wsg::construction(N));
-        wsg[destruction].emplace_back(Wsg::destruction(N));
-        wsg[connection].emplace_back(Wsg::connection(N));
-        wsg[emission].emplace_back(Wsg::emission(N));
-        wsg[combined].emplace_back(Wsg::combined(N));
+        wsg[construction].push_back(Benchmark<Wsg::Signal, Wsg>::construction(N));
+        wsg[destruction].push_back(Benchmark<Wsg::Signal, Wsg>::destruction(N));
+        wsg[connection].push_back(Benchmark<Wsg::Signal, Wsg>::connection(N));
+        wsg[emission].push_back(Benchmark<Wsg::Signal, Wsg>::emission(N));
+        wsg[combined].push_back(Benchmark<Wsg::Signal, Wsg>::combined(N));
 
         std::cout << "\n[Test Size: " << N << "] END" << std::endl;
     }
+
+    //--------------------------------------------------------------------------
 
     if (std::ofstream ofs { "report.txt", std::ios::app })
     {
@@ -200,7 +206,6 @@ int main(int argc, char* argv[])
     {
         std::cerr << "Unable to append report.txt: [error]" << std::endl;
     }
-    std::cout << "\nBenchmarks Completed: [paused]" << std::endl;
     std::cin.get();
 }
 
