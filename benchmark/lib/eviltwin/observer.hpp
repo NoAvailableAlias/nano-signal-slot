@@ -41,10 +41,10 @@ namespace detail
 
   // Slap the baby's bottom. This functions creates a complete no-op shared_ptr
   // which we use as the 'heartbeat' for the Subject
-  UniversalPtr createHeartBeat()
+  /*UniversalPtr createHeartBeat()
   {
     return createEmptyPtr([] (void*) {});
-  }
+  }*/
 
   // A base class for handling common code in all Subjects. Normally using
   // inheritance for code reuse is bad but in this case it is a common idiom
@@ -54,7 +54,8 @@ namespace detail
   class SubjectBase
   {
   protected:
-    SubjectBase(): heartBeat_(createHeartBeat()) {}
+    //SubjectBase(): heartBeat_(createHeartBeat()) {}
+    SubjectBase(): heartBeat_(createEmptyPtr([](void*){})) {}
 
     Registration registerObserver(UniversalPtr fptr)
     {
