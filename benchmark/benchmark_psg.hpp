@@ -36,6 +36,13 @@ class Psg
     {
         subject.Emit(rng);
     }
+
+    static void validate_assert(std::size_t);
+    static double construction(std::size_t);
+    static double destruction(std::size_t);
+    static double connection(std::size_t);
+    static double emission(std::size_t);
+    static double combined(std::size_t);
 };
 
 #endif // BENCHMARK_PSG_HPP

@@ -1,5 +1,3 @@
-#include "benchmark.hpp"
-
 #include "benchmark_asg.hpp"
 #include "benchmark_bs1.hpp"
 #include "benchmark_bs2.hpp"
@@ -63,22 +61,20 @@ int main(int argc, char* argv[])
     std::cout << "Change CPU priority now: [paused]" << std::endl;
     std::cin.get();
 
-    Benchmark<Asg::Signal, Asg>::validation_assert(maximum_n);
-    Benchmark<Bs1::Signal, Bs1>::validation_assert(maximum_n);
-    Benchmark<Bs2::Signal, Bs2>::validation_assert(maximum_n);
-    Benchmark<Evf::Signal, Evf>::validation_assert(maximum_n);
-    Benchmark<Evl::Signal, Evl>::validation_assert(maximum_n);
-    Benchmark<Jls::Signal, Jls>::validation_assert(maximum_n);
-    Benchmark<Nls::Signal, Nls>::validation_assert(maximum_n);
-    Benchmark<Nss::Signal, Nss>::validation_assert(maximum_n);
-    Benchmark<Psg::Signal, Psg>::validation_assert(maximum_n);
-    Benchmark<Sss::Signal, Sss>::validation_assert(maximum_n);
-    Benchmark<Wsg::Signal, Wsg>::validation_assert(maximum_n);
+    Asg::validate_assert(maximum_n);
+    Bs1::validate_assert(maximum_n);
+    Bs2::validate_assert(maximum_n);
+    Evf::validate_assert(maximum_n);
+    Evl::validate_assert(maximum_n);
+    Jls::validate_assert(maximum_n);
+    Nls::validate_assert(maximum_n);
+    Nss::validate_assert(maximum_n);
+    Psg::validate_assert(maximum_n);
+    Sss::validate_assert(maximum_n);
+    Wsg::validate_assert(maximum_n);
 
     auto start = std::chrono::system_clock::now();
     auto start_c = std::chrono::system_clock::to_time_t(start);
-
-    //--------------------------------------------------------------------------
 
     // Double the input size N for every iteration
     for(std::size_t N = start_n; N <= maximum_n; N *= 2)
@@ -88,101 +84,101 @@ int main(int argc, char* argv[])
         std::cout << "[Line: " << __LINE__ << "]" << std::endl;
 
         auto& asg = records["amc522 Signal11"];
-        asg[construction].push_back(Benchmark<Asg::Signal, Asg>::construction(N));
-        asg[destruction].push_back(Benchmark<Asg::Signal, Asg>::destruction(N));
-        asg[connection].push_back(Benchmark<Asg::Signal, Asg>::connection(N));
-        asg[emission].push_back(Benchmark<Asg::Signal, Asg>::emission(N));
-        asg[combined].push_back(Benchmark<Asg::Signal, Asg>::combined(N));
+        asg[construction].push_back(Asg::construction(N));
+        asg[destruction].push_back(Asg::destruction(N));
+        asg[connection].push_back(Asg::connection(N));
+        asg[emission].push_back(Asg::emission(N));
+        asg[combined].push_back(Asg::combined(N));
 
         std::cout << "[Line: " << __LINE__ << "]" << std::endl;
 
         auto& bs1 = records["Boost Signals"];
-        bs1[construction].push_back(Benchmark<Bs1::Signal, Bs1>::construction(N));
-        bs1[destruction].push_back(Benchmark<Bs1::Signal, Bs1>::destruction(N));
-        bs1[connection].push_back(Benchmark<Bs1::Signal, Bs1>::connection(N));
-        bs1[emission].push_back(Benchmark<Bs1::Signal, Bs1>::emission(N));
-        bs1[combined].push_back(Benchmark<Bs1::Signal, Bs1>::combined(N));
+        bs1[construction].push_back(Bs1::construction(N));
+        bs1[destruction].push_back(Bs1::destruction(N));
+        bs1[connection].push_back(Bs1::connection(N));
+        bs1[emission].push_back(Bs1::emission(N));
+        bs1[combined].push_back(Bs1::combined(N));
 
         std::cout << "[Line: " << __LINE__ << "]" << std::endl;
 
         auto& bs2 = records["Boost Signals2"];
-        bs2[construction].push_back(Benchmark<Bs2::Signal, Bs2>::construction(N));
-        bs2[destruction].push_back(Benchmark<Bs2::Signal, Bs2>::destruction(N));
-        bs2[connection].push_back(Benchmark<Bs2::Signal, Bs2>::connection(N));
-        bs2[emission].push_back(Benchmark<Bs2::Signal, Bs2>::emission(N));
-        bs2[combined].push_back(Benchmark<Bs2::Signal, Bs2>::combined(N));
+        bs2[construction].push_back(Bs2::construction(N));
+        bs2[destruction].push_back(Bs2::destruction(N));
+        bs2[connection].push_back(Bs2::connection(N));
+        bs2[emission].push_back(Bs2::emission(N));
+        bs2[combined].push_back(Bs2::combined(N));
 
         std::cout << "[Line: " << __LINE__ << "]" << std::endl;
 
         auto& evf = records["EvilTwin Obs Fork"];
-        evf[construction].push_back(Benchmark<Evf::Signal, Evf>::construction(N));
-        evf[destruction].push_back(Benchmark<Evf::Signal, Evf>::destruction(N));
-        evf[connection].push_back(Benchmark<Evf::Signal, Evf>::connection(N));
-        evf[emission].push_back(Benchmark<Evf::Signal, Evf>::emission(N));
-        evf[combined].push_back(Benchmark<Evf::Signal, Evf>::combined(N));
+        evf[construction].push_back(Evf::construction(N));
+        evf[destruction].push_back(Evf::destruction(N));
+        evf[connection].push_back(Evf::connection(N));
+        evf[emission].push_back(Evf::emission(N));
+        evf[combined].push_back(Evf::combined(N));
 
         std::cout << "[Line: " << __LINE__ << "]" << std::endl;
 
         auto& evl = records["EvilTwin Observer"];
-        evl[construction].push_back(Benchmark<Evl::Signal, Evl>::construction(N));
-        evl[destruction].push_back(Benchmark<Evl::Signal, Evl>::destruction(N));
-        evl[connection].push_back(Benchmark<Evl::Signal, Evl>::connection(N));
-        evl[emission].push_back(Benchmark<Evl::Signal, Evl>::emission(N));
-        evl[combined].push_back(Benchmark<Evl::Signal, Evl>::combined(N));
+        evl[construction].push_back(Evl::construction(N));
+        evl[destruction].push_back(Evl::destruction(N));
+        evl[connection].push_back(Evl::connection(N));
+        evl[emission].push_back(Evl::emission(N));
+        evl[combined].push_back(Evl::combined(N));
 
         std::cout << "[Line: " << __LINE__ << "]" << std::endl;
 
         auto& jls = records["Jl_signal"];
-        jls[construction].push_back(Benchmark<Jls::Signal, Jls>::construction(N));
-        jls[destruction].push_back(Benchmark<Jls::Signal, Jls>::destruction(N));
-        jls[connection].push_back(Benchmark<Jls::Signal, Jls>::connection(N));
-        jls[emission].push_back(Benchmark<Jls::Signal, Jls>::emission(N));
-        jls[combined].push_back(Benchmark<Jls::Signal, Jls>::combined(N));
+        jls[construction].push_back(Jls::construction(N));
+        jls[destruction].push_back(Jls::destruction(N));
+        jls[connection].push_back(Jls::connection(N));
+        jls[emission].push_back(Jls::emission(N));
+        jls[combined].push_back(Jls::combined(N));
 
         std::cout << "[Line: " << __LINE__ << "]" << std::endl;
 
         auto& nls = records["neosigslot"];
-        nls[construction].push_back(Benchmark<Nls::Signal, Nls>::construction(N));
-        nls[destruction].push_back(Benchmark<Nls::Signal, Nls>::destruction(N));
-        nls[connection].push_back(Benchmark<Nls::Signal, Nls>::connection(N));
-        nls[emission].push_back(Benchmark<Nls::Signal, Nls>::emission(N));
-        nls[combined].push_back(Benchmark<Nls::Signal, Nls>::combined(N));
+        nls[construction].push_back(Nls::construction(N));
+        nls[destruction].push_back(Nls::destruction(N));
+        nls[connection].push_back(Nls::connection(N));
+        nls[emission].push_back(Nls::emission(N));
+        nls[combined].push_back(Nls::combined(N));
 
         std::cout << "[Line: " << __LINE__ << "]" << std::endl;
 
         auto& nss = records["Nano-signal-slot"];
-        nss[construction].push_back(Benchmark<Nss::Signal, Nss>::construction(N));
-        nss[destruction].push_back(Benchmark<Nss::Signal, Nss>::destruction(N));
-        nss[connection].push_back(Benchmark<Nss::Signal, Nss>::connection(N));
-        nss[emission].push_back(Benchmark<Nss::Signal, Nss>::emission(N));
-        nss[combined].push_back(Benchmark<Nss::Signal, Nss>::combined(N));
+        nss[construction].push_back(Nss::construction(N));
+        nss[destruction].push_back(Nss::destruction(N));
+        nss[connection].push_back(Nss::connection(N));
+        nss[emission].push_back(Nss::emission(N));
+        nss[combined].push_back(Nss::combined(N));
 
         std::cout << "[Line: " << __LINE__ << "]" << std::endl;
 
         auto& psg = records["pbhogan Signals"];
-        psg[construction].push_back(Benchmark<Psg::Signal, Psg>::construction(N));
-        psg[destruction].push_back(Benchmark<Psg::Signal, Psg>::destruction(N));
-        psg[connection].push_back(Benchmark<Psg::Signal, Psg>::connection(N));
-        psg[emission].push_back(Benchmark<Psg::Signal, Psg>::emission(N));
-        psg[combined].push_back(Benchmark<Psg::Signal, Psg>::combined(N));
+        psg[construction].push_back(Psg::construction(N));
+        psg[destruction].push_back(Psg::destruction(N));
+        psg[connection].push_back(Psg::connection(N));
+        psg[emission].push_back(Psg::emission(N));
+        psg[combined].push_back(Psg::combined(N));
         
         std::cout << "[Line: " << __LINE__ << "]" << std::endl;
 
         auto& sss = records["supergrover sigslot"];
-        sss[construction].push_back(Benchmark<Sss::Signal, Sss>::construction(N));
-        sss[destruction].push_back(Benchmark<Sss::Signal, Sss>::destruction(N));
-        sss[connection].push_back(Benchmark<Sss::Signal, Sss>::connection(N));
-        sss[emission].push_back(Benchmark<Sss::Signal, Sss>::emission(N));
-        sss[combined].push_back(Benchmark<Sss::Signal, Sss>::combined(N));
+        sss[construction].push_back(Sss::construction(N));
+        sss[destruction].push_back(Sss::destruction(N));
+        sss[connection].push_back(Sss::connection(N));
+        sss[emission].push_back(Sss::emission(N));
+        sss[combined].push_back(Sss::combined(N));
 
         std::cout << "[Line: " << __LINE__ << "]" << std::endl;
 
         auto& wsg = records["winglot Signals"];
-        wsg[construction].push_back(Benchmark<Wsg::Signal, Wsg>::construction(N));
-        wsg[destruction].push_back(Benchmark<Wsg::Signal, Wsg>::destruction(N));
-        wsg[connection].push_back(Benchmark<Wsg::Signal, Wsg>::connection(N));
-        wsg[emission].push_back(Benchmark<Wsg::Signal, Wsg>::emission(N));
-        wsg[combined].push_back(Benchmark<Wsg::Signal, Wsg>::combined(N));
+        wsg[construction].push_back(Wsg::construction(N));
+        wsg[destruction].push_back(Wsg::destruction(N));
+        wsg[connection].push_back(Wsg::connection(N));
+        wsg[emission].push_back(Wsg::emission(N));
+        wsg[combined].push_back(Wsg::combined(N));
 
         std::cout << "\n[Test Size: " << N << "] END" << std::endl;
     }

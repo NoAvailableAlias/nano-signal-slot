@@ -81,9 +81,6 @@ static RangeHelper<Iterator> Range(Iterator lhs,
 
 //------------------------------------------------------------------------------
 
-namespace
-{
-
 class chrono_timer
 {
     std::chrono::time_point<std::chrono::high_resolution_clock> m_start;
@@ -107,8 +104,6 @@ struct IncrementFill
     std::size_t i = 0;
     std::size_t operator()() { return i++; }
 };
-
-}
 
 //------------------------------------------------------------------------------
 
