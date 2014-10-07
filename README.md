@@ -62,7 +62,7 @@ signal_two.disconnect<Foo, &Foo::handler_b>(foo);
 signal_one.disconnect<Foo::handler_c>();
 
 // Disconnect a free function
-signal_two.disconnect<handler_c>();
+signal_two.disconnect<handler_d>();
 ```
 
 #### Connection Management
@@ -80,6 +80,7 @@ struct Foo : public Nano::Observer
 	...
 ```
 
+
 Performance
 -----------
 
@@ -89,32 +90,31 @@ Performance
 + -------------------------------------------------------------------------------- +
 | Library             |  construct |  destruct |  connect  |  emission |  combined |
 + -------------------------------------------------------------------------------- +
-| Jl_signal           |  13621.97  |  6267.07  |  43055.01 |  41029.04 |  3560.67  |
-| amc522 Signal11     |  26042.47  |  902.47   |  572.37   |  32892.97 |  300.83   |
-| EvilTwin Obs Fork   |  24312.01  |  405.96   |  209.87   |  19649.00 |  101.13   |
-| pbhogan Signals     |  10563.03  |  529.66   |  261.47   |  29598.50 |  160.63   |
-| EvilTwin Observer   |  21806.37  |  358.08   |  151.01   |  18483.56 |  97.41    |
-| supergrover sigslot |  812.13    |  219.87   |  99.69    |  36957.01 |  57.67    |
-| * winglot Signals   |  330.58    |  291.75   |  203.65   |  29737.04 |  73.87    |
-| Nano-signal-slot    |  1026.58   |  482.56   |  278.72   |  24285.34 |  125.63   |
-| Boost Signals       |  714.46    |  144.81   |  45.73    |  4208.69  |  31.27    |
-| * Boost Signals2    |  800.15    |  268.77   |  129.43   |  2964.32  |  69.09    |
-| * neosigslot        |  1064.29   |  373.64   |  164.65   |  736.85   |  75.07    |
+| Jl_signal           |  145161.97 |  8828.51  |  47577.79 |  39814.73 |  5997.68  |
+| amc522 Signal11     |  149452.90 |  5575.79  |  3640.45  |  32080.56 |  2042.84  |
+| pbhogan Signals     |  133265.63 |  4150.35  |  3406.87  |  30616.29 |  1794.07  |
+| EvilTwin Obs Fork   |  129236.90 |  3153.31  |  1735.39  |  18904.88 |  1046.02  |
+| EvilTwin Observer   |  123673.13 |  2148.93  |  1094.75  |  19242.94 |  708.81   |
+| supergrover sigslot |  13330.19  |  1183.43  |  1977.58  |  38502.43 |  668.60   |
+| Nano-signal-slot    |  12493.60  |  3899.84  |  3828.53  |  28263.30 |  1631.76  |
+| * winglot Signals   |  5564.77   |  1856.80  |  2322.04  |  29981.18 |  853.71   |
+| * neosigslot        |  12329.68  |  2294.43  |  2067.94  |  6611.30  |  854.06   |
+| Boost Signals       |  8915.83   |  1670.17  |  556.03   |  4226.06  |  363.13   |
+| * Boost Signals2    |  6716.64   |  1840.39  |  798.68   |  3174.60  |  439.43   |
 + -------------------------------------------------------------------------------- +
 ```
-_* Library aims to be thread safe._
 
 Allocator
 ---------
 
-To utilize allocators in Nano-signal-slot, the only change needed is the following:
+To utilize allocators in Nano-signal-slot, the only change required is the following:
 
 ```
-    // Change
+    // Before
     std::map<DelegateKey, Observer*> tracked_connections;
 ```
 ```
-    // To
+    // After
     using Allocator = YourAllocator<std::map<DelegateKey, Observer*>::value_type>;
     std::map<DelegateKey, Observer*, std::less<DelegateKey>, Allocator> tracked_connections;
 ```
@@ -127,17 +127,34 @@ _Jl_signal uses a custom static allocator to achieve high performance._
 + -------------------------------------------------------------------------------- +
 | Library             |  construct |  destruct |  connect  |  emission |  combined |
 + -------------------------------------------------------------------------------- +
-| Jl_signal           |  14424.43  |  6711.48  |  43139.61 |  39783.57 |  3940.62  |
-| Nano-signal-slot    |  26513.30  |  5376.19  |  8179.32  |  27180.79 |  2597.05  |
-| amc522 Signal11     |  27608.88  |  934.51   |  598.57   |  31598.73 |  314.26   |
-| EvilTwin Obs Fork   |  24071.42  |  403.41   |  192.20   |  19081.48 |  100.06   |
-| EvilTwin Observer   |  22076.84  |  362.93   |  158.25   |  19055.19 |  95.82    |
-| pbhogan Signals     |  10091.72  |  539.62   |  266.03   |  28799.46 |  161.86   |
-| supergrover sigslot |  825.57    |  218.69   |  105.17   |  38399.19 |  57.70    |
-| * winglot Signals   |  336.90    |  295.14   |  201.78   |  31580.88 |  73.60    |
-| Boost Signals       |  744.24    |  148.17   |  44.89    |  4365.43  |  31.07    |
-| * Boost Signals2    |  790.10    |  233.38   |  139.09   |  3285.30  |  68.57    |
-| * neosigslot        |  1251.39   |  379.12   |  158.28   |  756.85   |  77.47    |
+| Jl_signal           |  142583.31 |  9441.12  |  47558.71 |  39957.49 |  6207.17  |
+| amc522 Signal11     |  149475.55 |  5652.26  |  3684.45  |  32263.83 |  2057.11  |
+| pbhogan Signals     |  130972.16 |  4089.34  |  3444.45  |  30025.49 |  1766.30  |
+| EvilTwin Obs Fork   |  132207.76 |  3212.45  |  1735.47  |  19003.71 |  1023.43  |
+| EvilTwin Observer   |  118959.42 |  2114.94  |  1102.22  |  18918.39 |  704.48   |
+| Nano-signal-slot    |  70201.91  |  7999.57  |  8382.54  |  28353.72 |  3605.56  |
+| supergrover sigslot |  13067.66  |  1157.52  |  1991.76  |  39613.48 |  663.45   |
+| * winglot Signals   |  5811.09   |  1953.51  |  2436.36  |  32844.27 |  895.75   |
+| * neosigslot        |  12341.82  |  2282.84  |  2059.40  |  6416.81  |  850.81   |
+| Boost Signals       |  9095.11   |  1686.62  |  544.76   |  4341.32  |  359.59   |
+| * Boost Signals2    |  6649.52   |  1873.46  |  809.35   |  3194.13  |  444.24   |
 + -------------------------------------------------------------------------------- +
 ```
 _* Library aims to be thread safe._
+
+Release Build Size
+------------------
+
+| Library | Object File Size |
+| ------- | ---------------- |
+| Jl_signal | 846 kb |
+| winglot Signals | 904 kb |
+| Nano-signal-slot | 908 kb |
+| EvilTwin Obs Fork | 955 kb |
+| supergrover sigslot | 966 kb |
+| pbhogan Signals | 967 kb |
+| EvilTwin Observer | 973 kb |
+| amc522 Signal11 | 981 kb |
+| Boost Signals | 1,375 kb |
+| neosigslot | 1,940 kb |
+| Boost Signals2 | 2,350 kb |
