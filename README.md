@@ -112,5 +112,5 @@ _Because of possible misuse, function objects will not be supported by default._
 
 #### Notes
 
-[Performance](https://github.com/NoAvailableAlias/nano-signal-slot/tree/master/benchmark)
-[Build Sizes](https://github.com/NoAvailableAlias/nano-signal-slot/tree/master/benchmark#release-build-size)
+| [Performance](https://github.com/NoAvailableAlias/nano-signal-slot/tree/master/benchmark) | [Build Sizes](https://github.com/NoAvailableAlias/nano-signal-slot/tree/master/benchmark#release-build-size) |
+|:----------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------:|
