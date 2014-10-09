@@ -11,9 +11,6 @@ template <typename T_rv> class Signal;
 template <typename T_rv, typename... Args>
 class Signal<T_rv(Args...)> : private Observer
 {
-
-//-----------------------------------------------------------------------PRIVATE
-
     template <typename T>
     void insert_sfinae(DelegateKey const& key, typename T::Observer* instance)
     {
@@ -41,7 +38,7 @@ class Signal<T_rv(Args...)> : private Observer
 
     using Function = Function<T_rv(Args...)>;
     
-//-----------------------------------------------------------------------CONNECT
+    //-------------------------------------------------------------------CONNECT
 
     template <T_rv (*fun_ptr)(Args...)>
     void connect()
@@ -73,7 +70,7 @@ class Signal<T_rv(Args...)> : private Observer
         connect<T, mem_ptr>(std::addressof(instance));
     }
     
-//--------------------------------------------------------------------DISCONNECT
+    //----------------------------------------------------------------DISCONNECT
 
     template <T_rv (*fun_ptr)(Args...)>
     void disconnect()
@@ -105,7 +102,7 @@ class Signal<T_rv(Args...)> : private Observer
         disconnect<T, mem_ptr>(std::addressof(instance));
     }
     
-//--------------------------------------------------------------------------EMIT
+    //----------------------------------------------------------------------EMIT
 
     void operator() (Args... args)
     {
@@ -122,7 +119,6 @@ class Signal<T_rv(Args...)> : private Observer
             sink(Function(std::get<0>(slot))(std::forward<Args>(args)...));
         }
     }
-
 };
 
 } // namespace Nano ------------------------------------------------------------

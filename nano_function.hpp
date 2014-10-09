@@ -13,28 +13,26 @@ template <typename T_rv> class Function;
 template <typename T_rv, typename... Args>
 class Function<T_rv(Args...)>
 {
-
-//-----------------------------------------------------------------------PRIVATE
-
     template <typename T> friend class Signal;
 
-    typedef T_rv (*sig_t)(void*, Args...);
+    using Thunk = T_rv(*)(void*, Args...);
 
     void* m_this_ptr; // instance pointer
-    sig_t m_stub_ptr; // free function pointer
+    Thunk m_stub_ptr; // free function pointer
 
     template <typename T, typename F>
     Function (T&& this_ptr, F&& stub_ptr):
         m_this_ptr { std::forward<T>(this_ptr) },
         m_stub_ptr { std::forward<F>(stub_ptr) } {}
 
+    /*Function (void* this_ptr, Thunk stub_ptr):
+        m_this_ptr { this_ptr }, m_stub_ptr { stub_ptr } {}*/
+
     Function (DelegateKey const& _k):
         m_this_ptr { reinterpret_cast<void*>(std::get<0>(_k)) },
-        m_stub_ptr { reinterpret_cast<sig_t>(std::get<1>(_k)) } {}
+        m_stub_ptr { reinterpret_cast<Thunk>(std::get<1>(_k)) } {}
 
     public:
-
-//--------------------------------------------------------------------------BIND
 
     template <T_rv (*fun_ptr)(Args...)>
     static inline Function bind()
@@ -57,13 +55,11 @@ class Function<T_rv(Args...)>
             (std::forward<Args>(args)...); }};
     }
 
-//--------------------------------------------------------------INSTANCE METHODS
-
     inline T_rv operator() (Args... args)
     {
         return (*m_stub_ptr)(m_this_ptr, std::forward<Args>(args)...);
     }
-    operator DelegateKey() const
+    inline operator DelegateKey() const
     {
         return
         {
