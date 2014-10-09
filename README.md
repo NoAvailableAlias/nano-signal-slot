@@ -82,7 +82,7 @@ struct Foo : public Nano::Observer
 
 #### Function Objects
 
-_Because of the possible misuse, function objects will not be supported by default._
+_Because of possible misuse, function objects will not be supported by default._
 
 ```
 ... // add the following to Nano::Function<T_rv(Args...)>
@@ -109,3 +109,8 @@ _Because of the possible misuse, function objects will not be supported by defau
         Observer::remove(Function::template bind(instance));
     }
 ```
+
+#### Notes
+
+[Performance](https://github.com/NoAvailableAlias/nano-signal-slot/tree/master/benchmark)
+[Build Sizes](https://github.com/NoAvailableAlias/nano-signal-slot/tree/master/benchmark#release-build-size)
