@@ -259,7 +259,7 @@ void outputReport(ImmediateData const& records, T& ost)
             auto const& opName = column.first;
             auto const& val = column.second;
 
-            ost << ", " << setprecision(2) << fixed << val;
+            ost << ", " << setprecision(0) << fixed << val;
         }
         ost << "\n";
     }

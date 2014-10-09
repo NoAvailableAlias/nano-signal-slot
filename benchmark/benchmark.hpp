@@ -120,7 +120,7 @@ template <typename Subject, typename Foo> class Benchmark
 
     public:
 
-    NOINLINE(static void validation_assert(std::size_t N))
+    static void validation_assert(std::size_t N)
     {
         Rng rng;
         std::size_t count = 0;
@@ -143,7 +143,7 @@ template <typename Subject, typename Foo> class Benchmark
 
     //--------------------------------------------------------------------------
 
-    NOINLINE(static double construction(std::size_t N))
+    static double construction(std::size_t N)
     {
         std::size_t count = 1;
         std::size_t elapsed = 0;
@@ -152,7 +152,7 @@ template <typename Subject, typename Foo> class Benchmark
         {
             s_timer.reset();
 
-            Subject* subject = new Subject;
+            volatile Subject* subject = new Subject;
             std::vector<Foo> foo(N);
 
             elapsed += s_timer.count<Timer_u>();
@@ -164,7 +164,7 @@ template <typename Subject, typename Foo> class Benchmark
 
     //--------------------------------------------------------------------------
 
-    NOINLINE(static double destruction(std::size_t N))
+    static double destruction(std::size_t N)
     {
         std::size_t count = 1;
         std::size_t elapsed = 0;
@@ -192,7 +192,7 @@ template <typename Subject, typename Foo> class Benchmark
 
     //--------------------------------------------------------------------------
 
-    NOINLINE(static double connection(std::size_t N))
+    static double connection(std::size_t N)
     {
         std::size_t count = 1;
         std::size_t elapsed = 0;
@@ -220,7 +220,7 @@ template <typename Subject, typename Foo> class Benchmark
 
     //--------------------------------------------------------------------------
 
-    NOINLINE(static double emission(std::size_t N))
+    static double emission(std::size_t N)
     {
         std::size_t count = 1;
         std::size_t elapsed = 0;
@@ -250,7 +250,7 @@ template <typename Subject, typename Foo> class Benchmark
 
     //--------------------------------------------------------------------------
 
-    NOINLINE(static double combined(std::size_t N))
+    static double combined(std::size_t N)
     {
         std::size_t count = 1;
         std::size_t elapsed = 0;
