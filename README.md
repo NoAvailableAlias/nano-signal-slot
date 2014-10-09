@@ -79,3 +79,33 @@ struct Foo : public Nano::Observer
     }
 	...
 ```
+
+#### Function Objects
+
+_Because of the possible misuse, function objects will not be supported by default._
+
+```
+... // add the following to Nano::Function<T_rv(Args...)>
+
+    template <typename L>
+    static inline Function bind(L* pointer)
+    {
+        return { pointer, [](void *this_ptr, Args... args) {
+        return (static_cast<L*>(this_ptr)->operator()(args...)); }};
+    }
+```
+```
+... // add the following to Nano::Signal<T_rv(Args...)>
+
+    template <typename L>
+    void connect(L* instance)
+    {
+        Observer::insert(Function::template bind(instance));
+    }
+...
+    template <typename L>
+    void disconnect(L* instance)
+    {
+        Observer::remove(Function::template bind(instance));
+    }
+```
