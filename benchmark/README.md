@@ -15,7 +15,7 @@ Performance
 | EvilTwin Observer    |  107610    |  2338     |  1098    |  19188    |  723      |
 | joanrieu signal11    |  86338     |  4525     |  3366    |  7625     |  1533     |
 | supergrover sigslot  |  11880     |  1403     |  2166    |  41723    |  766      |
-| Nano-signal-slot     |  13771     |  4169     |  4335    |  30313    |  1823     |
+| Nano-signal-slot     |  13771     |  4169     |  4335    |  30313    |  1823     | <-
 | * winglot Signals    |  5568      |  1998     |  2548    |  33095    |  899      |
 | * neosigslot         |  13616     |  2506     |  2367    |  6508     |  921      |
 | Boost Signals        |  8139      |  1688     |  586     |  4262     |  366      |
@@ -37,7 +37,7 @@ To utilize allocators in Nano-signal-slot, the only change required is the follo
     std::map<DelegateKey, Observer*, std::less<DelegateKey>, Allocator> tracked_connections;
 ```
 
-_Jl_signal uses a custom static allocator to achieve high performance._
+_Jl_signal uses a static allocator and custom linked list to achieve high performance._
 
 ```
 + -------------------------------------------------------------------------------- +
@@ -49,7 +49,7 @@ _Jl_signal uses a custom static allocator to achieve high performance._
 | pbhogan Signals      |  114170    |  4167     |  3616    |  32659    |  1808     |
 | EvilTwin Fork        |  111976    |  3226     |  1805    |  19350    |  1090     |
 | EvilTwin Observer    |  100186    |  2177     |  1086    |  19505    |  729      |
-| Nano-signal-slot     |  73118     |  8362     |  9273    |  28565    |  3919     |
+| Nano-signal-slot     |  73118     |  8362     |  9273    |  28565    |  3919     | <-
 | joanrieu signal11    |  85838     |  4720     |  3419    |  7619     |  1532     |
 | supergrover sigslot  |  11943     |  1365     |  2091    |  39375    |  752      |
 | * winglot Signals    |  5366      |  2035     |  2485    |  31195    |  898      |
@@ -78,3 +78,14 @@ Size Metrics
 | [Boost Signals](http://www.boost.org/doc/libs/1_56_0/doc/html/signals.html) | 1,375 kb | N/A | - |
 | [neosigslot](http://www.i42.co.uk/stuff/neosigslot.htm) | 1,940 kb | 2496 ~ | - |
 | [Boost Signals2](http://www.boost.org/doc/libs/1_56_0/doc/html/signals2.html) | 2,350 kb | N/A | X |
+
+##### Notes
+
+| [Benchmark Algorithms](https://github.com/NoAvailableAlias/nano-signal-slot/blob/master/benchmark/benchmark.hpp#L110) | Description |
+| --------------------------------------------------------------------------------------------------------------------- | ----------- |
+| [validation_assert](https://github.com/NoAvailableAlias/nano-signal-slot/blob/master/benchmark/benchmark.hpp#L123) | Make sure the Signal implementation is functioning correctly. |
+| [construction](https://github.com/NoAvailableAlias/nano-signal-slot/blob/master/benchmark/benchmark.hpp#L146) | Time the construction of a Signal and associated Foo instances. |
+| [destruction](https://github.com/NoAvailableAlias/nano-signal-slot/blob/master/benchmark/benchmark.hpp#L167) | Time the destruction of a Signal and associated Connections to Foo instances. |
+| [connection](https://github.com/NoAvailableAlias/nano-signal-slot/blob/master/benchmark/benchmark.hpp#L195) | Time Signal connections to random Foo instances. |
+| [emission](https://github.com/NoAvailableAlias/nano-signal-slot/blob/master/benchmark/benchmark.hpp#L223) | Time how long it takes to complete a Signal emission. |
+| [combined](https://github.com/NoAvailableAlias/nano-signal-slot/blob/master/benchmark/benchmark.hpp#L253) | Time all the above together. |
