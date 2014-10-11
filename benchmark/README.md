@@ -63,18 +63,18 @@ _* Library aims to be thread safe._
 Size Metrics
 ------------
 
-| Library       [MSVC] | Object File Size ^ | Lines of Code |
-| -------------------- | ------------------ | ------------- |
-| [jeffomatic Jl_signal](https://github.com/jeffomatic/jl_signal) | 846 kb | ~ 6060 |
-| [winglot Signals](https://github.com/winglot/Signals) | 904 kb | 427 |
-| [Nano-signal-slot](https://github.com/NoAvailableAlias/nano-signal-slot) | 908 kb | 251 |
-| [EvilTwin Fork](https://github.com/NoAvailableAlias/nano-signal-slot/blob/master/benchmark/lib/eviltwin/observer_fork.hpp) | 955 kb | 65 |
-| [supergrover sigslot](https://github.com/supergrover/sigslot) | 966 kb | 185 |
-| [pbhogan Signals](https://github.com/pbhogan/Signals) | 967 kb | ~ 2595 |
-| [EvilTwin Observer](http://eviltwingames.com/blog/the-observer-pattern-revisited/) | 973 kb | 117 |
-| [mwthinker Signal](https://github.com/mwthinker/Signal) | 975 kb | 171 |
-| [amc522 Signal11](https://github.com/amc522/Signal11) | 981 kb | 730 |
-| [joanrieu signal11](https://github.com/joanrieu/signal11) | 1,006 kb | 47 |
-| [Boost Signals](http://www.boost.org/doc/libs/1_56_0/doc/html/signals.html) | 1,375 kb | N/A |
-| [neosigslot](http://www.i42.co.uk/stuff/neosigslot.htm) | 1,940 kb | ~ 2496 |
-| [Boost Signals2](http://www.boost.org/doc/libs/1_56_0/doc/html/signals2.html) | 2,350 kb | N/A |
+| Library | Object File Size ^ | Lines of Code | Header Only |
+| ------- | ------------------ | ------------- |:-----------:|
+| [jeffomatic Jl_signal](https://github.com/jeffomatic/jl_signal) | 846 kb | 6060 ~ | - |
+| [winglot Signals](https://github.com/winglot/Signals) | 904 kb | 427 | - |
+| [Nano-signal-slot](https://github.com/NoAvailableAlias/nano-signal-slot) | 908 kb | 251 | X |
+| [EvilTwin Fork](https://github.com/NoAvailableAlias/nano-signal-slot/blob/master/benchmark/lib/eviltwin/observer_fork.hpp) | 955 kb | 65 | X |
+| [supergrover sigslot](https://github.com/supergrover/sigslot) | 966 kb | 185 | - |
+| [pbhogan Signals](https://github.com/pbhogan/Signals) | 967 kb | 2595 ~ | X |
+| [EvilTwin Observer](http://eviltwingames.com/blog/the-observer-pattern-revisited/) | 973 kb | 117 | X |
+| [mwthinker Signal](https://github.com/mwthinker/Signal) | 975 kb | 171 | - |
+| [amc522 Signal11](https://github.com/amc522/Signal11) | 981 kb | 730 | X |
+| [joanrieu signal11](https://github.com/joanrieu/signal11) | 1,006 kb | 47 | X |
+| [Boost Signals](http://www.boost.org/doc/libs/1_56_0/doc/html/signals.html) | 1,375 kb | N/A | - |
+| [neosigslot](http://www.i42.co.uk/stuff/neosigslot.htm) | 1,940 kb | 2496 ~ | - |
+| [Boost Signals2](http://www.boost.org/doc/libs/1_56_0/doc/html/signals2.html) | 2,350 kb | N/A | X |
