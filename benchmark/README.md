@@ -79,13 +79,14 @@ Size Metrics
 | [neosigslot](http://www.i42.co.uk/stuff/neosigslot.htm) | 1,940 kb | 2496 ~ | - |
 | [Boost Signals2](http://www.boost.org/doc/libs/1_56_0/doc/html/signals2.html) | 2,350 kb | N/A | X |
 
-##### Notes
+Benchmark Algorithms
+--------------------
 
-| [Benchmark Algorithms](https://github.com/NoAvailableAlias/nano-signal-slot/blob/master/benchmark/benchmark.hpp#L110) | Description |
-| --------------------------------------------------------------------------------------------------------------------- | ----------- |
+| Algorithm | Description |
+| --------- | ----------- |
 | [validation_assert](https://github.com/NoAvailableAlias/nano-signal-slot/blob/master/benchmark/benchmark.hpp#L123) | Make sure the Signal implementation is functioning correctly. |
-| [construction](https://github.com/NoAvailableAlias/nano-signal-slot/blob/master/benchmark/benchmark.hpp#L146) | Time the construction of a Signal and associated Foo instances. |
-| [destruction](https://github.com/NoAvailableAlias/nano-signal-slot/blob/master/benchmark/benchmark.hpp#L167) | Time the destruction of a Signal and associated Connections to Foo instances. |
-| [connection](https://github.com/NoAvailableAlias/nano-signal-slot/blob/master/benchmark/benchmark.hpp#L195) | Time Signal connections to random Foo instances. |
-| [emission](https://github.com/NoAvailableAlias/nano-signal-slot/blob/master/benchmark/benchmark.hpp#L223) | Time how long it takes to complete a Signal emission. |
+| [construction](https://github.com/NoAvailableAlias/nano-signal-slot/blob/master/benchmark/benchmark.hpp#L146) | Time the construction of a Signal and N number of Foo instances. |
+| [destruction](https://github.com/NoAvailableAlias/nano-signal-slot/blob/master/benchmark/benchmark.hpp#L167) | Time the destruction of a Signal and associated Connections to N number of Foo instances. |
+| [connection](https://github.com/NoAvailableAlias/nano-signal-slot/blob/master/benchmark/benchmark.hpp#L195) | Time Signal connections to an N number of random Foo instances. |
+| [emission](https://github.com/NoAvailableAlias/nano-signal-slot/blob/master/benchmark/benchmark.hpp#L223) | Time how long it takes to complete a Signal emission to N number of slots. |
 | [combined](https://github.com/NoAvailableAlias/nano-signal-slot/blob/master/benchmark/benchmark.hpp#L253) | Time all the above together. |
