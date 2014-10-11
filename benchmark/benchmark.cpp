@@ -4,14 +4,16 @@
 #include "benchmark_evf.hpp"
 #include "benchmark_evl.hpp"
 #include "benchmark_jls.hpp"
+#include "benchmark_jos.hpp"
+#include "benchmark_mws.hpp"
 #include "benchmark_nls.hpp"
 #include "benchmark_nss.hpp"
 #include "benchmark_psg.hpp"
 #include "benchmark_sss.hpp"
 #include "benchmark_wsg.hpp"
 
-#include "lib/jl_signal/Signal.h"
-#include "lib/jl_signal/StaticSignalConnectionAllocators.h"
+#include "lib/jeffomatic/jl_signal/src/Signal.h"
+#include "lib/jeffomatic/jl_signal/src/StaticSignalConnectionAllocators.h"
 
 #include <iostream>
 #include <fstream>
@@ -43,7 +45,7 @@ int main(int argc, char* argv[])
 
     ImmediateData records;
 
-    std::size_t start_n = 8;
+    std::size_t start_n = 4;
     std::size_t maximum_n = 64;
 
     std::cout << "Enter the time limit per sample [milliseconds]: ";
@@ -67,6 +69,8 @@ int main(int argc, char* argv[])
     Evf::validate_assert(maximum_n);
     Evl::validate_assert(maximum_n);
     Jls::validate_assert(maximum_n);
+    Jos::validate_assert(maximum_n);
+    Mws::validate_assert(maximum_n);
     Nls::validate_assert(maximum_n);
     Nss::validate_assert(maximum_n);
     Psg::validate_assert(maximum_n);
@@ -101,7 +105,7 @@ int main(int argc, char* argv[])
 
         std::cout << "[Line: " << __LINE__ << "]" << std::endl;
 
-        auto& bs2 = records["Boost Signals2"];
+        auto& bs2 = records["* Boost Signals2"];
         bs2[construction].push_back(Bs2::construction(N));
         bs2[destruction].push_back(Bs2::destruction(N));
         bs2[connection].push_back(Bs2::connection(N));
@@ -110,7 +114,7 @@ int main(int argc, char* argv[])
 
         std::cout << "[Line: " << __LINE__ << "]" << std::endl;
 
-        auto& evf = records["EvilTwin Obs Fork"];
+        auto& evf = records["EvilTwin Fork"];
         evf[construction].push_back(Evf::construction(N));
         evf[destruction].push_back(Evf::destruction(N));
         evf[connection].push_back(Evf::connection(N));
@@ -128,7 +132,7 @@ int main(int argc, char* argv[])
 
         std::cout << "[Line: " << __LINE__ << "]" << std::endl;
 
-        auto& jls = records["Jl_signal"];
+        auto& jls = records["jeffomatic jl_signal"];
         jls[construction].push_back(Jls::construction(N));
         jls[destruction].push_back(Jls::destruction(N));
         jls[connection].push_back(Jls::connection(N));
@@ -137,7 +141,25 @@ int main(int argc, char* argv[])
 
         std::cout << "[Line: " << __LINE__ << "]" << std::endl;
 
-        auto& nls = records["neosigslot"];
+        auto& jos = records["joanrieu signal11"];
+        jos[construction].push_back(Jos::construction(N));
+        jos[destruction].push_back(Jos::destruction(N));
+        jos[connection].push_back(Jos::connection(N));
+        jos[emission].push_back(Jos::emission(N));
+        jos[combined].push_back(Jos::combined(N));
+
+        std::cout << "[Line: " << __LINE__ << "]" << std::endl;
+
+        auto& mws = records["mwthinker Signal"];
+        mws[construction].push_back(Mws::construction(N));
+        mws[destruction].push_back(Mws::destruction(N));
+        mws[connection].push_back(Mws::connection(N));
+        mws[emission].push_back(Mws::emission(N));
+        mws[combined].push_back(Mws::combined(N));
+
+        std::cout << "[Line: " << __LINE__ << "]" << std::endl;
+
+        auto& nls = records["* neosigslot"];
         nls[construction].push_back(Nls::construction(N));
         nls[destruction].push_back(Nls::destruction(N));
         nls[connection].push_back(Nls::connection(N));
@@ -173,7 +195,7 @@ int main(int argc, char* argv[])
 
         std::cout << "[Line: " << __LINE__ << "]" << std::endl;
 
-        auto& wsg = records["winglot Signals"];
+        auto& wsg = records["* winglot Signals"];
         wsg[construction].push_back(Wsg::construction(N));
         wsg[destruction].push_back(Wsg::destruction(N));
         wsg[connection].push_back(Wsg::connection(N));

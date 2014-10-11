@@ -1,12 +1,17 @@
-#ifndef BENCHMARK_JLS_HPP
-#define BENCHMARK_JLS_HPP
+#ifndef BENCHMARK_JOS_HPP
+#define BENCHMARK_JOS_HPP
 
-#include "lib/jeffomatic/jl_signal/src/Signal.h"
+#include "lib/joanrieu/signal11/signal11.h"
 
 #include "benchmark.hpp"
 
-class Jls : public jl::SignalObserver
+#include <forward_list>
+#include <memory>
+
+class Jos
 {
+    std::forward_list<std::shared_ptr<void>> reg;
+
     NOINLINE(void handler(Rng& rng))
     {
         volatile std::size_t a = rng(); (void)a;
@@ -14,17 +19,22 @@ class Jls : public jl::SignalObserver
 
     public:
 
-    using Signal = jl::Signal<void(Rng&)>;
+    using Signal = signal11<Rng&>;
 
     template <typename Subject, typename Foo>
     static void connect_method(Subject& subject, Foo& foo)
     {
-        subject.Connect(&foo, &Foo::handler);
+        auto con = subject.connect(std::bind(&Foo::handler, &foo, std::placeholders::_1));
+
+        foo.reg.emplace_front(&foo, [con, &subject](void*)
+        {
+            subject.disconnect(con);
+        });
     }
     template <typename Subject, typename Foo>
     static void emit_method(Subject& subject, Foo& rng)
     {
-        subject.Emit(rng);
+        subject(rng);
     }
 
     static void validate_assert(std::size_t);
@@ -35,4 +45,4 @@ class Jls : public jl::SignalObserver
     static double combined(std::size_t);
 };
 
-#endif // BENCHMARK_JLS_HPP
+#endif // BENCHMARK_JOS_HPP
