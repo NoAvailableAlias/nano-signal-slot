@@ -36,26 +36,26 @@ class Signal<T_rv(Args...)> : private Observer
 
     public:
 
-    using Function = Function<T_rv(Args...)>;
+    using Delegate = Function<T_rv(Args...)>;
     
     //-------------------------------------------------------------------CONNECT
 
     template <T_rv (*fun_ptr)(Args...)>
     void connect()
     {
-        Observer::insert(Function::template bind<fun_ptr>());
+        Observer::insert(Delegate::template bind<fun_ptr>());
     }
 
     template <typename T, T_rv (T::*mem_ptr)(Args...)>
     void connect(T* instance)
     {
-        auto delegate  = Function::template bind<T, mem_ptr>(instance);
+        auto delegate  = Delegate::template bind<T, mem_ptr>(instance);
         insert_sfinae<T>(delegate, instance);
     }
     template <typename T, T_rv (T::*mem_ptr)(Args...) const>
     void connect(T* instance)
     {
-        auto delegate  = Function::template bind<T, mem_ptr>(instance);
+        auto delegate  = Delegate::template bind<T, mem_ptr>(instance);
         insert_sfinae<T>(delegate, instance);
     }
     
@@ -75,19 +75,19 @@ class Signal<T_rv(Args...)> : private Observer
     template <T_rv (*fun_ptr)(Args...)>
     void disconnect()
     {
-        Observer::remove(Function::template bind<fun_ptr>());
+        Observer::remove(Delegate::template bind<fun_ptr>());
     }
 
     template <typename T, T_rv (T::*mem_ptr)(Args...)>
     void disconnect(T* instance)
     {
-        auto delegate  = Function::template bind<T, mem_ptr>(instance);
+        auto delegate  = Delegate::template bind<T, mem_ptr>(instance);
         remove_sfinae<T>(delegate, instance);
     }
     template <typename T, T_rv (T::*mem_ptr)(Args...) const>
     void disconnect(T* instance)
     {
-        auto delegate  = Function::template bind<T, mem_ptr>(instance);
+        auto delegate  = Delegate::template bind<T, mem_ptr>(instance);
         remove_sfinae<T>(delegate, instance);
     }
     
@@ -108,7 +108,7 @@ class Signal<T_rv(Args...)> : private Observer
     {
         for (auto const& slot : tracked_connections)
         {
-            Function(std::get<0>(slot))(std::forward<Args>(args)...);
+            Delegate(std::get<0>(slot))(std::forward<Args>(args)...);
         }
     }
     template <typename Accumulator>
@@ -116,7 +116,7 @@ class Signal<T_rv(Args...)> : private Observer
     {
         for (auto const& slot : tracked_connections)
         {
-            sink(Function(std::get<0>(slot))(std::forward<Args>(args)...));
+            sink(Delegate(std::get<0>(slot))(std::forward<Args>(args)...));
         }
     }
 };
