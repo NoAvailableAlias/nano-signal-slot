@@ -7,7 +7,7 @@
 
 class Evl
 {
-    std::vector<obs::detail::UniversalPtr> reg;
+    obs::detail::UniversalPtr reg;
 
     NOINLINE(void handler(Rng& rng))
     {
@@ -21,11 +21,10 @@ class Evl
     template <typename Subject, typename Foo>
     static void connect_method(Subject& subject, Foo& foo)
     {
-        foo.reg.emplace_back(subject.registerObserver(
-            std::bind(&Foo::handler, &foo, std::placeholders::_1)));
+        foo.reg = subject.registerObserver(std::bind(&Foo::handler, &foo, std::placeholders::_1));
     }
-    template <typename Subject, typename Foo>
-    static void emit_method(Subject& subject, Foo& rng)
+    template <typename Subject, typename Arg>
+    static void emit_method(Subject& subject, Arg& rng)
     {
         subject(rng);
     }

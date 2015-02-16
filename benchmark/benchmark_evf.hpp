@@ -7,7 +7,7 @@
 
 class Evf
 {
-    std::forward_list<Nano::Fork::UniversalPtr> reg;
+    Nano::Fork::UniversalPtr reg;
 
     NOINLINE(void handler(Rng& rng))
     {
@@ -21,11 +21,10 @@ class Evf
     template <typename Subject, typename Foo>
     static void connect_method(Subject& subject, Foo& foo)
     {
-        foo.reg.emplace_front(subject.connect(
-            std::bind(&Foo::handler, &foo, std::placeholders::_1)));
+        foo.reg = subject.connect(std::bind(&Foo::handler, &foo, std::placeholders::_1));
     }
-    template <typename Subject, typename Foo>
-    static void emit_method(Subject& subject, Foo& rng)
+    template <typename Subject, typename Arg>
+    static void emit_method(Subject& subject, Arg& rng)
     {
         subject(rng);
     }

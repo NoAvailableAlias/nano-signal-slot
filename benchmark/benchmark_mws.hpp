@@ -5,11 +5,9 @@
 
 #include "benchmark.hpp"
 
-#include <forward_list>
-
 class Mws
 {
-    std::forward_list<mw::signals::Connection> reg;
+    mw::signals::Connection reg;
 
     NOINLINE(void handler(Rng& rng))
     {
@@ -23,10 +21,10 @@ class Mws
     template <typename Subject, typename Foo>
     static void connect_method(Subject& subject, Foo& foo)
     {
-        foo.reg.emplace_front(subject.connect(std::bind(&Foo::handler, &foo, std::placeholders::_1)));
+        foo.reg = subject.connect(std::bind(&Foo::handler, &foo, std::placeholders::_1));
     }
-    template <typename Subject, typename Foo>
-    static void emit_method(Subject& subject, Foo& rng)
+    template <typename Subject, typename Arg>
+    static void emit_method(Subject& subject, Arg& rng)
     {
         subject(rng);
     }

@@ -11,6 +11,7 @@
 #include "benchmark_psg.hpp"
 #include "benchmark_sss.hpp"
 #include "benchmark_wsg.hpp"
+#include "benchmark_yas.hpp"
 
 #include "lib/jeffomatic/jl_signal/src/Signal.h"
 #include "lib/jeffomatic/jl_signal/src/StaticSignalConnectionAllocators.h"
@@ -48,6 +49,8 @@ int main(int argc, char* argv[])
     std::size_t start_n = 4;
     std::size_t maximum_n = 64;
 
+    // 32 bit limit is ~ 4294 ms (when converted to nanoseconds)
+    // Total duration at 4294 is around 3 hours depending on hardware
     std::cout << "Enter the time limit per sample [milliseconds]: ";
     std::size_t limit;
 
@@ -60,7 +63,7 @@ int main(int argc, char* argv[])
     std::cin.ignore();
 
     // Make sure to set process to high priority and affinity to 1 core
-    std::cout << "Change CPU priority now: [paused]" << std::endl;
+    std::cout << "Change the CPU priority now: [paused]" << std::endl;
     std::cin.get();
 
     Asg::validate_assert(maximum_n);
@@ -76,6 +79,7 @@ int main(int argc, char* argv[])
     Psg::validate_assert(maximum_n);
     Sss::validate_assert(maximum_n);
     Wsg::validate_assert(maximum_n);
+    Yas::validate_assert(maximum_n);
 
     auto start = std::chrono::system_clock::now();
     auto start_c = std::chrono::system_clock::to_time_t(start);
@@ -202,6 +206,15 @@ int main(int argc, char* argv[])
         wsg[emission].push_back(Wsg::emission(N));
         wsg[combined].push_back(Wsg::combined(N));
 
+        std::cout << "[Line: " << __LINE__ << "]" << std::endl;
+
+        auto& yas = records["Yassi"];
+        yas[construction].push_back(Yas::construction(N));
+        yas[destruction].push_back(Yas::destruction(N));
+        yas[connection].push_back(Yas::connection(N));
+        yas[emission].push_back(Yas::emission(N));
+        yas[combined].push_back(Yas::combined(N));
+
         std::cout << "\n[Test Size: " << N << "] END" << std::endl;
     }
 
@@ -264,7 +277,7 @@ void outputReport(ImmediateData const& records, T& ost)
         resultOrder[score] = OrderedResults { libName, &resultAverage[libName] };
     }
 
-    // Print output in csv format
+    // Output in unformatted csv
 
     ost << "\nLibrary, " << construction << ", " << destruction << ", "
         << connection << ", " << emission << ", " << combined << "\n";

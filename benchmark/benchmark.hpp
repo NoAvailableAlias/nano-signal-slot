@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <cassert>
 #include <chrono>
+#include <memory>
 #include <random>
 #include <vector>
 #include <tuple>
@@ -24,6 +25,16 @@ typedef std::minstd_rand Rng;
 typedef std::chrono::nanoseconds Timer_u;
 typedef std::chrono::milliseconds Limit_u;
 typedef std::chrono::duration<double, std::milli> Delta_u;
+
+//------------------------------------------------------------------------------
+
+typedef std::shared_ptr<void> SlotScope;
+
+template <typename Deleter>
+SlotScope make_slot_scope(Deleter deleter)
+{
+    return SlotScope((void*)0xDEADC0DE, deleter);
+}
 
 //------------------------------------------------------------------------------
 
@@ -115,6 +126,7 @@ template <typename Subject, typename Foo> class Benchmark
 
     static double _calculate_score(std::size_t N, std::size_t limit, std::size_t count)
     {
+        // Return the test size N divided by the average sample time in milliseconds
         return N / std::chrono::duration_cast<Delta_u>(Timer_u(limit / count)).count();
     }
 
@@ -136,6 +148,8 @@ template <typename Subject, typename Foo> class Benchmark
             }
             Foo::emit_method(subject, rng);
         }
+        // If the PRNG state is different
+        // There is an error in the signal implementation
         Rng test;
         test.discard(count);
         assert(rng == test);
@@ -184,6 +198,8 @@ template <typename Subject, typename Foo> class Benchmark
                     Foo::connect_method(subject, foo[index]);
                 }
                 s_timer.reset();
+                
+                // Destruction
             }
             elapsed += s_timer.count<Timer_u>();
         }
@@ -260,7 +276,7 @@ template <typename Subject, typename Foo> class Benchmark
         std::shuffle(s_indices.begin(), s_indices.end(), s_rng);
 
         s_timer.reset();
-
+        
         for (; elapsed < g_limit; ++count, elapsed = s_timer.count<Timer_u>())
         {
             Subject subject;

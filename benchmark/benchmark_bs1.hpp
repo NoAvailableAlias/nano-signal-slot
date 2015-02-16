@@ -24,8 +24,8 @@ class Bs1 : public boost::signals::trackable
     {
         subject.connect(boost::bind(&Foo::handler, &foo, ::_1));
     }
-    template <typename Subject, typename Foo>
-    static void emit_method(Subject& subject, Foo& rng)
+    template <typename Subject, typename Arg>
+    static void emit_method(Subject& subject, Arg& rng)
     {
         subject(rng);
     }

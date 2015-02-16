@@ -5,12 +5,9 @@
 
 #include "benchmark.hpp"
 
-#include <forward_list>
-#include <memory>
-
 class Jos
 {
-    std::forward_list<std::shared_ptr<void>> reg;
+    SlotScope reg;
 
     NOINLINE(void handler(Rng& rng))
     {
@@ -26,13 +23,13 @@ class Jos
     {
         auto con = subject.connect(std::bind(&Foo::handler, &foo, std::placeholders::_1));
 
-        foo.reg.emplace_front(&foo, [con, &subject](void*)
-        {
-            subject.disconnect(con);
-        });
+        // Automatically disconnect when the foo instance is destroyed
+        // Benchmarks require connection management
+        // Note that con must be captured by value because it is local
+        foo.reg = make_slot_scope([con, &subject](void*) { subject.disconnect(con); });
     }
-    template <typename Subject, typename Foo>
-    static void emit_method(Subject& subject, Foo& rng)
+    template <typename Subject, typename Arg>
+    static void emit_method(Subject& subject, Arg& rng)
     {
         subject(rng);
     }

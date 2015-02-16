@@ -1,11 +1,11 @@
-#ifndef BENCHMARK_PSG_HPP
-#define BENCHMARK_PSG_HPP
+#ifndef BENCHMARK_YAS_HPP
+#define BENCHMARK_YAS_HPP
 
-#include "lib\pbhogan\Signals\Signal.h"
+#include "lib/yassi/yassi.h"
 
 #include "benchmark.hpp"
 
-class Psg
+class Yas
 {
     SlotScope reg;
 
@@ -16,21 +16,22 @@ class Psg
 
     public:
 
-    using Signal = Gallant::Signal1<Rng&>;
+    using Event = yassi::Signal<void(Rng&)>;
+    using Signal = yassi::Emitter<Event>;
 
     template <typename Subject, typename Foo>
     static void connect_method(Subject& subject, Foo& foo)
     {
-        subject.Connect(&foo, &Foo::handler);
+        subject.connect<Event>(foo, &Foo::handler);
 
         // Automatically disconnect when the foo instance is destroyed
         // Benchmarks require connection management
-        foo.reg = make_slot_scope([&](void*) { subject.Disconnect(&foo, &Foo::handler); });
+        foo.reg = make_slot_scope([&](void*) { subject.disconnect(foo, &Foo::handler); });
     }
     template <typename Subject, typename Arg>
     static void emit_method(Subject& subject, Arg& rng)
     {
-        subject.Emit(rng);
+        subject.emit<Event>(rng);
     }
 
     static void validate_assert(std::size_t);
@@ -41,4 +42,4 @@ class Psg
     static double combined(std::size_t);
 };
 
-#endif // BENCHMARK_PSG_HPP
+#endif // BENCHMARK_YAS_HPP
