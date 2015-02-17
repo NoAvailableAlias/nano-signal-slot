@@ -39,6 +39,7 @@ template <typename T> void outputReport(ImmediateData const&, T&);
 
 int main(int argc, char* argv[])
 {
+    // Jl_signal uses a static allocator for high performance
     jl::StaticSignalConnectionAllocator<c_jlsignal_max> signal_con_allocator;
     jl::StaticObserverConnectionAllocator<c_jlsignal_max> observer_con_allocator;
     jl::SignalBase::SetCommonConnectionAllocator(&signal_con_allocator);
@@ -66,6 +67,7 @@ int main(int argc, char* argv[])
     std::cout << "Change the CPU priority now: [paused]" << std::endl;
     std::cin.get();
 
+    // Assert that all implementations are functioning correctly
     Asg::validate_assert(maximum_n);
     Bs1::validate_assert(maximum_n);
     Bs2::validate_assert(maximum_n);
@@ -81,6 +83,7 @@ int main(int argc, char* argv[])
     Wsg::validate_assert(maximum_n);
     Yas::validate_assert(maximum_n);
 
+    // Time the entire duration of the benchmark
     auto start = std::chrono::system_clock::now();
     auto start_c = std::chrono::system_clock::to_time_t(start);
 

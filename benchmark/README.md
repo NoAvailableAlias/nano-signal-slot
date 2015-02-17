@@ -47,7 +47,7 @@ To utilize allocators in Nano-signal-slot, the only change required is the follo
 Size Metrics
 ------------
 
-_Results are from using release build settings._
+_Results using release build settings._
 
 | Library | Object File Size ^ | Lines of Code | Header Only |
 | ------- | ------------------ | ------------- |:-----------:|
@@ -73,9 +73,9 @@ _The test size N is doubled for every iteration._
 
 | Algorithm | Description |
 | --------- | ----------- |
-| [validation_assert](https://github.com/NoAvailableAlias/nano-signal-slot/blob/master/benchmark/benchmark.hpp#L135) | Assert correct signal slot operation. |
-| [construction](https://github.com/NoAvailableAlias/nano-signal-slot/blob/master/benchmark/benchmark.hpp#L160) | Time the construction of a Signal and N number of Foo instances. |
-| [destruction](https://github.com/NoAvailableAlias/nano-signal-slot/blob/master/benchmark/benchmark.hpp#L181) | Time the destruction of a Signal and associated Connections to N number of Foo instances. |
-| [connection](https://github.com/NoAvailableAlias/nano-signal-slot/blob/master/benchmark/benchmark.hpp#L211) | Time Signal connections to a randomized N number of Foo instances. |
-| [emission](https://github.com/NoAvailableAlias/nano-signal-slot/blob/master/benchmark/benchmark.hpp#L239) | Time the duration of an N slot emission. |
-| [combined](https://github.com/NoAvailableAlias/nano-signal-slot/blob/master/benchmark/benchmark.hpp#L269) | Time construction, destruction, connection, and emission together. |
+| [validation_assert](https://github.com/NoAvailableAlias/nano-signal-slot/blob/master/benchmark/benchmark.hpp#L21) | Assert correct signal slot operation. |
+| [construction](https://github.com/NoAvailableAlias/nano-signal-slot/blob/master/benchmark/benchmark.hpp#L46) | Time the construction of a Signal and N number of Foo instances. |
+| [destruction](https://github.com/NoAvailableAlias/nano-signal-slot/blob/master/benchmark/benchmark.hpp#L67) | Time the destruction of a Signal and associated Connections to N number of Foo instances. |
+| [connection](https://github.com/NoAvailableAlias/nano-signal-slot/blob/master/benchmark/benchmark.hpp#L97) | Time Signal connections to a randomized N number of Foo instances. |
+| [emission](https://github.com/NoAvailableAlias/nano-signal-slot/blob/master/benchmark/benchmark.hpp#L125) | Time the duration of an N slot emission. |
+| [combined](https://github.com/NoAvailableAlias/nano-signal-slot/blob/master/benchmark/benchmark.hpp#L155) | Time construction, destruction, connection, and emission together. |
