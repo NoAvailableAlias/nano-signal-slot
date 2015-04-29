@@ -1,7 +1,9 @@
 Performance
 -----------
 
-**_Higher score is better._** _N / milliseconds per sample._
+..* **_Higher score is better._** _N / milliseconds per sample._
+..* **_You are currently viewing the benchmark results of the master branch._**
+..* _Click [Here](https://github.com/NoAvailableAlias/nano-signal-slot/tree/FT/benchmark#performance) to view the latest results._
 
 ```
 + -------------------------------------------------------------------------------- +
@@ -32,13 +34,20 @@ To utilize allocators in Nano-signal-slot, the only change required is the follo
 ```
     // Before
     std::map<DelegateKey, Observer*> tracked_connections;
+
++ -------------------------------------------------------------------------------- +
+|                      |  construct |  destruct |  connect |  emission |  combined |
++ -------------------------------------------------------------------------------- +
+| Nano-signal-slot     |  13564     |  4277     |  4572    |  27476    |  1818     |
++ -------------------------------------------------------------------------------- +
 ```
 ```
     // After
     using Allocator = YourAllocator<std::map<DelegateKey, Observer*>::value_type>;
     std::map<DelegateKey, Observer*, std::less<DelegateKey>, Allocator> tracked_connections;
-```
-```
+
++ -------------------------------------------------------------------------------- +
+|                      |  construct |  destruct |  connect |  emission |  combined |
 + -------------------------------------------------------------------------------- +
 | Nano-signal-slot     |  73118     |  8362     |  9273    |  28565    |  3919     |
 + -------------------------------------------------------------------------------- +
@@ -51,7 +60,7 @@ _Results using release build settings._
 
 | Library | Object File Size ^ | Lines of Code | Header Only |
 | ------- | ------------------ | ------------- |:-----------:|
-| [jeffomatic Jl_signal](https://github.com/jeffomatic/jl_signal) | 846 kb | 6060 ~ | - |
+| [jeffomatic jl_signal](https://github.com/jeffomatic/jl_signal) | 846 kb | 6060 ~ | - |
 | [winglot Signals](https://github.com/winglot/Signals) | 912 kb | 427 | - |
 | [Nano-signal-slot](https://github.com/NoAvailableAlias/nano-signal-slot) | 915 kb | 251 | X |
 | [pbhogan Signals](https://github.com/pbhogan/Signals) | 944kb | 2595 ~ | X |
@@ -73,7 +82,7 @@ _The test size N is doubled for every iteration._
 
 | Algorithm | Description |
 | --------- | ----------- |
-| [validation_assert](https://github.com/NoAvailableAlias/nano-signal-slot/blob/master/benchmark/benchmark.hpp#L21) | Assert correct signal slot operation. |
+| [validation_assert](https://github.com/NoAvailableAlias/nano-signal-slot/blob/master/benchmark/benchmark.hpp#L21) | Assert correct implementation operation. |
 | [construction](https://github.com/NoAvailableAlias/nano-signal-slot/blob/master/benchmark/benchmark.hpp#L46) | Time the construction of a Signal and N number of Foo instances. |
 | [destruction](https://github.com/NoAvailableAlias/nano-signal-slot/blob/master/benchmark/benchmark.hpp#L67) | Time the destruction of a Signal and associated Connections to N number of Foo instances. |
 | [connection](https://github.com/NoAvailableAlias/nano-signal-slot/blob/master/benchmark/benchmark.hpp#L97) | Time Signal connections to a randomized N number of Foo instances. |
