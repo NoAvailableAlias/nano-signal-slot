@@ -1,9 +1,9 @@
 Performance
 -----------
 
-..* **_Higher score is better._** _N / milliseconds per sample._
-..* **_You are currently viewing the benchmark results of the master branch._**
-..* _Click [Here](https://github.com/NoAvailableAlias/nano-signal-slot/tree/FT/benchmark#performance) to view the latest results._
+  * **_Higher score is better._** _N / milliseconds per sample._
+  * **_You are currently viewing the benchmark results of the master branch._**
+  * _Click [Here](https://github.com/NoAvailableAlias/nano-signal-slot/tree/FT/benchmark#performance) to view the latest results._
 
 ```
 + -------------------------------------------------------------------------------- +

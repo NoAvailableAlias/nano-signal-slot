@@ -120,4 +120,4 @@ _Because of possible misuse, function objects will not be supported by default._
 1. Nano-signal slot is currently not thread safe.
 2. Order of slot emission is not maintained in relation to slot connection.
 3. Nano-signal-slot isn't the fastest within the realm of possibility.
-..* All the above is to be addressed by the FT (feature trunk) branch.
+  * All the above is to be addressed by the FT (feature trunk) branch.
