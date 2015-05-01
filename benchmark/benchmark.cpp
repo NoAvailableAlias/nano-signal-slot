@@ -7,6 +7,7 @@
 #include "benchmark_jos.hpp"
 #include "benchmark_mws.hpp"
 #include "benchmark_nls.hpp"
+#include "benchmark_nod.hpp"
 #include "benchmark_nss.hpp"
 #include "benchmark_psg.hpp"
 #include "benchmark_sss.hpp"
@@ -51,7 +52,7 @@ int main(int argc, char* argv[])
     std::size_t maximum_n = 64;
 
     // 32 bit limit is ~ 4294 ms (when converted to nanoseconds)
-    // Total duration at 4294 is around 3 hours depending on hardware
+    // Total duration at 4294 is around ~8 hours depending on hardware
     std::cout << "Enter the time limit per sample [milliseconds]: ";
     std::size_t limit;
 
@@ -77,6 +78,7 @@ int main(int argc, char* argv[])
     Jos::validate_assert(maximum_n);
     Mws::validate_assert(maximum_n);
     Nls::validate_assert(maximum_n);
+    Nod::validate_assert(maximum_n);
     Nss::validate_assert(maximum_n);
     Psg::validate_assert(maximum_n);
     Sss::validate_assert(maximum_n);
@@ -172,6 +174,15 @@ int main(int argc, char* argv[])
         nls[connection].push_back(Nls::connection(N));
         nls[emission].push_back(Nls::emission(N));
         nls[combined].push_back(Nls::combined(N));
+
+        std::cout << "[Line: " << __LINE__ << "]" << std::endl;
+
+        auto& nod = records["* fr00b0 nod"];
+        nod[construction].push_back(Nod::construction(N));
+        nod[destruction].push_back(Nod::destruction(N));
+        nod[connection].push_back(Nod::connection(N));
+        nod[emission].push_back(Nod::emission(N));
+        nod[combined].push_back(Nod::combined(N));
 
         std::cout << "[Line: " << __LINE__ << "]" << std::endl;
 

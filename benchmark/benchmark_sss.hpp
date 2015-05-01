@@ -21,8 +21,8 @@ class Sss : public SigSlotBase
     {
         subject.bind(&Foo::handler, &foo);
     }
-    template <typename Subject, typename Arg>
-    static void emit_method(Subject& subject, Arg& rng)
+    template <typename Subject>
+    static void emit_method(Subject& subject, Rng& rng)
     {
         subject.emit(rng);
     }

@@ -1,15 +1,19 @@
-#ifndef BENCHMARK_BS1_HPP
-#define BENCHMARK_BS1_HPP
+#ifndef BENCHMARK_NOD_HPP
+#define BENCHMARK_NOD_HPP
 
 #define BOOST_SIGNALS_NO_DEPRECATION_WARNING
 
-#include <boost/signals.hpp>
-#include <boost/bind.hpp>
+#include "lib\nod\include\nod\nod.hpp"
+#include "lib\nod\tests\test_helpers.hpp"
 
 #include "benchmark.hpp"
 
-class Bs1 : public boost::signals::trackable
+#include <memory>
+
+class Nod
 {
+    std::unique_ptr<nod::scoped_connection> reg;
+
     NOINLINE(void handler(Rng& rng))
     {
         volatile std::size_t a = rng(); (void)a;
@@ -17,12 +21,20 @@ class Bs1 : public boost::signals::trackable
 
     public:
 
-    using Signal = boost::signal<void(Rng&)>;
+    using Signal = nod::signal<void(Rng&)>;
 
     template <typename Subject, typename Foo>
     static void connect_method(Subject& subject, Foo& foo)
     {
-        subject.connect(boost::bind(&Foo::handler, &foo, ::_1));
+        /*foo.reg = test::make_unique<nod::scoped_connection>(
+            subject.connect([&foo](Rng& rng)
+            {
+                foo.handler(rng);
+            })
+        );*/
+        foo.reg = test::make_unique<nod::scoped_connection>(
+            subject.connect(std::bind(&Foo::handler, &foo, std::placeholders::_1))
+        );
     }
     template <typename Subject>
     static void emit_method(Subject& subject, Rng& rng)
@@ -38,4 +50,4 @@ class Bs1 : public boost::signals::trackable
     static double combined(std::size_t);
 };
 
-#endif // BENCHMARK_BS1_HPP
+#endif // BENCHMARK_NOD_HPP

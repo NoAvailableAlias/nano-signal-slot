@@ -1,9 +1,7 @@
 Performance
 -----------
 
-  * **_Higher score is better._** _N / milliseconds per sample._
-  * **_You are currently viewing the benchmark results of the master branch._**
-  * _Click [Here](https://github.com/NoAvailableAlias/nano-signal-slot/tree/FT/benchmark#performance) to view the latest results._
+**_Higher score is better._** _N / milliseconds per sample._
 
 ```
 + -------------------------------------------------------------------------------- +
@@ -20,38 +18,13 @@ Performance
 | Nano-signal-slot     |  13564     |  4277     |  4572    |  27476    |  1818     | <-
 | supergrover sigslot  |  10558     |  1387     |  2126    |  36789    |  745      |
 | * winglot Signals    |  5272      |  1942     |  2424    |  31097    |  893      |
+| * fr00b0 nod         |  2452      |  1101     |  311     |  32641    |  199      |
 | * neosigslot         |  13585     |  2500     |  2193    |  6059     |  909      |
 | Boost Signals        |  8043      |  1635     |  572     |  4149     |  363      |
 | * Boost Signals2     |  6457      |  1903     |  845     |  3315     |  450      |
 + -------------------------------------------------------------------------------- +
 ```
 _* Library aims to be thread safe._
-
-#### Performance using an Allocator
-
-To utilize allocators in Nano-signal-slot, the only change required is the following:
-
-```
-    // Before
-    std::map<DelegateKey, Observer*> tracked_connections;
-
-+ -------------------------------------------------------------------------------- +
-|                      |  construct |  destruct |  connect |  emission |  combined |
-+ -------------------------------------------------------------------------------- +
-| Nano-signal-slot     |  13564     |  4277     |  4572    |  27476    |  1818     |
-+ -------------------------------------------------------------------------------- +
-```
-```
-    // After
-    using Allocator = YourAllocator<std::map<DelegateKey, Observer*>::value_type>;
-    std::map<DelegateKey, Observer*, std::less<DelegateKey>, Allocator> tracked_connections;
-
-+ -------------------------------------------------------------------------------- +
-|                      |  construct |  destruct |  connect |  emission |  combined |
-+ -------------------------------------------------------------------------------- +
-| Nano-signal-slot     |  73118     |  8362     |  9273    |  28565    |  3919     |
-+ -------------------------------------------------------------------------------- +
-```
 
 Size Metrics
 ------------
@@ -62,11 +35,12 @@ _Results using release build settings._
 | ------- | ------------------ | ------------- |:-----------:|
 | [jeffomatic jl_signal](https://github.com/jeffomatic/jl_signal) | 846 kb | 6060 ~ | - |
 | [winglot Signals](https://github.com/winglot/Signals) | 912 kb | 427 | - |
-| [Nano-signal-slot](https://github.com/NoAvailableAlias/nano-signal-slot) | 915 kb | 251 | X |
+| [Nano-signal-slot](https://github.com/NoAvailableAlias/nano-signal-slot/tree/FT) | 915 kb | 251 | X |
 | [pbhogan Signals](https://github.com/pbhogan/Signals) | 944kb | 2595 ~ | X |
 | [mwthinker Signal](https://github.com/mwthinker/Signal) | 951 kb | 171 | - |
 | [EvilTwin Fork](https://github.com/NoAvailableAlias/nano-signal-slot/blob/master/benchmark/lib/eviltwin/observer_fork.hpp) | 956 kb | 65 | X |
 | [supergrover sigslot](https://github.com/supergrover/sigslot) | 966 kb | 185 | - |
+| [fr00b0 nod](https://github.com/fr00b0/nod) | 969 kb | < 300 | X |
 | [EvilTwin Observer](http://eviltwingames.com/blog/the-observer-pattern-revisited/) | 973 kb | 117 | X |
 | [amc522 Signal11](https://github.com/amc522/Signal11) | 981 kb | 730 | X |
 | [joanrieu signal11](https://github.com/joanrieu/signal11) | 990 kb | 47 | X |
@@ -82,9 +56,9 @@ _The test size N is doubled for every iteration._
 
 | Algorithm | Description |
 | --------- | ----------- |
-| [validation_assert](https://github.com/NoAvailableAlias/nano-signal-slot/blob/master/benchmark/benchmark.hpp#L21) | Assert correct implementation operation. |
-| [construction](https://github.com/NoAvailableAlias/nano-signal-slot/blob/master/benchmark/benchmark.hpp#L46) | Time the construction of a Signal and N number of Foo instances. |
-| [destruction](https://github.com/NoAvailableAlias/nano-signal-slot/blob/master/benchmark/benchmark.hpp#L67) | Time the destruction of a Signal and associated Connections to N number of Foo instances. |
-| [connection](https://github.com/NoAvailableAlias/nano-signal-slot/blob/master/benchmark/benchmark.hpp#L97) | Time Signal connections to a randomized N number of Foo instances. |
-| [emission](https://github.com/NoAvailableAlias/nano-signal-slot/blob/master/benchmark/benchmark.hpp#L125) | Time the duration of an N slot emission. |
-| [combined](https://github.com/NoAvailableAlias/nano-signal-slot/blob/master/benchmark/benchmark.hpp#L155) | Time construction, destruction, connection, and emission together. |
+| [validation_assert](https://github.com/NoAvailableAlias/nano-signal-slot/blob/FT/benchmark/benchmark.hpp#L21) | Assert correct implementation operation. |
+| [construction](https://github.com/NoAvailableAlias/nano-signal-slot/blob/FT/benchmark/benchmark.hpp#L46) | Time the construction of a Signal and N number of Foo instances. |
+| [destruction](https://github.com/NoAvailableAlias/nano-signal-slot/blob/FT/benchmark/benchmark.hpp#L67) | Time the destruction of a Signal and associated Connections to N number of Foo instances. |
+| [connection](https://github.com/NoAvailableAlias/nano-signal-slot/blob/FT/benchmark/benchmark.hpp#L97) | Time Signal connections to a randomized N number of Foo instances. |
+| [emission](https://github.com/NoAvailableAlias/nano-signal-slot/blob/FT/benchmark/benchmark.hpp#L125) | Time the duration of an N slot emission. |
+| [combined](https://github.com/NoAvailableAlias/nano-signal-slot/blob/FT/benchmark/benchmark.hpp#L155) | Time construction, destruction, connection, and emission together. |

@@ -112,7 +112,7 @@ _Because of possible misuse, function objects will not be supported by default._
 
 #### Links
 
-| [Performance](https://github.com/NoAvailableAlias/nano-signal-slot/tree/master/benchmark#performance) | [Size Metrics](https://github.com/NoAvailableAlias/nano-signal-slot/tree/master/benchmark#size-metrics) | [Benchmark Algorithms](https://github.com/NoAvailableAlias/nano-signal-slot/tree/master/benchmark#benchmark-algorithms) | [Feature Trunk](https://github.com/NoAvailableAlias/nano-signal-slot/tree/FT) |
+| [Performance](https://github.com/NoAvailableAlias/nano-signal-slot/tree/master/benchmark#performance) | [Size Metrics](https://github.com/NoAvailableAlias/nano-signal-slot/tree/master/benchmark#size-metrics) | [Benchmark Algorithms](https://github.com/NoAvailableAlias/nano-signal-slot/tree/master/benchmark#benchmark-algorithms) | [Master](https://github.com/NoAvailableAlias/nano-signal-slot/tree/master) |
 |:----------------------------------------------------------------------------------------------------- |:-------------------------------------------------------------------------------------------------------:|:-----------------------------------------------------------------------------------------------------------------------:| -----------------------------------------------------------------------------:|
 
 #### Caveats

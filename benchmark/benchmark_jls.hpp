@@ -21,8 +21,8 @@ class Jls : public jl::SignalObserver
     {
         subject.Connect(&foo, &Foo::handler);
     }
-    template <typename Subject, typename Arg>
-    static void emit_method(Subject& subject, Arg& rng)
+    template <typename Subject>
+    static void emit_method(Subject& subject, Rng& rng)
     {
         subject.Emit(rng);
     }

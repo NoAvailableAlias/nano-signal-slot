@@ -23,8 +23,8 @@ class Nls : public neolib::has_slots<>
     {
         subject(foo, &Foo::handler);
     }
-    template <typename Subject, typename Arg>
-    static void emit_method(Subject& subject, Arg& rng)
+    template <typename Subject>
+    static void emit_method(Subject& subject, Rng& rng)
     {
         subject.trigger(rng);
     }

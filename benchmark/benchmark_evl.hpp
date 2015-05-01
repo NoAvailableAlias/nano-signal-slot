@@ -21,10 +21,12 @@ class Evl
     template <typename Subject, typename Foo>
     static void connect_method(Subject& subject, Foo& foo)
     {
-        foo.reg = subject.registerObserver(std::bind(&Foo::handler, &foo, std::placeholders::_1));
+        foo.reg = subject.registerObserver(
+            std::bind(&Foo::handler, &foo, std::placeholders::_1)
+        );
     }
-    template <typename Subject, typename Arg>
-    static void emit_method(Subject& subject, Arg& rng)
+    template <typename Subject>
+    static void emit_method(Subject& subject, Rng& rng)
     {
         subject(rng);
     }

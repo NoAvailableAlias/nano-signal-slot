@@ -28,8 +28,8 @@ class Jos
         // Note that con must be captured by value because it is local
         foo.reg = make_slot_scope([con, &subject](void*) { subject.disconnect(con); });
     }
-    template <typename Subject, typename Arg>
-    static void emit_method(Subject& subject, Arg& rng)
+    template <typename Subject>
+    static void emit_method(Subject& subject, Rng& rng)
     {
         subject(rng);
     }
