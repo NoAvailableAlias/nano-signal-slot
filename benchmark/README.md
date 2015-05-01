@@ -18,7 +18,7 @@ Performance
 | Nano-signal-slot     |  13564     |  4277     |  4572    |  27476    |  1818     | <-
 | supergrover sigslot  |  10558     |  1387     |  2126    |  36789    |  745      |
 | * winglot Signals    |  5272      |  1942     |  2424    |  31097    |  893      |
-| * fr00b0 nod         |  2452      |  1101     |  311     |  32641    |  199      |
+| * fr00b0 nod         |  3213      |  1101     |  311     |  32641    |  211      |
 | * neosigslot         |  13585     |  2500     |  2193    |  6059     |  909      |
 | Boost Signals        |  8043      |  1635     |  572     |  4149     |  363      |
 | * Boost Signals2     |  6457      |  1903     |  845     |  3315     |  450      |
@@ -47,7 +47,7 @@ _Results using release build settings._
 | [Yassi](http://www.codeproject.com/Articles/867044/Yassi-Yet-Another-Signal-Slot-Implementation) | 992 kb | ~700 | X |
 | [Boost Signals](http://www.boost.org/doc/libs/1_56_0/doc/html/signals.html) | 1,375 kb | N/A | - |
 | [neosigslot](http://www.i42.co.uk/stuff/neosigslot.htm) | 1,943 kb | 2496 ~ | - |
-| [Boost Signals2](http://www.boost.org/doc/libs/1_56_0/doc/html/signals2.html) | 2,350 kb | N/A | X |
+| [Boost Signals2](http://www.boost.org/doc/libs/1_56_0/doc/html/signals2.html) | 2,350 kb | N/A | ? |
 
 Benchmark Algorithms
 --------------------

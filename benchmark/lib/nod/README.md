@@ -12,7 +12,7 @@ nod::signal<void()> signal;
 // Connect a lambda slot that writes "Hello, World!" to stdout
 signal.connect([](){
 		std::cout << "Hello, World!" << std::endl;
-	})
+	});
 // Call the slots
 signal();
 ```
@@ -26,10 +26,13 @@ void endline() {
 	std::cout << std::endl;
 }
 
+// Create a signal
 nod::signal<void()> signal;
+// Connect a lambda that prints a message
 signal.connect([](){
-		std::count << "Hello, World!";
+		std::cout << "Message without endline!";
 	});
+// Connect a function that prints a endline
 signal.connect(endline);
 
 // Call the slots
@@ -53,12 +56,12 @@ void print_product( int x, int y ) {
 // We create a signal with two integer arguments.
 nod::signal<void(int,int)> signal;
 // Let's connect our slot
-nod.connect( print_sum );
-nod.connect( print_product );
+signal.connect( print_sum );
+signal.connect( print_product );
 
 // Call the slots
-nod( 10, 15 );
-nod(-5, 7);
+signal( 10, 15 );
+signal(-5, 7);	
 
 ```
 
@@ -77,8 +80,8 @@ that slot.
 nod::signal<void()> signal;
 // Connect a slot, and save the connection
 nod::connection connection = signal.connect([](){
-                                 std::cout << "Hello, World!" << std::endl;
-                             });
+								 std::cout << "I'm connected!" << std::endl;
+							 });
 // Triggering the signal will call the slot
 signal();
 // Now we disconnect the slot
@@ -92,19 +95,20 @@ To assist in disconnecting slots, one can use the class `nod::scoped_connection`
 to capture a slot connection. A scoped connection will automatically disconnect
 the slot when the connection object goes out of scope.
 ```cpp
+// We create a signal
 nod::signal<void()> signal;
-
-{
+// Let's use a scope to control lifetime
+{ 
 	// Let's save the connection in a scoped_connection
 	nod::scoped_connection connection =
 		signal.connect([](){
-			std::cout << "Hello, World!" << std::endl; 
+			std::cout << "This message should only be emitted once!" << std::endl; 
 		});
 	// If we trigger the signal, the slot will be called
 	signal();
 } // Our scoped connection is destructed, and disconnects the slot
 // Triggering the signal now will not call the slot
-signal();
+signal();	
 ```
 
 ### More usage

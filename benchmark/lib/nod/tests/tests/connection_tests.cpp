@@ -5,9 +5,18 @@
 
 #include <sstream>
 
+SCENARIO( "Connection objects are default constructible" ) {
+	GIVEN( "a default constructed connection" ) {
+		nod::connection connection;
+		THEN( "the connection will not be considered connected" ) {
+			REQUIRE( connection.connected() == false );
+		}	
+	}
+}
+
 SCENARIO( "Slots can get connected and disconnected to signals" ) {
 	GIVEN( "A singnal" ) {
-		nod::signal<void(void)> signal;
+		nod::signal<void()> signal;
 		WHEN( "a slot is connected" ) {
 			auto connection = signal.connect( [](){} );
 			THEN( "the resulting connection is considered connected" ) {
@@ -49,7 +58,7 @@ SCENARIO( "Signals can be invoked and will trigger connected slots" ) {
 
 SCENARIO( "Signals will disconnect all slots when destroyed" ) {
 	GIVEN( "A signal" ) {
-		auto signal_ptr = std::unique_ptr<nod::signal<void(void)>>( new nod::signal<void(void)>() );
+		auto signal_ptr = test::make_unique<nod::signal<void()>>();
 		WHEN( "Some slots gets connected to the signal" ) {
 			auto connection1 = signal_ptr->connect( []() {} );
 			auto connection2 = signal_ptr->connect( []() {} );
@@ -71,10 +80,19 @@ SCENARIO( "Signals will disconnect all slots when destroyed" ) {
 	}
 }
 
+SCENARIO( "Scoped connection objects are default constructible" ) {
+	GIVEN( "a default scoped constructed connection" ) {
+		nod::scoped_connection scoped;
+		THEN( "the scoped connection will not be considered connected" ) {
+			REQUIRE( scoped.connected() == false );
+		}	
+	}
+}
+
 SCENARIO( "Scoped connection will disconnect when destroyed" ) {
 	GIVEN( "A signal" ) {
 		std::ostringstream ss;
-		nod::signal<void(void)> signal;
+		nod::signal<void()> signal;
 		WHEN( "A slot get's connected and managed by a scoped connection" ) {
 			auto connection = test::make_unique<nod::scoped_connection>( signal.connect([&](){ ss << "singaled!"; }) );
 			THEN( "the connection is considered connected" ) {
@@ -85,6 +103,65 @@ SCENARIO( "Scoped connection will disconnect when destroyed" ) {
 				THEN( "it is disconnected so no signaling is done" ) {
 					signal();
 					REQUIRE( ss.str().empty() );
+				}
+			}
+		}
+	}
+}
+
+SCENARIO( "Scoped connections can be reset" ) {
+	GIVEN( "A signal") {
+		std::ostringstream ss;
+		nod::signal<void()> signal;
+		WHEN( "A slot get's connected and managed by a scoped connection" ) {
+			nod::scoped_connection scoped = signal.connect( [&](){ ss << "Signaled!"; } );
+			THEN( "the connection is considered connected" ) {
+				REQUIRE( scoped.connected() == true );		
+			}
+			AND_WHEN( "the connection is reset to empty") {
+				scoped.reset();
+				THEN( "the connection is not considered connected" ) {
+					REQUIRE( scoped.connected() == false );
+				}
+				AND_THEN( "the connection is disconnected, so the slot will not be called when triggering the signal") {
+					signal();
+					REQUIRE( ss.str().empty() );
+				}				
+			}
+			AND_WHEN( "The scoped connection is reset to another connection" ) {
+				scoped.reset( signal.connect( [&](){ ss << "Honk!"; } ) );
+				THEN( "The scoped connection is considered connected" ) {
+					REQUIRE( scoped.connected() == true );					
+				}
+				AND_THEN( "The first connection is disconnected, so the slot will call the new slot when triggered") {
+					signal();
+					REQUIRE( ss.str() == "Honk!" );
+				}
+			}
+		}
+	}
+}
+
+SCENARIO( "Scoped connections can be released" ) {
+	GIVEN( "A signal") {
+		std::ostringstream ss;
+		nod::signal<void()> signal;
+		WHEN( "A slot get's connected and managed by a scoped connection" ){
+			nod::scoped_connection scoped = signal.connect( [&](){ ss << "Signaled!"; } );
+			THEN( "The scoped connection is considered connected" ) {
+				REQUIRE( scoped.connected() == true );
+			}
+			AND_WHEN( "the connection is released" ) {
+				nod::connection c = scoped.release();
+				THEN( "the scoped connection is not considered connected" ) {
+					REQUIRE( scoped.connected() == false );
+				}
+				AND_THEN( "the released connection is considered connected" ) {
+					REQUIRE( c.connected() == true );
+				}
+				AND_THEN( "the slot will be called when the signal is triggered" ) {
+					signal();
+					REQUIRE( ss.str() == "Signaled!" );
 				}
 			}
 		}

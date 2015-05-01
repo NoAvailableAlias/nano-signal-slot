@@ -30,14 +30,18 @@ namespace nod {
 	/// This is used to be able to disconnect slots after they have been connected.
 	/// Used as return type for the connect method of the signals.
 	///
-	/// Connections are not default constructible.
+	/// Connections are default constructible.
 	/// Connections are not copy constructible or copy assignable.
 	/// Connections are move constructible and move assignable.
 	///
 	class connection {
 		public:
-			// Connection are not default constructible, copy constructible or copy assignable
-			connection() = delete;
+			/// Default constructor
+			connection() :
+				_index()
+			{}
+
+			// Connection are not copy constructible or copy assignable
 			connection( connection const& ) = delete;
 			connection& operator=( connection const& ) = delete;
 
@@ -49,11 +53,8 @@ namespace nod {
 			{}
 
 			/// Move assign operator.
-			/// @note If this connection is connected, it will be disconnected when moving
-			///       another instance into it.
 			/// @param other   The instance to move from.
 			connection& operator=( connection&& other ) {
-				disconnect();
 				_weak_disconnector = std::move( other._weak_disconnector );
 				_index = other._index;
 				return *this;
@@ -102,12 +103,17 @@ namespace nod {
 	class scoped_connection
 	{
 		public:
-			/// Scoped connections are not default constructible
-			scoped_connection() = delete;
+			/// Scoped are default constructible
+			scoped_connection() = default;
 			/// Scoped connections are not copy constructible
 			scoped_connection( scoped_connection const& ) = delete;
 			/// Scoped connections are not copy assingable
 			scoped_connection& operator=( scoped_connection const& ) = delete;
+
+			/// Move constructor
+			scoped_connection( scoped_connection&& other ) :
+				_connection( std::move(other._connection) )
+			{}
 
 			/// Construct a scoped connection from a connection object
 			/// @param connection   The connection object to manage
@@ -118,6 +124,33 @@ namespace nod {
 			/// destructor
 			~scoped_connection() {
 				disconnect();
+			}
+
+			/// Assignment operator moving a new connection into the instance.
+			/// @note If the scoped_connection instance already contains a
+			///       connection, that connection will be disconnected as if
+			///       the scoped_connection was destroyed.
+			/// @param c   New connection to manage
+			scoped_connection& operator=( connection&& c ) {
+				reset( std::forward<connection>(c) );
+				return *this;
+			}
+
+			/// Reset the underlying connection to another connection.
+			/// @note The connection currently managed by the scoped_connection
+			///       instance will be disconnected when resetting.
+			/// @param c   New connection to manage
+			void reset( connection&& c = {} ) {
+				disconnect();
+				_connection = std::move(c);
+			}
+
+			/// Release the underlying connection, without disconnecting it.
+			/// @returns The newly released connection instance is returned.
+			connection release() {
+				connection c = std::move(_connection);
+				_connection = connection{};
+				return c;
 			}
 
 			///
@@ -150,12 +183,6 @@ namespace nod {
 	/// Any function or function object is considered a slot, and 
 	/// can be connected to a signal instance, as long as the signature
 	/// of the slot matches the signature of the signal.
-	///
-	///
-	///
-	///
-	///
-	///
 	template <class R, class... A >
 	class signal<R(A...)>
 	{
@@ -190,10 +217,14 @@ namespace nod {
 			/// Type that will be used to store the slots for this signal type.
 			using slot_type = std::function<R(A...)>;
 
+			/// Connect a new slot to the signal.
 			///
-			///
-			///
-			///
+			/// The connected slot will be called every time the signal
+			/// is triggered.
+			/// @param slot   The slot to connect. This must be a callable with
+			///               the same signature as the singal itself.
+			/// @return       A connection object is returned, and can be used to
+			///               disconnect the slot.
 			template <class T>
 			connection connect( T&& slot ) {
 				std::lock_guard<std::mutex> lock{ _mutex };

@@ -1,18 +1,17 @@
 #ifndef BENCHMARK_NOD_HPP
 #define BENCHMARK_NOD_HPP
 
-#define BOOST_SIGNALS_NO_DEPRECATION_WARNING
-
 #include "lib\nod\include\nod\nod.hpp"
-#include "lib\nod\tests\test_helpers.hpp"
+//#include "lib\nod\tests\test_helpers.hpp"
 
 #include "benchmark.hpp"
 
-#include <memory>
+//#include <memory>
 
 class Nod
 {
-    std::unique_ptr<nod::scoped_connection> reg;
+    //std::unique_ptr<nod::scoped_connection> reg;
+    nod::scoped_connection reg;
 
     NOINLINE(void handler(Rng& rng))
     {
@@ -32,9 +31,10 @@ class Nod
                 foo.handler(rng);
             })
         );*/
-        foo.reg = test::make_unique<nod::scoped_connection>(
+        /*foo.reg = test::make_unique<nod::scoped_connection>(
             subject.connect(std::bind(&Foo::handler, &foo, std::placeholders::_1))
-        );
+        );*/
+        foo.reg = subject.connect(std::bind(&Foo::handler, &foo, std::placeholders::_1));
     }
     template <typename Subject>
     static void emit_method(Subject& subject, Rng& rng)
