@@ -5,49 +5,49 @@ Performance
 
 ```
 + -------------------------------------------------------------------------------- +
-| Library       [MSVC] |  construct |  destruct |  connect |  emission |  combined |
+| Library              |  construct |  destruct |  connect |  emission |  combined |
 + -------------------------------------------------------------------------------- +
-| jeffomatic jl_signal |  120169    |  9683     |  46925   |  38034    |  6248     |
-| Yassi                |  146357    |  2249     |  1639    |  39144    |  810      |
-| amc522 Signal11      |  121921    |  5776     |  3574    |  34371    |  1985     |
-| pbhogan Signals      |  109879    |  5345     |  4787    |  31980    |  2277     |
-| mwthinker Signal     |  106472    |  5291     |  1848    |  39052    |  1291     |
-| EvilTwin Fork        |  108401    |  3986     |  2131    |  20262    |  1281     |
-| EvilTwin Observer    |  103376    |  2490     |  1304    |  19282    |  798      |
-| joanrieu signal11    |  87940     |  5994     |  4279    |  7839     |  1757     |
-| Nano-signal-slot     |  13564     |  4277     |  4572    |  27476    |  1818     | <-
-| supergrover sigslot  |  10558     |  1387     |  2126    |  36789    |  745      |
-| * winglot Signals    |  5272      |  1942     |  2424    |  31097    |  893      |
-| * fr00b0 nod         |  3213      |  1101     |  311     |  32641    |  211      |
-| * neosigslot         |  13585     |  2500     |  2193    |  6059     |  909      |
-| Boost Signals        |  8043      |  1635     |  572     |  4149     |  363      |
-| * Boost Signals2     |  6457      |  1903     |  845     |  3315     |  450      |
+| jeffomatic jl_signal |  123557    |  9645     |  44346   |  39051    |  6352     |
+| Yassi                |  149941    |  2250     |  1610    |  37176    |  845      |
+| amc522 Signal11      |  125020    |  5661     |  3730    |  32403    |  2092     |
+| mwthinker Signal     |  109900    |  5181     |  1857    |  38771    |  1306     |
+| pbhogan Signals      |  107762    |  5195     |  4859    |  31997    |  2275     |
+| * fr00b0 nod         |  95490     |  4150     |  2642    |  30786    |  1493     |
+| EvilTwin Fork        |  105054    |  3801     |  2112    |  18928    |  1252     |
+| EvilTwin Observer    |  96725     |  2517     |  1210    |  19295    |  813      |
+| joanrieu signal11    |  90288     |  6119     |  4336    |  7796     |  1744     |
+| supergrover sigslot  |  11086     |  1395     |  2244    |  38451    |  759      |
+| Nano-signal-slot     |  12449     |  4060     |  3761    |  29266    |  1655     |<-
+| * winglot Signals    |  5780      |  2041     |  2379    |  31247    |  900      |
+| * neosigslot         |  13778     |  2541     |  2343    |  6345     |  928      |
+| Boost Signals        |  7844      |  1653     |  571     |  4483     |  354      |
+| * Boost Signals2     |  6367      |  1821     |  865     |  3118     |  459      |
 + -------------------------------------------------------------------------------- +
 ```
-_* Library aims to be thread safe._
+_* Library is designed to be thread safe._
 
 Size Metrics
 ------------
 
-_Results using release build settings._
+_Results are from Visual Studio 2013 using release build settings._
 
-| Library | Object File Size ^ | Lines of Code | Header Only |
-| ------- | ------------------ | ------------- |:-----------:|
-| [jeffomatic jl_signal](https://github.com/jeffomatic/jl_signal) | 846 kb | 6060 ~ | - |
+| Library | Object File Size ^ | Header Only |
+| ------- | ------------------ |:-----------:|
+| [jeffomatic jl_signal](https://github.com/jeffomatic/jl_signal) | 846 kb | - |
 | [winglot Signals](https://github.com/winglot/Signals) | 912 kb | 427 | - |
-| [Nano-signal-slot](https://github.com/NoAvailableAlias/nano-signal-slot/tree/FT) | 915 kb | 251 | X |
-| [pbhogan Signals](https://github.com/pbhogan/Signals) | 944kb | 2595 ~ | X |
-| [mwthinker Signal](https://github.com/mwthinker/Signal) | 951 kb | 171 | - |
-| [EvilTwin Fork](https://github.com/NoAvailableAlias/nano-signal-slot/blob/master/benchmark/lib/eviltwin/observer_fork.hpp) | 956 kb | 65 | X |
-| [supergrover sigslot](https://github.com/supergrover/sigslot) | 966 kb | 185 | - |
-| [fr00b0 nod](https://github.com/fr00b0/nod) | 969 kb | < 300 | X |
-| [EvilTwin Observer](http://eviltwingames.com/blog/the-observer-pattern-revisited/) | 973 kb | 117 | X |
-| [amc522 Signal11](https://github.com/amc522/Signal11) | 981 kb | 730 | X |
-| [joanrieu signal11](https://github.com/joanrieu/signal11) | 990 kb | 47 | X |
-| [Yassi](http://www.codeproject.com/Articles/867044/Yassi-Yet-Another-Signal-Slot-Implementation) | 992 kb | ~700 | X |
-| [Boost Signals](http://www.boost.org/doc/libs/1_56_0/doc/html/signals.html) | 1,375 kb | N/A | - |
-| [neosigslot](http://www.i42.co.uk/stuff/neosigslot.htm) | 1,943 kb | 2496 ~ | - |
-| [Boost Signals2](http://www.boost.org/doc/libs/1_56_0/doc/html/signals2.html) | 2,350 kb | N/A | ? |
+| [Nano-signal-slot](https://github.com/NoAvailableAlias/nano-signal-slot/tree/FT) | 915 kb | X |
+| [pbhogan Signals](https://github.com/pbhogan/Signals) | 944kb | X |
+| [mwthinker Signal](https://github.com/mwthinker/Signal) | 951 kb | - |
+| [EvilTwin Fork](https://github.com/NoAvailableAlias/nano-signal-slot/blob/master/benchmark/lib/eviltwin/observer_fork.hpp) | 956 kb | X |
+| [supergrover sigslot](https://github.com/supergrover/sigslot) | 966 kb | - |
+| [fr00b0 nod](https://github.com/fr00b0/nod) | 969 kb | X |
+| [EvilTwin Observer](http://eviltwingames.com/blog/the-observer-pattern-revisited/) | 973 kb | X |
+| [amc522 Signal11](https://github.com/amc522/Signal11) | 981 kb | X |
+| [joanrieu signal11](https://github.com/joanrieu/signal11) | 990 kb | X |
+| [Yassi](http://www.codeproject.com/Articles/867044/Yassi-Yet-Another-Signal-Slot-Implementation) | 992 kb | X |
+| [Boost Signals](http://www.boost.org/doc/libs/1_56_0/doc/html/signals.html) | 1,375 kb | - |
+| [neosigslot](http://www.i42.co.uk/stuff/neosigslot.htm) | 1,943 kb | - |
+| [Boost Signals2](http://www.boost.org/doc/libs/1_56_0/doc/html/signals2.html) | 2,350 kb | ? |
 
 Benchmark Algorithms
 --------------------

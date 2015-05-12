@@ -56,6 +56,38 @@ SCENARIO( "Signals can be invoked and will trigger connected slots" ) {
 	}
 }
 
+SCENARIO( "Slots should be called in the order they where connected" ) {
+	GIVEN( "A signal" ) {
+		nod::signal<void(std::ostream&)> signal;
+		WHEN( "we connect three slots to the signal" ) {
+			auto c1 = signal.connect([](std::ostream& o){ o<<"one"; });
+			auto c2 = signal.connect([](std::ostream& o){ o<<"two"; });
+			auto c3 = signal.connect([](std::ostream& o){ o<<"three"; });
+			THEN( "triggering the signal will call all the slots in connection order" ) {
+				std::ostringstream ss;
+				signal(ss);
+				REQUIRE( ss.str() == "onetwothree" );
+			}
+			AND_WHEN( "we connect the second connection and trigger the signal" ) {
+				c2.disconnect();
+				std::ostringstream ss;
+				THEN( "the remaining two slots will still be called in connecion order" ) {
+					signal(ss);
+					REQUIRE( ss.str() == "onethree" );
+				}
+				AND_WHEN( "connecting a new slot to the signal" ) {
+					auto c4 = signal.connect([](std::ostream& o){ o<<"four"; });
+					THEN( "signaling the slot will call all three connected slots in connection order" ) {
+						signal(ss);
+						REQUIRE( ss.str() == "onethreefour" );
+					}
+				}
+			}
+		}
+	}
+}
+
+
 SCENARIO( "Signals will disconnect all slots when destroyed" ) {
 	GIVEN( "A signal" ) {
 		auto signal_ptr = test::make_unique<nod::signal<void()>>();

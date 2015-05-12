@@ -80,44 +80,7 @@ struct Foo : public Nano::Observer
 	...
 ```
 
-#### Function Objects
-
-_Because of possible misuse, function objects will not be supported by default._
-
-```
-... // add the following to Nano::Function<T_rv(Args...)>
-
-    template <typename L>
-    static inline Function bind(L* pointer)
-    {
-        return { pointer, [](void *this_ptr, Args... args) {
-        return (static_cast<L*>(this_ptr)->operator()(args...)); }};
-    }
-```
-```
-... // add the following to Nano::Signal<T_rv(Args...)>
-
-    template <typename L>
-    void connect(L* instance)
-    {
-        Observer::insert(Function::template bind(instance));
-    }
-...
-    template <typename L>
-    void disconnect(L* instance)
-    {
-        Observer::remove(Function::template bind(instance));
-    }
-```
-
 #### Links
 
 | [Performance](https://github.com/NoAvailableAlias/nano-signal-slot/tree/FT/benchmark#performance) | [Size Metrics](https://github.com/NoAvailableAlias/nano-signal-slot/tree/FT/benchmark#size-metrics) | [Benchmark Algorithms](https://github.com/NoAvailableAlias/nano-signal-slot/tree/FT/benchmark#benchmark-algorithms) | [Master](https://github.com/NoAvailableAlias/nano-signal-slot/tree/master) |
-|:----------------------------------------------------------------------------------------------------- |:-------------------------------------------------------------------------------------------------------:|:-----------------------------------------------------------------------------------------------------------------------:| -----------------------------------------------------------------------------:|
-
-#### Caveats
-
-1. Nano-signal slot is currently not thread safe.
-2. Order of slot emission is not maintained in relation to slot connection.
-3. Nano-signal-slot isn't the fastest within the realm of possibility.
-  * All the above is to be addressed by the FT (feature trunk) branch.
+|:------------------------------------------------------------------------------------------------- |:---------------------------------------------------------------------------------------------------:|:-------------------------------------------------------------------------------------------------------------------:| --------------------------------------------------------------------------:|
