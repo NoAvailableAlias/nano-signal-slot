@@ -34,7 +34,7 @@ _Results are from Visual Studio 2013 using release build settings._
 | Library | Object File Size ^ | Header Only |
 | ------- | ------------------ |:-----------:|
 | [jeffomatic jl_signal](https://github.com/jeffomatic/jl_signal) | 846 kb | - |
-| [winglot Signals](https://github.com/winglot/Signals) | 912 kb | 427 | - |
+| [winglot Signals](https://github.com/winglot/Signals) | 912 kb | - |
 | [Nano-signal-slot](https://github.com/NoAvailableAlias/nano-signal-slot/tree/FT) | 915 kb | X |
 | [pbhogan Signals](https://github.com/pbhogan/Signals) | 944kb | X |
 | [mwthinker Signal](https://github.com/mwthinker/Signal) | 951 kb | - |

@@ -51,8 +51,7 @@ int main(int argc, char* argv[])
     std::size_t start_n = 4;
     std::size_t maximum_n = 64;
 
-    // 32 bit limit is ~ 4294 ms (when converted to nanoseconds)
-    // Total duration at 4294 is around ~8 hours depending on hardware
+    // Total duration at 4000 is around ~4 hours depending on hardware
     std::cout << "Enter the time limit per sample [milliseconds]: ";
     std::size_t limit;
 
