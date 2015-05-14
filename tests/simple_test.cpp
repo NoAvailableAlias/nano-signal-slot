@@ -53,10 +53,11 @@ int main()
     std::vector<bool> status;
 
     // Emit Signals and accumulate SRVs (signal return values)
-    signal_one("how are you gentlemen", [&](bool srv)
+    /*signal_one([&](bool srv)
     {
         status.push_back(srv);
-    });
+    }
+	,"how are you gentlemen");*/
 
     // Disconnect member functions from a Nano::Signal
     signal_one.disconnect<Foo, &Foo::handler_a>(foo);
