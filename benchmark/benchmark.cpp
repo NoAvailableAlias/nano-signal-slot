@@ -185,7 +185,7 @@ int main(int argc, char* argv[])
 
         std::cout << "[Line: " << __LINE__ << "]" << std::endl;
 
-        auto& nss = records["Nano-signal-slot"];
+        auto& nss = records["Nano-signal-slot FT"];
         nss[construction].push_back(Nss::construction(N));
         nss[destruction].push_back(Nss::destruction(N));
         nss[connection].push_back(Nss::connection(N));

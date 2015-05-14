@@ -6,8 +6,8 @@
 
 #include <forward_list>
 #include <cstdint>
-#include <memory>
-#include <atomic>
+//#include <memory>
+//#include <atomic>
 #include <array>
 
 // EXPERIMENTAL BRANCH
@@ -17,7 +17,138 @@ namespace Nano
 
 //------------------------------------------------------POOL ALLOCATOR INTERFACE
 
-// TODO
+template <typename T> class Singleton
+{
+    protected:
+
+    Singleton() = default;
+    Singleton(Singleton const&) = default;
+    Singleton& operator= (Singleton const&) = default;
+
+    public:
+
+    static T& get()
+    {
+        static T s;
+        return s;
+    }
+};
+
+// DO NOT USE, HASTILY THROWN TOGETHER FOR LEAST OVERHEAD
+
+template <typename T, std::size_t N = 256> class Allocator
+{
+    class Free_List : public Singleton<Free_List>
+    {
+        struct Node { Node* next = nullptr; };
+        
+        typename std::aligned_union<0, T, Node>::type m_data[N];
+        
+        Node* m_head = nullptr;
+        
+        public:
+        
+        Free_List()
+        {
+            for (auto& node : m_data)
+            {
+                push(std::addressof(node));
+            }
+        }
+        void* next()
+        {
+			Node* node = m_head;
+            m_head = node->next;
+            return reinterpret_cast<void*>(node);
+        }
+        void push(void* temp)
+        {
+            Node* node = reinterpret_cast<Node*>(temp);
+            node->next = m_head;
+            m_head = node;
+        }
+    };
+
+    public:
+
+    typedef T value_type;
+    typedef T* pointer;
+    typedef T const* const_pointer;
+    typedef T& reference;
+    typedef T const& const_reference;
+    typedef std::size_t size_type;
+    typedef std::ptrdiff_t difference_type;
+
+    Allocator () throw() {}
+   ~Allocator () throw() {}
+    Allocator (Allocator const&) throw() {}
+    template<typename U>
+    Allocator (Allocator<U> const&) throw() {}
+
+    Allocator& operator= (Allocator const&)
+    {
+        return *this;
+    }
+    template<typename U>
+    Allocator& operator= (Allocator<U> const&)
+    {
+        return *this;
+    }
+    template <typename U> struct rebind
+    {
+        typedef Allocator<U> other;
+    };
+    pointer address(reference ref)
+    {
+        return std::addressof(ref);
+    }
+    const_pointer address(const_reference ref)
+    {
+        return std::addressof(ref);
+    }
+    pointer allocate(size_type n) const
+    {
+        return static_cast<pointer>(Free_List::get().next());
+    }
+    pointer allocate(size_type n, const void*) const
+    {
+        return static_cast<pointer>(Free_List::get().next());
+    }
+    void deallocate(pointer ptr, size_type)
+    {
+        Free_List::get().push(ptr);
+    }
+    template <typename U, typename... Args>
+    void construct(U * ptr, Args&&... args)
+    {
+        ::new(ptr) U(std::forward<Args>(args)...);
+    }
+    void destroy(pointer ptr)
+    {
+        ptr->~value_type();
+    }
+    template <typename U>
+    void destroy(U* ptr)
+    {
+        ptr->~U();
+    }
+    size_type max_size() const
+    {
+        return std::numeric_limits<size_type>::max() / sizeof(value_type);
+    }
+};
+
+template <typename L, typename R>
+inline bool operator== (Allocator<L> const&, Allocator<R> const&)
+{
+    return reinterpret_cast<std::uintptr_t>(Allocator<L>::Free_List::get()) ==
+           reinterpret_cast<std::uintptr_t>(Allocator<R>::Free_List::get());
+}
+template <typename L, typename R>
+inline bool operator!= (Allocator<L> const& lhs, Allocator<R> const& rhs)
+{
+    return !(lhs == rhs);
+}
 
 //------------------------------------------------------------FUNCTION INTERFACE
 
@@ -82,8 +213,7 @@ class Observer
         Observer* observer;
     };
 
-    // TODO use pool allocator
-    std::forward_list<DelegateKeyObserver> connections;
+    std::forward_list<DelegateKeyObserver, Allocator<DelegateKeyObserver>> connections;
 
     void insert(DelegateKey const& key, Observer* observer)
     {
