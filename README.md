@@ -82,5 +82,5 @@ struct Foo : public Nano::Observer
 
 #### Links
 
-| [Performance](https://github.com/NoAvailableAlias/signal-slot-benchmarks/tree/master/benchmark#performance) | [Size Metrics](https://github.com/NoAvailableAlias/signal-slot-benchmarks/tree/master/benchmark#size-metrics) | [Benchmark Algorithms](https://github.com/NoAvailableAlias/signal-slot-benchmarks/tree/master/benchmark#benchmark-algorithms) | [Master](https://github.com/NoAvailableAlias/nano-signal-slot/tree/master) |
+| [Performance](https://github.com/NoAvailableAlias/signal-slot-benchmarks/tree/master/#performance) | [Size Metrics](https://github.com/NoAvailableAlias/signal-slot-benchmarks/tree/master/#size-metrics) | [Benchmark Algorithms](https://github.com/NoAvailableAlias/signal-slot-benchmarks/tree/master/#benchmark-algorithms) | [Master](https://github.com/NoAvailableAlias/nano-signal-slot/tree/master) |
 |:------------------------------------------------------------------------------------------------- |:---------------------------------------------------------------------------------------------------:|:-------------------------------------------------------------------------------------------------------------------:| --------------------------------------------------------------------------:|
