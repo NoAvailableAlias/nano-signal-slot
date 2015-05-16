@@ -35,6 +35,7 @@ template <typename T> class Singleton
 };
 
 // DO NOT USE, HASTILY THROWN TOGETHER FOR LEAST OVERHEAD
+// HAS A FIXED SIZE AND NO PROTECTIONS OTHER THAN BEING MINIMAL
 
 template <typename T, std::size_t N = 256> class Allocator
 {
@@ -301,7 +302,7 @@ class Signal<RT(Args...)> : private Observer
     
     //----------------------------------------------------TYPE DEDUCTION CONNECT
 
-    void connect(RT (*fun_ptr)(Args...))
+    /*void connect(RT (*fun_ptr)(Args...))
     {
         connect<fun_ptr>();
     }
@@ -326,7 +327,7 @@ class Signal<RT(Args...)> : private Observer
     void connect(Y& instance, RT (X::*mem_ptr)(Args...) const)
     {
         connect<Y, mem_ptr>(std::addressof(instance));
-    }
+    }*/
     
     //----------------------------------------------NON-TYPE TEMPLATE DISCONNECT
 
@@ -360,7 +361,7 @@ class Signal<RT(Args...)> : private Observer
 
     //-------------------------------------------------TYPE DEDUCTION DISCONNECT
 
-    void disconnect(RT (*fun_ptr)(Args...))
+    /*void disconnect(RT (*fun_ptr)(Args...))
     {
         disconnect<fun_ptr>();
     }
@@ -384,7 +385,7 @@ class Signal<RT(Args...)> : private Observer
     void disconnect(Y& instance, RT (X::*mem_ptr)(Args...) const)
     {
         disconnect<Y, mem_ptr>(std::addressof(instance));
-    }
+    }*/
     
     //----------------------------------------------------------------------EMIT
 
