@@ -70,16 +70,16 @@ class Observer
             Delegate(node->data.delegate)(std::forward<Uref>(args)...);
         }
     }
-/*
+
     template <typename Delegate, typename Accumulate, typename... Uref>
-    void onEach(Accumulate&& accumulator, Uref&&... args)
+    void onEach_Accumulate(Accumulate&& accumulator, Uref&&... args)
     {
         for (auto node = std::atomic_load(&head); node; node = node->next)
         {
             accumulator(Delegate(node->data.delegate)(std::forward<Uref>(args)...));
         }
     }
-*/
+
 };
 
 } // namespace Nano ------------------------------------------------------------
