@@ -33,17 +33,26 @@ public:
     template <RT (*fun_ptr)(Args...)>
     static inline Function bind()
     {
-        return { nullptr, [](void* /*NULL*/, Args... args) { return (*fun_ptr)(std::forward<Args>(args)...); } };
+        return { nullptr, [](void* /*NULL*/, Args... args)
+            { return (*fun_ptr)(std::forward<Args>(args)...); } };
     }
     template <typename T, RT (T::*mem_ptr)(Args...)>
     static inline Function bind(T* pointer)
     {
-        return { pointer, [](void* this_ptr, Args... args) { return (static_cast<T*>(this_ptr)->*mem_ptr)(std::forward<Args>(args)...); } };
+        return { pointer, [](void* this_ptr, Args... args)
+            { return (static_cast<T*>(this_ptr)->*mem_ptr) (std::forward<Args>(args)...); } };
     }
     template <typename T, RT (T::*mem_ptr)(Args...) const>
     static inline Function bind(T* pointer)
     {
-        return { pointer, [](void* this_ptr, Args... args) { return (static_cast<T*>(this_ptr)->*mem_ptr)(std::forward<Args>(args)...); } };
+        return { pointer, [](void* this_ptr, Args... args)
+            { return (static_cast<T*>(this_ptr)->*mem_ptr) (std::forward<Args>(args)...); } };
+    }
+    template <typename L>
+    static inline Function bind(L* pointer)
+    {
+        return { pointer, [](void *this_ptr, Args... args)
+            { return (static_cast<L*>(this_ptr)->operator()(std::forward<Args>(args)...)); }};
     }
     inline operator DelegateKey() const
     {

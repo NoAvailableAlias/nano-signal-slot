@@ -40,6 +40,12 @@ class Signal<RT(Args...)> : private Observer
     
     //-------------------------------------------------------------------CONNECT
 
+    template <typename L>
+    void connect(L* instance)
+    {
+        Observer::insert(Delegate::template bind (instance));
+    }
+
     template <RT (*fun_ptr)(Args...)>
     void connect()
     {
@@ -69,6 +75,12 @@ class Signal<RT(Args...)> : private Observer
     }
     
     //----------------------------------------------------------------DISCONNECT
+
+    template <typename L>
+    void disconnect(L* instance)
+    {
+        Observer::remove(Delegate::template bind (instance));
+    }
 
     template <RT (*fun_ptr)(Args...)>
     void disconnect()

@@ -3,6 +3,7 @@
 
 #include "nano_function.hpp"
 
+#include <atomic>
 #include <memory>
 
 namespace Nano
@@ -64,18 +65,18 @@ class Observer
     template <typename Delegate, typename... Uref>
     void onEach(Uref&&... args)
     {
-        for (auto c = std::atomic_load(&head); c; c = c->next)
+        for (auto node = std::atomic_load(&head); node; node = node->next)
         {
-            Delegate(c->data.delegate)(std::forward<Uref>(args)...);
+            Delegate(node->data.delegate)(std::forward<Uref>(args)...);
         }
     }
 /*
     template <typename Delegate, typename Accumulate, typename... Uref>
     void onEach(Accumulate&& accumulator, Uref&&... args)
     {
-        for (auto c = std::atomic_load(&head); c; c = c->next)
+        for (auto node = std::atomic_load(&head); node; node = node->next)
         {
-            accumulator(Delegate(c->data.delegate)(std::forward<Uref>(args)...));
+            accumulator(Delegate(node->data.delegate)(std::forward<Uref>(args)...));
         }
     }
 */
