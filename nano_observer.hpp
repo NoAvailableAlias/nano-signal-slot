@@ -3,8 +3,6 @@
 
 #include "nano_function.hpp"
 
-#include <forward_list>
-#include <cassert>
 #include <memory>
 
 namespace Nano
@@ -18,6 +16,8 @@ class Observer
     struct Node { DelegateKeyObserver data; std::shared_ptr<Node> next; };
 
     std::shared_ptr<Node> head;
+
+    //--------------------------------------------------------------------------
 
     void insert(DelegateKey const& key, Observer* ptr)
     {
@@ -33,6 +33,9 @@ class Observer
     {
         this->insert(key, this);
     }
+
+    //--------------------------------------------------------------------------
+
     void remove(DelegateKey const& key)
     {
         std::shared_ptr<Node> node = std::atomic_load(&head);
@@ -54,26 +57,6 @@ class Observer
                 break;
             }
         }
-        /*std::shared_ptr<Node> prev = std::atomic_load(&head);
-        std::shared_ptr<Node> temp;
-
-        if (prev->data.delegate == key)
-        {
-            head = head->next;
-            prev.reset();
-        }
-        else
-        {
-            while (prev->next && prev->next->data.delegate != key)
-                prev = prev->next;
-
-            if (prev->next && prev->next->data.delegate == key)
-            {
-                temp = prev->next;
-                prev->next = temp->next;
-                prev.reset();
-            }
-        }*/
     }
 
     //--------------------------------------------------------------------------
@@ -86,6 +69,7 @@ class Observer
             Delegate(c->data.delegate)(std::forward<Uref>(args)...);
         }
     }
+/*
     template <typename Delegate, typename Accumulate, typename... Uref>
     void onEach(Accumulate&& accumulator, Uref&&... args)
     {
@@ -94,49 +78,8 @@ class Observer
             accumulator(Delegate(c->data.delegate)(std::forward<Uref>(args)...));
         }
     }
+*/
 };
-
-//class Observer
-//{
-//    template <typename T> friend class Signal;
-//
-//    struct DelegateKeyObserver
-//    {
-//        DelegateKeyObserver(DelegateKey k, Observer* o): delegate_key(k), observer(o) {}
-//        DelegateKey delegate_key;
-//        Observer* observer;
-//    };
-//
-//    std::forward_list<DelegateKeyObserver> connections;
-//
-//    void insert(DelegateKey const& key, Observer* observer)
-//    {
-//        connections.emplace_front(key, observer);
-//    }
-//    void insert(DelegateKey const& key)
-//    {
-//        connections.emplace_front(key, this);
-//    }
-//    void remove(DelegateKey const& key)
-//    {
-//        connections.remove_if([&key](DelegateKeyObserver const& slot) { return key == slot.delegate_key; });
-//    }
-//    template <typename Delegate, typename... Uref>
-//    void onEach(Uref&&... args)
-//    {
-//        for (auto const& slot : connections)
-//        {
-//            Delegate(slot.delegate_key)(std::forward<Uref>(args)...);
-//        }
-//    }
-//
-//    protected:
-//
-//    ~Observer()
-//    {
-//        for (auto const& slot : connections) { slot.observer->remove(slot.delegate_key); }
-//    }
-//};
 
 } // namespace Nano ------------------------------------------------------------
 

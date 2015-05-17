@@ -105,14 +105,14 @@ class Signal<RT(Args...)> : private Observer
     {
         Observer::onEach<Delegate>(std::forward<Uref>(args)...);
     }
-
+/*
     template <typename Accumulate, typename... Uref>
     void emit_accumulate(Accumulate&& accumulator, Uref&&... args)
     {
         Observer::onEach<Delegate, Accumulate>
             (std::forward<Accumulate>(accumulator), std::forward<Uref>(args)...);
     }
-
+*/
 };
 
 } // namespace Nano ------------------------------------------------------------
