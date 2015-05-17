@@ -47,13 +47,13 @@ int main()
     signal_two.connect<handler_d>();
 
     // Emit Signals
-    signal_one("we get signal");
-    signal_two("main screen turn on", __LINE__);
+    signal_one.emit("we get signal");
+    signal_two.emit("main screen turn on", __LINE__);
 
     std::vector<bool> status;
 
     // Emit Signals and accumulate SRVs (signal return values)
-    /*signal_one([&](bool srv)
+    /*signal_one.emit_accumulate([&](bool srv)
     {
         status.push_back(srv);
     }
@@ -70,8 +70,8 @@ int main()
     signal_two.disconnect<handler_d>();
 
     // Emit again to test disconnects
-    signal_one("THIS SHOULD NOT APPEAR");
-    signal_two("THIS SHOULD NOT APPEAR", __LINE__);
+    signal_one.emit("THIS SHOULD NOT APPEAR");
+    signal_two.emit("THIS SHOULD NOT APPEAR", __LINE__);
 
     // Pause the screen
     std::cin.get();
