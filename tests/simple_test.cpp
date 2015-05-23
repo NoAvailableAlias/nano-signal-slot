@@ -93,6 +93,13 @@ void test_two()
     sig.emit();
     sig.disconnect(&fun);
     sig.emit();
+    sig.disconnect(&fun);
+    
+    sig.connect(&fun);
+    sig.connect(&fun);
+    sig.disconnect(&fun);
+    sig.disconnect(&fun);
+
     std::cin.get();
 }
 

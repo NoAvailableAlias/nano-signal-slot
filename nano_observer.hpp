@@ -75,20 +75,17 @@ class Observer
 
     ~Observer()
     {
-        for (auto node = head; node;)
+        for(auto node = head; node;)
         {
-            if (node->data.observer == this)
-            {
-                auto temp = node;
-                node = node->next;
-                delete temp;
-            }
-            else
+            auto temp = node;
+            // If this is us we only need to delete
+            if (this != node->data.observer)
             {
                 // Remove this slot from this listening Observer
                 node->data.observer->remove(node->data.delegate);
-                node = node->next;
-            }            
+            }  
+            node = node->next;
+            delete temp;       
         }
     }
 
