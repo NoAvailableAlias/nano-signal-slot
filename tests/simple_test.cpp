@@ -28,8 +28,17 @@ bool handler_d(const char* e, std::size_t n)
     return false;
 }
 
-void test_one()
+//------------------------------------------------------------------------------
+
+int main()
 {
+    // Test using function objects
+    auto fo = [&](const char* sl)
+    {
+        std::cout << sl << std::endl;
+        return true;
+    };
+
     // Declare Nano::Signals using function signature syntax
     Nano::Signal<bool(const char*)> signal_one;
     Nano::Signal<bool(const char*, std::size_t)> signal_two;
@@ -74,37 +83,17 @@ void test_one()
         signal_one.emit("THIS SHOULD NOT APPEAR");
         signal_two.emit("THIS SHOULD NOT APPEAR", __LINE__);
 
+        // Connecting function objects (or any object defining a suitable operator())
+        signal_one.connect(&fo);
+
+        // Disconnecting function objects (test convenience overload)
+        signal_one.disconnect(fo);
+
         // Test auto disconnect
         signal_one.connect<Foo, &Foo::handler_a>(foo);
     }
     signal_one.emit("THIS SHOULD NOT APPEAR");
+
     // Pause the screen
     std::cin.get();
-}
-
-void test_two()
-{
-    using namespace Nano;
-
-    Signal<void()> sig;
-    auto fun = [&](){ std::cout << __LINE__ << std::endl; };
-    sig.connect(&fun);
-    sig.connect(&fun);
-    sig.emit();
-    sig.disconnect(&fun);
-    sig.emit();
-    sig.disconnect(&fun);
-    
-    sig.connect(&fun);
-    sig.connect(&fun);
-    sig.disconnect(&fun);
-    sig.disconnect(&fun);
-
-    std::cin.get();
-}
-
-int main()
-{
-    test_one();
-    test_two();
 }

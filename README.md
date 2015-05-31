@@ -31,22 +31,21 @@ signal_one.connect<Foo::handler_c>();
 signal_two.connect<handler_d>();
 ```
 
-#### Emit
-
-_Additionally test signal return value support._
+#### Emit / Emit Accumulate
 
 ```
 // Emit Signals
-signal_one("we get signal");
-signal_two("main screen turn on", __LINE__);
+signal_one.emit("we get signal");
+signal_two.emit("main screen turn on", __LINE__);
 
 std::vector<bool> status;
 
 // Emit Signals and accumulate SRVs (signal return values)
-signal_one("how are you gentlemen", [&](bool srv)
+signal_one.emit_accumulate([&](bool srv)
 {
-	status.push_back(srv);
-});
+    status.push_back(srv);
+}
+,"how are you gentlemen");
 ```
 
 #### Disconnect
@@ -67,7 +66,7 @@ signal_two.disconnect<handler_d>();
 
 #### Connection Management
 
-_To utilize automatic connection management you must inherit from Nano::Observer_
+_To utilize automatic connection management you must inherit from Nano::Observer._
 
 ```
 struct Foo : public Nano::Observer
@@ -80,7 +79,30 @@ struct Foo : public Nano::Observer
 	...
 ```
 
+#### Function Objects
+
+_*Must guarantee that object lifetimes are compatible.*_
+
+```
+// Test using function objects
+auto fo = [&](const char* sl)
+{
+    std::cout << sl << std::endl;
+    return true;
+};
+
+...
+
+// Connecting function objects (or any object defining a suitable operator())
+signal_one.connect(&fo);
+
+...
+
+// Disconnecting function objects (convenience overload is used here)
+signal_one.disconnect(fo);
+```
+
 #### Links
 
-| [Performance](https://github.com/NoAvailableAlias/signal-slot-benchmarks/tree/master/#performance) | [Size Metrics](https://github.com/NoAvailableAlias/signal-slot-benchmarks/tree/master/#size-metrics) | [Benchmark Algorithms](https://github.com/NoAvailableAlias/signal-slot-benchmarks/tree/master/#benchmark-algorithms) | [Master](https://github.com/NoAvailableAlias/nano-signal-slot/tree/master) |
-|:------------------------------------------------------------------------------------------------- |:---------------------------------------------------------------------------------------------------:|:-------------------------------------------------------------------------------------------------------------------:| --------------------------------------------------------------------------:|
+| [Performance](https://github.com/NoAvailableAlias/signal-slot-benchmarks/tree/master/#performance) | [Metrics](https://github.com/NoAvailableAlias/signal-slot-benchmarks/tree/master/#metrics) | [Benchmark Algorithms](https://github.com/NoAvailableAlias/signal-slot-benchmarks/tree/master/#benchmark-algorithms) | [Master](https://github.com/NoAvailableAlias/nano-signal-slot/tree/master) |
+|:-------------------------------------------------------------------------------------------------- |:------------------------------------------------------------------------------------------:|:--------------------------------------------------------------------------------------------------------------------:| --------------------------------------------------------------------------:|
