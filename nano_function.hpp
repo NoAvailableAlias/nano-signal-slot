@@ -16,7 +16,6 @@ class Function<RT(Args...)>
     using Thunk = RT (*)(void*, Args...);
 
     friend class Observer;
-    template <typename T> friend class Signal;
 
     void* m_this_ptr; // instance pointer
     Thunk m_stub_ptr; // free function pointer
@@ -30,19 +29,19 @@ class Function<RT(Args...)>
 
 public:
 
-    template <RT (*fun_ptr)(Args...)>
+    template <RT (*fun_ptr) (Args...)>
     static inline Function bind()
     {
         return { nullptr, [](void* /*NULL*/, Args... args)
             { return (*fun_ptr)(std::forward<Args>(args)...); } };
     }
-    template <typename T, RT (T::*mem_ptr)(Args...)>
+    template <typename T, RT (T::* mem_ptr) (Args...)>
     static inline Function bind(T* pointer)
     {
         return { pointer, [](void* this_ptr, Args... args)
             { return (static_cast<T*>(this_ptr)->*mem_ptr) (std::forward<Args>(args)...); } };
     }
-    template <typename T, RT (T::*mem_ptr)(Args...) const>
+    template <typename T, RT (T::* mem_ptr) (Args...) const>
     static inline Function bind(T* pointer)
     {
         return { pointer, [](void* this_ptr, Args... args)
@@ -56,7 +55,8 @@ public:
     }
     inline operator DelegateKey() const
     {
-        return { reinterpret_cast<std::uintptr_t>(m_this_ptr), reinterpret_cast<std::uintptr_t>(m_stub_ptr) };
+        return { reinterpret_cast<std::uintptr_t>(m_this_ptr),
+                 reinterpret_cast<std::uintptr_t>(m_stub_ptr) };
     }
     template <typename... Uref>
     inline RT operator() (Uref&&... args)
