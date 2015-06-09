@@ -125,8 +125,7 @@ class Signal<RT(Args...)> : private Observer
     template <typename... Uref>
     void emit (Uref &&... args)
     {
-        Observer::onEach_Accumulate<Delegate>
-            ([](...){}, std::forward<Uref>(args)...);
+        Observer::onEach<Delegate>(std::forward<Uref>(args)...);
     }
 
     template <typename Accumulate, typename... Uref>

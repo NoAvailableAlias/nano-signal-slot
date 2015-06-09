@@ -31,6 +31,11 @@ bool handler_d(const char* sl, std::size_t ln)
     return false;
 }
 
+void handler_e()
+{
+
+}
+
 //------------------------------------------------------------------------------
 
 int main()
@@ -38,6 +43,11 @@ int main()
     // Declare Nano::Signals using function signature syntax
     Nano::Signal<bool(const char*)> signal_one;
     Nano::Signal<bool(const char*, std::size_t)> signal_two;
+
+    // Test void slot types
+    Nano::Signal<void()> signal_three;
+    signal_three.connect<handler_e>();
+    signal_three.emit();
 
     // Test using function objects
     std::function<bool(const char*, std::size_t)> fo;
