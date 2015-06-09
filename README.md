@@ -71,9 +71,9 @@ _To utilize automatic connection management you must inherit from Nano::Observer
 ```
 struct Foo : public Nano::Observer
 {
-    bool handler_a(const char* e) const
+    bool handler_a(const char* sl) const
     {
-        std::cout << e << std::endl;
+        std::cout << sl << std::endl;
         return true;
     }
 	...
@@ -104,5 +104,5 @@ signal_one.disconnect(fo);
 
 #### Links
 
-| [Performance](https://github.com/NoAvailableAlias/signal-slot-benchmarks/tree/master/#performance) | [Metrics](https://github.com/NoAvailableAlias/signal-slot-benchmarks/tree/master/#metrics) | [Benchmark Algorithms](https://github.com/NoAvailableAlias/signal-slot-benchmarks/tree/master/#benchmark-algorithms) | [Master](https://github.com/NoAvailableAlias/nano-signal-slot/tree/master) |
-|:-------------------------------------------------------------------------------------------------- |:------------------------------------------------------------------------------------------:|:--------------------------------------------------------------------------------------------------------------------:| --------------------------------------------------------------------------:|
+| [Performance](https://github.com/NoAvailableAlias/signal-slot-benchmarks/tree/master/#performance) | [Metrics](https://github.com/NoAvailableAlias/signal-slot-benchmarks/tree/master/#metrics) | [Benchmark Algorithms](https://github.com/NoAvailableAlias/signal-slot-benchmarks/tree/master/#benchmark-algorithms) |
+|:-------------------------------------------------------------------------------------------------- |:------------------------------------------------------------------------------------------:|:--------------------------------------------------------------------------------------------------------------------:|

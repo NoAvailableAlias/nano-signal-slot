@@ -51,20 +51,14 @@ class Observer
 
     //--------------------------------------------------------------------------
 
-    template <typename Delegate, typename... Uref>
-    void onEach(Uref&&... args)
-    {
-        for (auto node = head; node; node = node->next)
-        {
-            Delegate(node->data.delegate)(std::forward<Uref>(args)...);
-        }
-    }
-
     template <typename Delegate, typename Accumulate, typename... Uref>
-    void onEach_Accumulate(Accumulate&& accumulator, Uref&&... args)
+    void onEach_Accumulate (Accumulate && accumulator, Uref &&... args)
     {
-        for (auto node = head; node; node = node->next)
+        for (auto node = head, next = head; node; node = next)
         {
+            // Indirect remove safety
+            next = node->next;
+            // Perfect forward, emit, and accumulate the return value
             accumulator(Delegate(node->data.delegate)(std::forward<Uref>(args)...));
         }
     }

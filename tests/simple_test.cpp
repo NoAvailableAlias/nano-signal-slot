@@ -1,30 +1,33 @@
 #include "../nano_signal_slot.hpp"
 
+#include <functional>
 #include <iostream>
 #include <vector>
 
+//------------------------------------------------------------------------------
+
 struct Foo : public Nano::Observer
 {
-    bool handler_a(const char* e) const
+    bool handler_a(const char* sl) const
     {
-        std::cout << e << std::endl;
+        std::cout << sl << std::endl;
         return true;
     }
-    bool handler_b(const char* e, std::size_t n)
+    bool handler_b(const char* sl, std::size_t ln)
     {
-        std::cout << e << " [on line: " << n << "]" << std::endl;
+        std::cout << sl << " [on line: " << ln << "]" << std::endl;
         return true;
     }
-    static bool handler_c(const char* e)
+    static bool handler_c(const char* sl)
     {
-        std::cout << e << std::endl;
+        std::cout << sl << std::endl;
         return true;
     }
 };
 
-bool handler_d(const char* e, std::size_t n)
+bool handler_d(const char* sl, std::size_t ln)
 {
-    std::cout << e << " [on line: " << n << "]" << std::endl;
+    std::cout << sl << " [on line: " << ln << "]" << std::endl;
     return false;
 }
 
@@ -32,16 +35,20 @@ bool handler_d(const char* e, std::size_t n)
 
 int main()
 {
-    // Test using function objects
-    auto fo = [&](const char* sl)
-    {
-        std::cout << sl << std::endl;
-        return true;
-    };
-
     // Declare Nano::Signals using function signature syntax
     Nano::Signal<bool(const char*)> signal_one;
     Nano::Signal<bool(const char*, std::size_t)> signal_two;
+
+    // Test using function objects
+    std::function<bool(const char*, std::size_t)> fo;
+
+    fo = [&](const char* sl, std::size_t ln)
+    {
+        std::cout << sl << " [on line: " << ln << "]" << std::endl;
+        // Test indirectly disconnecting the currently emitting slot
+        signal_two.disconnect(fo);
+        return true;
+    };
 
     {
         Foo foo;
@@ -84,10 +91,13 @@ int main()
         signal_two.emit("THIS SHOULD NOT APPEAR", __LINE__);
 
         // Connecting function objects (or any object defining a suitable operator())
-        signal_one.connect(&fo);
+        signal_two.connect(&fo);
+
+        // Test indirectly disconnecting the currently emitting slot
+        signal_two.emit("indirect disconnect", __LINE__);
 
         // Disconnecting function objects (test convenience overload)
-        signal_one.disconnect(fo);
+        signal_two.disconnect(fo);
 
         // Test auto disconnect
         signal_one.connect<Foo, &Foo::handler_a>(foo);
