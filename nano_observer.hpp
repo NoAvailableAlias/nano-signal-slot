@@ -30,7 +30,7 @@ class Observer
     {
         Node* node = head;
         Node* prev = nullptr;
-
+        // Only delete the first occurrence
         for ( ; node; prev = node, node = node->next)
         {
             if (node->data.delegate == key)
@@ -63,13 +63,13 @@ class Observer
     }
 
     template <typename Delegate, typename Accumulate, typename... Uref>
-    void onEach_Accumulate (Accumulate && accumulator, Uref &&... args)
+    void onEach_Accumulate (Accumulate && accumulate, Uref &&... args)
     {
         for (auto node = head, next = head; node; node = next)
         {
             next = node->next;
             // Perfect forward, emit, and accumulate the return value
-            accumulator(Delegate(node->data.delegate)(std::forward<Uref>(args)...));
+            accumulate(Delegate(node->data.delegate)(std::forward<Uref>(args)...));
         }
     }
 
@@ -79,7 +79,7 @@ class Observer
 
     ~Observer()
     {
-        for(auto node = head; node;)
+        for (auto node = head; node;)
         {
             auto temp = node;
             // If this is us we only need to delete
@@ -180,11 +180,11 @@ class Observer
 //    }
 //
 //    template <typename Delegate, typename Accumulate, typename... Uref>
-//    void onEach_Accumulate(Accumulate&& accumulator, Uref&&... args)
+//    void onEach_Accumulate(Accumulate&& accumulate, Uref&&... args)
 //    {
 //        for (auto node = std::atomic_load(&head); node; node = node->next)
 //        {
-//            accumulator(Delegate(node->data.delegate)(std::forward<Uref>(args)...));
+//            accumulate(Delegate(node->data.delegate)(std::forward<Uref>(args)...));
 //        }
 //    }
 //

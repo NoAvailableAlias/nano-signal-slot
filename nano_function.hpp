@@ -59,7 +59,7 @@ public:
                  reinterpret_cast<std::uintptr_t>(m_stub_ptr) };
     }
     template <typename... Uref>
-    inline RT operator() (Uref&&... args)
+    inline RT operator() (Uref &&... args)
     {
         return (*m_stub_ptr)(m_this_ptr, std::forward<Uref>(args)...);
     }
