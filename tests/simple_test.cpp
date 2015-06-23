@@ -6,6 +6,7 @@
 
 //------------------------------------------------------------------------------
 
+// To utilize automatic disconnect you must inherit from Nano::Observer
 struct Foo : public Nano::Observer
 {
     bool handler_a(const char* sl) const
@@ -33,7 +34,7 @@ bool handler_d(const char* sl, std::size_t ln)
 
 void handler_e()
 {
-
+    // Empty definition
 }
 
 //------------------------------------------------------------------------------
@@ -60,6 +61,7 @@ int main()
         return true;
     };
 
+    // Create a new scope to test automatic disconnect
     {
         Foo foo;
 
@@ -112,7 +114,20 @@ int main()
         // Test auto disconnect
         signal_one.connect<Foo, &Foo::handler_a>(foo);
     }
+    // If this appears then automatic disconnect did not work
     signal_one.emit("THIS SHOULD NOT APPEAR");
+
+    // Test deprecated emit interface
+    signal_one("we get signal");
+    signal_two("main screen turn on", __LINE__);
+
+    std::vector<bool> status;
+
+    // Emit Signals and accumulate SRVs (signal return values)
+    signal_one("how are you gentlemen", [&](bool srv)
+    {
+        status.push_back(srv);
+    });
 
     // Pause the screen
     std::cin.get();

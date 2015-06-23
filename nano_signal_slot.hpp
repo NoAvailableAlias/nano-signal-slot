@@ -122,6 +122,21 @@ class Signal<RT(Args...)> : private Observer
     
     //----------------------------------------------------EMIT / EMIT ACCUMULATE
 
+    #ifdef NANO_BACKWARDS_COMPAT
+
+    void operator() (Args ... args)
+    {
+        emit(std::forward<Args>(args)...);
+    }
+    template <typename Accumulate>
+    void operator() (Args ... args, Accumulate&& accumulate)
+    {
+        emit_accumulate<Accumulate>
+            (std::forward<Accumulate>(accumulate), std::forward<Args>(args)...);
+    }
+
+    #endif
+
     template <typename... Uref>
     void emit (Uref &&... args)
     {
@@ -129,10 +144,10 @@ class Signal<RT(Args...)> : private Observer
     }
 
     template <typename Accumulate, typename... Uref>
-    void emit_accumulate(Accumulate&& accumulator, Uref&&... args)
+    void emit_accumulate(Accumulate&& accumulate, Uref &&... args)
     {
         Observer::onEach_Accumulate<Delegate, Accumulate>
-            (std::forward<Accumulate>(accumulator), std::forward<Uref>(args)...);
+            (std::forward<Accumulate>(accumulate), std::forward<Uref>(args)...);
     }
 
 };
