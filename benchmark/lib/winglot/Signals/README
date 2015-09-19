@@ -1,8 +1,0 @@
-Signal-Slot library using variadic templates
-
-Library requires C++ compiler supporting variadic templates and other C++11 features.
-
-Library has very minimal dependecies:
- - std::list
- - std::set
- - std::mutex

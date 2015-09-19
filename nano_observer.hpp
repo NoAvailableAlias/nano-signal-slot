@@ -3,8 +3,6 @@
 
 #include "nano_function.hpp"
 
-#include <map>
-
 namespace Nano
 {
 
@@ -12,38 +10,89 @@ class Observer
 {
     template <typename T> friend class Signal;
 
-    std::map<DelegateKey, Observer*> tracked_connections;
+    struct DelegateKeyObserver { DelegateKey delegate; Observer* observer; };
+    struct Node { DelegateKeyObserver data; Node* next; } *head = nullptr;
 
-    void insert(DelegateKey const& key, Observer* observer)
+    //--------------------------------------------------------------------------
+
+    void insert(DelegateKey const& key, Observer* ptr)
     {
-        tracked_connections.emplace(key, observer);
+        head = new Node { { key, ptr }, head };
     }
     void insert(DelegateKey const& key)
     {
-        tracked_connections.emplace(key, this);
+        this->insert(key, this);
     }
+
+    //--------------------------------------------------------------------------
+
     void remove(DelegateKey const& key)
     {
-        tracked_connections.erase(key);
+        Node* node = head;
+        Node* prev = nullptr;
+        // Only delete the first occurrence
+        for ( ; node; prev = node, node = node->next)
+        {
+            if (node->data.delegate == key)
+            {
+                if (prev)
+                {
+                    prev->next = node->next;
+                }
+                else
+                {
+                    head = head->next;
+                }
+                delete node;
+                break;
+            }
+        }
     }
+
+    //--------------------------------------------------------------------------
+
+    template <typename Delegate, typename... Uref>
+    void onEach(Uref&&... args)
+    {
+        for (auto node = head, next = head; node; node = next)
+        {
+            next = node->next;
+            // Perfect forward and emit
+            Delegate(node->data.delegate)(std::forward<Uref>(args)...);
+        }
+    }
+
+    template <typename Delegate, typename Accumulate, typename... Uref>
+    void onEach_Accumulate(Accumulate&& accumulate, Uref&&... args)
+    {
+        for (auto node = head, next = head; node; node = next)
+        {
+            next = node->next;
+            // Perfect forward, emit, and accumulate the return value
+            accumulate(Delegate(node->data.delegate)(std::forward<Uref>(args)...));
+        }
+    }
+
+    //--------------------------------------------------------------------------
 
     protected:
 
-   ~Observer()
+    ~Observer()
     {
-        auto iter = tracked_connections.cbegin();
-        auto stop = tracked_connections.cend();
-
-        while (iter != stop)
+        for (auto node = head; node;)
         {
-            auto const& delegate_key = iter->first;
-            auto const& observer = iter->second;
-
-            std::advance(iter, 1);
-
-            observer->remove(delegate_key);
+            auto temp = node;
+            // If this is us we only need to delete
+            if (this != node->data.observer)
+            {
+                // Remove this slot from this listening Observer
+                node->data.observer->remove(node->data.delegate);
+            }  
+            node = node->next;
+            delete temp;       
         }
     }
+
 };
 
 } // namespace Nano ------------------------------------------------------------
