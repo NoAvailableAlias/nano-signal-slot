@@ -122,14 +122,17 @@ class Signal<RT(Args...)> : private Observer
     
     //----------------------------------------------------EMIT / EMIT ACCUMULATE
 
-    #ifdef NANO_BACKWARDS_COMPAT
+    #ifdef NANO_USE_DEPRECATED
 
-    void operator() (Args ... args)
+    /// Will not benefit from perfect forwarding
+    /// TODO [[deprecated]] when c++14 is comfortably supported
+
+    void operator() (Args... args)
     {
         emit(std::forward<Args>(args)...);
     }
     template <typename Accumulate>
-    void operator() (Args ... args, Accumulate&& accumulate)
+    void operator() (Args... args, Accumulate&& accumulate)
     {
         emit_accumulate<Accumulate>
             (std::forward<Accumulate>(accumulate), std::forward<Args>(args)...);
@@ -138,13 +141,13 @@ class Signal<RT(Args...)> : private Observer
     #endif
 
     template <typename... Uref>
-    void emit (Uref &&... args)
+    void emit(Uref&&... args)
     {
         Observer::onEach<Delegate>(std::forward<Uref>(args)...);
     }
 
     template <typename Accumulate, typename... Uref>
-    void emit_accumulate(Accumulate&& accumulate, Uref &&... args)
+    void emit_accumulate(Accumulate&& accumulate, Uref&&... args)
     {
         Observer::onEach_Accumulate<Delegate, Accumulate>
             (std::forward<Accumulate>(accumulate), std::forward<Uref>(args)...);

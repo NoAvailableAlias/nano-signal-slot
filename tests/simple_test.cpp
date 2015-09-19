@@ -117,6 +117,8 @@ int main()
     // If this appears then automatic disconnect did not work
     signal_one.emit("THIS SHOULD NOT APPEAR");
 
+    #ifdef NANO_USE_DEPRECATED
+
     // Test deprecated emit interface
     signal_one("we get signal");
     signal_two("main screen turn on", __LINE__);
@@ -128,6 +130,8 @@ int main()
     {
         status.push_back(srv);
     });
+
+    #endif
 
     // Pause the screen
     std::cin.get();
