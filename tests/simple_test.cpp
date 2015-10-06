@@ -4,6 +4,8 @@
 #include <iostream>
 #include <vector>
 
+#include <cassert>
+
 //------------------------------------------------------------------------------
 
 // To utilize automatic disconnect you must inherit from Nano::Observer
@@ -69,6 +71,9 @@ int main()
         signal_one.connect<Foo, &Foo::handler_a>(&foo);
         signal_two.connect<Foo, &Foo::handler_b>(&foo);
 
+        // Signal one should not be empty
+        assert(!signal_one.empty());
+
         // Connect a static member function
         signal_one.connect<Foo::handler_c>();
 
@@ -114,6 +119,9 @@ int main()
         // Test auto disconnect
         signal_one.connect<Foo, &Foo::handler_a>(foo);
     }
+    // Signal one should be empty
+    assert(signal_one.empty());
+
     // If this appears then automatic disconnect did not work
     signal_one.emit("THIS SHOULD NOT APPEAR");
 
