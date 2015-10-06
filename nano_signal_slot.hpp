@@ -155,7 +155,8 @@ class Signal<RT(Args...)> : private Observer
 
     //---------------------------------------------------------------------EMPTY
 
-    bool empty() {
+    bool empty()
+    {
         return Observer::empty();
     }
 
