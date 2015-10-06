@@ -51,6 +51,13 @@ class Observer
 
     //--------------------------------------------------------------------------
 
+    bool empty()
+    {
+        return head == nullptr;
+    }
+
+    //--------------------------------------------------------------------------
+
     template <typename Delegate, typename... Uref>
     void onEach(Uref&&... args)
     {
@@ -87,9 +94,9 @@ class Observer
             {
                 // Remove this slot from this listening Observer
                 node->data.observer->remove(node->data.delegate);
-            }  
+            }
             node = node->next;
-            delete temp;       
+            delete temp;
         }
     }
 
