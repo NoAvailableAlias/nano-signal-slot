@@ -153,6 +153,12 @@ class Signal<RT(Args...)> : private Observer
             (std::forward<Accumulate>(accumulate), std::forward<Uref>(args)...);
     }
 
+    //---------------------------------------------------------------------EMPTY
+
+    bool empty() {
+        return Observer::empty();
+    }
+
 };
 
 } // namespace Nano ------------------------------------------------------------
