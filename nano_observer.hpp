@@ -8,23 +8,23 @@ namespace Nano
 
 class Observer
 {
+
     template <typename T> friend class Signal;
 
     struct DelegateKeyObserver { DelegateKey delegate; Observer* observer; };
     struct Node { DelegateKeyObserver data; Node* next; } *head = nullptr;
 
-    //--------------------------------------------------------------------------
+    //-----------------------------------------------------------PRIVATE METHODS
 
     void insert(DelegateKey const& key, Observer* ptr)
     {
         head = new Node { { key, ptr }, head };
     }
+
     void insert(DelegateKey const& key)
     {
         this->insert(key, this);
     }
-
-    //--------------------------------------------------------------------------
 
     void remove(DelegateKey const& key)
     {
@@ -49,14 +49,27 @@ class Observer
         }
     }
 
-    //--------------------------------------------------------------------------
+    void removeAll()
+    {
+        for (auto node = head; node;)
+        {
+            auto temp = node;
+            // If this is us we only need to delete
+            if (this != node->data.observer)
+            {
+                // Remove this slot from this listening Observer
+                node->data.observer->remove(node->data.delegate);
+            }
+            node = node->next;
+            delete temp;
+        }
+        head = nullptr;
+    }
 
-    bool empty()
+    bool isEmpty()
     {
         return head == nullptr;
     }
-
-    //--------------------------------------------------------------------------
 
     template <typename Delegate, typename... Uref>
     void onEach(Uref&&... args)
@@ -80,25 +93,22 @@ class Observer
         }
     }
 
-    //--------------------------------------------------------------------------
+    //-----------------------------------------------------------------PROTECTED
 
     protected:
 
     ~Observer()
     {
-        for (auto node = head; node;)
-        {
-            auto temp = node;
-            // If this is us we only need to delete
-            if (this != node->data.observer)
-            {
-                // Remove this slot from this listening Observer
-                node->data.observer->remove(node->data.delegate);
-            }
-            node = node->next;
-            delete temp;
-        }
+        removeAll();
     }
+
+    //--------------------------------------------------------------------PUBLIC
+
+    public:
+
+    Observer() = default;
+    Observer(const Observer& other) = delete; // non construction-copyable
+    Observer& operator=(const Observer&) = delete; // non copyable
 
 };
 

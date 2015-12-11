@@ -3,7 +3,6 @@
 #include <functional>
 #include <iostream>
 #include <vector>
-
 #include <cassert>
 
 //------------------------------------------------------------------------------
@@ -118,6 +117,14 @@ int main()
 
         // Test auto disconnect
         signal_one.connect<Foo, &Foo::handler_a>(foo);
+
+        // Test copying, (currently deleted because of issue #15)
+        //Nano::Signal<void()> signal_four = signal_three;
+        //signal_four.emit();
+
+        // Test removeAll()
+        signal_two.connect<Foo, &Foo::handler_b>(&foo);
+        signal_two.removeAll();
     }
     // Signal one should be empty
     assert(signal_one.empty());

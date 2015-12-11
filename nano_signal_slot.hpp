@@ -153,11 +153,16 @@ class Signal<RT(Args...)> : private Observer
             (std::forward<Accumulate>(accumulate), std::forward<Uref>(args)...);
     }
 
-    //---------------------------------------------------------------------EMPTY
+    //-------------------------------------------------------------------UTILITY
 
     bool empty()
     {
-        return Observer::empty();
+        return Observer::isEmpty();
+    }
+
+    void removeAll()
+    {
+        Observer::removeAll();
     }
 
 };
