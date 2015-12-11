@@ -125,6 +125,9 @@ int main()
         // Test removeAll()
         signal_two.connect<Foo, &Foo::handler_b>(&foo);
         signal_two.removeAll();
+
+        // Test multiple explicit removeAll()
+        signal_two.removeAll();
     }
     // Signal one should be empty
     assert(signal_one.empty());
