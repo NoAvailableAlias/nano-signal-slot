@@ -27,7 +27,7 @@ class Function<RT(Args...)>
         m_this_ptr(reinterpret_cast<void*>(delegate_key[0])),
         m_stub_ptr(reinterpret_cast<Thunk>(delegate_key[1])) {}
 
-public:
+    public:
 
     template <RT (*fun_ptr) (Args...)>
     static inline Function bind()
@@ -55,8 +55,11 @@ public:
     }
     inline operator DelegateKey() const
     {
-        return { reinterpret_cast<std::uintptr_t>(m_this_ptr),
-                 reinterpret_cast<std::uintptr_t>(m_stub_ptr) };
+        return
+        {{
+            reinterpret_cast<std::uintptr_t>(m_this_ptr),
+            reinterpret_cast<std::uintptr_t>(m_stub_ptr)
+        }};
     }
     template <typename... Uref>
     inline RT operator() (Uref&&... args)
