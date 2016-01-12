@@ -66,7 +66,7 @@ class Observer
         head = nullptr;
     }
 
-    bool isEmpty()
+    bool isEmpty() const
     {
         return head == nullptr;
     }
