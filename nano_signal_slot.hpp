@@ -20,18 +20,18 @@ class Signal<RT(Args...)> : private Observer
     template <typename T>
     void remove_sfinae(DelegateKey const& key, typename T::Observer* instance)
     {
-        Observer::remove(key);
-        instance->remove(key);
+        Observer::remove(key, instance);
+        instance->remove(key, this);
     }
     template <typename T>
     void insert_sfinae(DelegateKey const& key, ...)
     {
-        Observer::insert(key);
+        Observer::insert(key, this);
     }
     template <typename T>
     void remove_sfinae(DelegateKey const& key, ...)
     {
-        Observer::remove(key);
+        Observer::remove(key, this);
     }
 
     public:
@@ -43,7 +43,7 @@ class Signal<RT(Args...)> : private Observer
     template <typename L>
     void connect(L* instance)
     {
-        Observer::insert(Delegate::template bind (instance));
+        Observer::insert(Delegate::template bind (instance), this);
     }
     template <typename L>
     void connect(L& instance)
@@ -54,7 +54,7 @@ class Signal<RT(Args...)> : private Observer
     template <RT (* fun_ptr)(Args...)>
     void connect()
     {
-        Observer::insert(Delegate::template bind<fun_ptr>());
+        Observer::insert(Delegate::template bind<fun_ptr>(), this);
     }
 
     template <typename T, RT (T::* mem_ptr)(Args...)>
@@ -84,7 +84,7 @@ class Signal<RT(Args...)> : private Observer
     template <typename L>
     void disconnect(L* instance)
     {
-        Observer::remove(Delegate::template bind (instance));
+        Observer::remove(Delegate::template bind (instance), this);
     }
     template <typename L>
     void disconnect(L& instance)
@@ -95,7 +95,7 @@ class Signal<RT(Args...)> : private Observer
     template <RT (* fun_ptr)(Args...)>
     void disconnect()
     {
-        Observer::remove(Delegate::template bind<fun_ptr>());
+        Observer::remove(Delegate::template bind<fun_ptr>(), this);
     }
     
     template <typename T, RT (T::* mem_ptr)(Args...)>

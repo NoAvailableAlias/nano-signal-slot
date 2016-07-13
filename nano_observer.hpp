@@ -21,19 +21,14 @@ class Observer
         head = new Node { { key, ptr }, head };
     }
 
-    void insert(DelegateKey const& key)
-    {
-        this->insert(key, this);
-    }
-
-    void remove(DelegateKey const& key)
+    void remove(DelegateKey const& key, Observer* obs)
     {
         Node* node = head;
         Node* prev = nullptr;
         // Only delete the first occurrence
         for ( ; node; prev = node, node = node->next)
         {
-            if (node->data.delegate == key)
+            if (node->data.delegate == key && node->data.observer == obs)
             {
                 if (prev)
                 {
@@ -58,7 +53,7 @@ class Observer
             if (this != node->data.observer)
             {
                 // Remove this slot from this listening Observer
-                node->data.observer->remove(node->data.delegate);
+                node->data.observer->remove(node->data.delegate, this);
             }
             node = node->next;
             delete temp;
