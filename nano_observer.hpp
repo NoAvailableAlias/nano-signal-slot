@@ -16,9 +16,9 @@ class Observer
 
     //-----------------------------------------------------------PRIVATE METHODS
 
-    void insert(DelegateKey const& key, Observer* ptr)
+    void insert(DelegateKey const& key, Observer* obs)
     {
-        head = new Node { { key, ptr }, head };
+        head = new Node { { key, obs }, head };
     }
 
     void remove(DelegateKey const& key, Observer* obs)
