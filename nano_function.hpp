@@ -51,7 +51,7 @@ class Function<RT(Args...)>
     static inline Function bind(L* pointer)
     {
         return { pointer, [](void *this_ptr, Args... args)
-            { return (static_cast<L*>(this_ptr)->operator()(std::forward<Args>(args)...)); }};
+            { return (static_cast<L*>(this_ptr)->emit(std::forward<Args>(args)...)); }};
     }
     inline operator DelegateKey() const
     {
