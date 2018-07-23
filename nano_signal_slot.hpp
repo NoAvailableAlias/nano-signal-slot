@@ -120,16 +120,16 @@ class Signal<RT(Args...)> : public Observer
         disconnect<T, mem_ptr>(std::addressof(instance));
     }
     
-    //----------------------------------------------------EMIT / EMIT ACCUMULATE
+    //----------------------------------------------------FIRE / FIRE ACCUMULATE
 
     template <typename... Uref>
-    void emit(Uref&&... args)
+    void fire(Uref&&... args)
     {
         Observer::on_each<Delegate>(std::forward<Uref>(args)...);
     }
 
     template <typename Accumulate, typename... Uref>
-    void emit_accumulate(Accumulate&& accumulate, Uref&&... args)
+    void fire_accumulate(Accumulate&& accumulate, Uref&&... args)
     {
         Observer::on_each_accumulate<Delegate, Accumulate>
             (std::forward<Accumulate>(accumulate), std::forward<Uref>(args)...);

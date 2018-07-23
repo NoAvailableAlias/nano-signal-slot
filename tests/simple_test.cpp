@@ -49,7 +49,7 @@ int main()
     // Test void slot types
     Nano::Signal<void()> signal_three;
     signal_three.connect<handler_e>();
-    signal_three.emit();
+    signal_three.fire();
 
     // Test using function objects
     std::function<bool(const char*, std::size_t)> fo;
@@ -80,13 +80,13 @@ int main()
         signal_two.connect<handler_d>();
 
         // Emit Signals
-        signal_one.emit("we get signal");
-        signal_two.emit("main screen turn on", __LINE__);
+        signal_one.fire("we get signal");
+        signal_two.fire("main screen turn on", __LINE__);
 
         std::vector<bool> status;
 
         // Emit Signals and accumulate SRVs (signal return values)
-        signal_one.emit_accumulate([&](bool srv)
+        signal_one.fire_accumulate([&](bool srv)
         {
             status.push_back(srv);
         }
@@ -103,14 +103,14 @@ int main()
         signal_two.disconnect<handler_d>();
 
         // Emit again to test disconnects
-        signal_one.emit("THIS SHOULD NOT APPEAR");
-        signal_two.emit("THIS SHOULD NOT APPEAR", __LINE__);
+        signal_one.fire("THIS SHOULD NOT APPEAR");
+        signal_two.fire("THIS SHOULD NOT APPEAR", __LINE__);
 
         // Connecting function objects (or any object defining a suitable operator())
         signal_two.connect(&fo);
 
         // Test indirectly disconnecting the currently emitting slot
-        signal_two.emit("indirect disconnect", __LINE__);
+        signal_two.fire("indirect disconnect", __LINE__);
 
         // Disconnecting function objects (test convenience overload)
         signal_two.disconnect(fo);
@@ -120,7 +120,7 @@ int main()
 
         // Test copying (issue #15)
         Nano::Signal<void()> signal_four = signal_three;
-        signal_four.emit();
+        signal_four.fire();
 
         // Test remove_all()
         signal_two.connect<Foo, &Foo::handler_b>(&foo);
@@ -133,7 +133,7 @@ int main()
     assert(signal_one.is_empty());
 
     // If this appears then automatic disconnect did not work
-    signal_one.emit("THIS SHOULD NOT APPEAR");
+    signal_one.fire("THIS SHOULD NOT APPEAR");
 
     // Pause the screen
     std::cin.get();
