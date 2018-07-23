@@ -1,110 +1,87 @@
 #ifndef NANO_OBSERVER_HPP
 #define NANO_OBSERVER_HPP
 
+#include <map>
+
 #include "nano_function.hpp"
+#include "nano_pool_allocator.hpp"
 
 namespace Nano
 {
 
 class Observer
 {
-
     template <typename T> friend class Signal;
 
-    struct DelegateKeyObserver { DelegateKey delegate; Observer* observer; };
-    struct Node { DelegateKeyObserver data; Node* next; } *head = nullptr;
-
-    //-----------------------------------------------------------PRIVATE METHODS
+    std::map<
+        DelegateKey,
+        Observer*,
+        std::less<DelegateKey>,
+        Nano::Pool_Allocator<std::pair<DelegateKey, Observer*>>
+    > m_connections;
 
     void insert(DelegateKey const& key, Observer* obs)
     {
-        head = new Node { { key, obs }, head };
+        m_connections.emplace(key, obs);
     }
 
     void remove(DelegateKey const& key, Observer* obs)
     {
-        Node* node = head;
-        Node* prev = nullptr;
-        // Only delete the first occurrence
-        for ( ; node; prev = node, node = node->next)
-        {
-            if (node->data.delegate == key && node->data.observer == obs)
-            {
-                if (prev)
-                {
-                    prev->next = node->next;
-                }
-                else
-                {
-                    head = head->next;
-                }
-                delete node;
-                break;
-            }
-        }
-    }
-
-    void removeAll()
-    {
-        for (auto node = head; node;)
-        {
-            auto temp = node;
-            // If this is us we only need to delete
-            if (this != node->data.observer)
-            {
-                // Remove this slot from this listening Observer
-                node->data.observer->remove(node->data.delegate, this);
-            }
-            node = node->next;
-            delete temp;
-        }
-        head = nullptr;
-    }
-
-    bool isEmpty() const
-    {
-        return head == nullptr;
+        m_connections.erase(key);
     }
 
     template <typename Delegate, typename... Uref>
-    void onEach(Uref&&... args)
+    void on_each(Uref&&... args)
     {
-        for (auto node = head, next = head; node; node = next)
+        for (auto const& connection : m_connections)
         {
-            next = node->next;
             // Perfect forward and emit
-            Delegate(node->data.delegate)(std::forward<Uref>(args)...);
+            Delegate(connection.first)(std::forward<Uref>(args)...);
         }
     }
 
     template <typename Delegate, typename Accumulate, typename... Uref>
-    void onEach_Accumulate(Accumulate&& accumulate, Uref&&... args)
+    void on_each_accumulate(Accumulate&& accumulate, Uref&&... args)
     {
-        for (auto node = head, next = head; node; node = next)
+        for (auto const& connection : m_connections)
         {
-            next = node->next;
             // Perfect forward, emit, and accumulate the return value
-            accumulate(Delegate(node->data.delegate)(std::forward<Uref>(args)...));
+            accumulate(Delegate(connection.first)(std::forward<Uref>(args)...));
         }
     }
 
-    //-----------------------------------------------------------------PROTECTED
-
     protected:
 
+    // Guideline #4: A base class destructor should be
+    // either public and virtual, or protected and non-virtual.
     ~Observer()
     {
-        removeAll();
+        remove_all();
     }
-
-    //--------------------------------------------------------------------PUBLIC
 
     public:
 
-    Observer() = default;
-    Observer(const Observer& other) = delete; // non construction-copyable
-    Observer& operator=(const Observer&) = delete; // non copyable
+    bool is_empty() const
+    {
+        m_connections.empty();
+    }
 
+    void remove_all()
+    {
+        auto iter = m_connections.cbegin();
+        auto stop = m_connections.cend();
+
+        while (iter != stop)
+        {
+            auto const& delegate_key = iter->first;
+            auto const& observer = iter->second;
+
+            // Advance the iterator before possible removal
+            std::advance(iter, 1);
+
+            observer->remove(delegate_key, observer);
+        }
+    }
 };
 
 } // namespace Nano ------------------------------------------------------------

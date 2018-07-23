@@ -15,6 +15,7 @@ class Function<RT(Args...)>
 {
     using Thunk = RT (*)(void*, Args...);
 
+    // Friended for Function(DelegateKey const&)
     friend class Observer;
 
     void* m_this_ptr; // instance pointer
@@ -23,7 +24,7 @@ class Function<RT(Args...)>
     Function(void* this_ptr, Thunk stub_ptr) :
         m_this_ptr(this_ptr), m_stub_ptr(stub_ptr) {}
 
-    Function(DelegateKey delegate_key) :
+    Function(DelegateKey const& delegate_key) :
         m_this_ptr(reinterpret_cast<void*>(delegate_key[0])),
         m_stub_ptr(reinterpret_cast<Thunk>(delegate_key[1])) {}
 

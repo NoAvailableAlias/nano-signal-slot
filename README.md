@@ -1,7 +1,11 @@
 nano-signal-slot
 ================
 
-Pure C++11 Signals and Slots
+Pure C++14 Signals and Slots
+
+#### Prerequisites
+
+_C++14 is now required for std::aligned_union._
 
 #### Include
 ```

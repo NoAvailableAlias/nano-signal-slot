@@ -71,7 +71,7 @@ int main()
         signal_two.connect<Foo, &Foo::handler_b>(&foo);
 
         // Signal one should not be empty
-        assert(!signal_one.empty());
+        assert(!signal_one.is_empty());
 
         // Connect a static member function
         signal_one.connect<Foo::handler_c>();
@@ -118,38 +118,22 @@ int main()
         // Test auto disconnect
         signal_one.connect<Foo, &Foo::handler_a>(foo);
 
-        // Test copying, (currently deleted because of issue #15)
-        //Nano::Signal<void()> signal_four = signal_three;
-        //signal_four.emit();
+        // Test copying (issue #15)
+        Nano::Signal<void()> signal_four = signal_three;
+        signal_four.emit();
 
-        // Test removeAll()
+        // Test remove_all()
         signal_two.connect<Foo, &Foo::handler_b>(&foo);
-        signal_two.removeAll();
+        signal_two.remove_all();
 
-        // Test multiple explicit removeAll()
-        signal_two.removeAll();
+        // Test multiple explicit remove_all()
+        signal_two.remove_all();
     }
     // Signal one should be empty
-    assert(signal_one.empty());
+    assert(signal_one.is_empty());
 
     // If this appears then automatic disconnect did not work
     signal_one.emit("THIS SHOULD NOT APPEAR");
-
-    #ifdef NANO_USE_DEPRECATED
-
-    // Test deprecated emit interface
-    signal_one("we get signal");
-    signal_two("main screen turn on", __LINE__);
-
-    std::vector<bool> status;
-
-    // Emit Signals and accumulate SRVs (signal return values)
-    signal_one("how are you gentlemen", [&](bool srv)
-    {
-        status.push_back(srv);
-    });
-
-    #endif
 
     // Pause the screen
     std::cin.get();

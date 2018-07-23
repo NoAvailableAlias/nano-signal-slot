@@ -9,7 +9,7 @@ namespace Nano
 
 template <typename RT> class Signal;
 template <typename RT, typename... Args>
-class Signal<RT(Args...)> : private Observer
+class Signal<RT(Args...)> : public Observer
 {
     template <typename T>
     void insert_sfinae(DelegateKey const& key, typename T::Observer* instance)
@@ -122,49 +122,18 @@ class Signal<RT(Args...)> : private Observer
     
     //----------------------------------------------------EMIT / EMIT ACCUMULATE
 
-    #ifdef NANO_USE_DEPRECATED
-
-    /// Will not benefit from perfect forwarding
-    /// TODO [[deprecated]] when c++14 is comfortably supported
-
-    void operator() (Args... args)
-    {
-        emit(std::forward<Args>(args)...);
-    }
-    template <typename Accumulate>
-    void operator() (Args... args, Accumulate&& accumulate)
-    {
-        emit_accumulate<Accumulate>
-            (std::forward<Accumulate>(accumulate), std::forward<Args>(args)...);
-    }
-
-    #endif
-
     template <typename... Uref>
     void emit(Uref&&... args)
     {
-        Observer::onEach<Delegate>(std::forward<Uref>(args)...);
+        Observer::on_each<Delegate>(std::forward<Uref>(args)...);
     }
 
     template <typename Accumulate, typename... Uref>
     void emit_accumulate(Accumulate&& accumulate, Uref&&... args)
     {
-        Observer::onEach_Accumulate<Delegate, Accumulate>
+        Observer::on_each_accumulate<Delegate, Accumulate>
             (std::forward<Accumulate>(accumulate), std::forward<Uref>(args)...);
     }
-
-    //-------------------------------------------------------------------UTILITY
-
-    bool empty() const
-    {
-        return Observer::isEmpty();
-    }
-
-    void removeAll()
-    {
-        Observer::removeAll();
-    }
-
 };
 
 } // namespace Nano ------------------------------------------------------------
