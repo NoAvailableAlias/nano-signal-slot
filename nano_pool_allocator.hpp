@@ -30,12 +30,19 @@ template <typename T> class Singleton
 
 //------------------------------------------------------------------------------
 
-template <typename T, size_t N = 128> class Pool_Allocator
+template <
+    typename T,
+#ifdef NANO_DEFINE_THREADSAFE_ALLOCATOR
+    typename Mutex = std::mutex,
+#else
+    typename Mutex = Noop_Mutex,
+#endif
+    size_t N = 64
+>
+class Pool_Allocator
 {
     class Free_List : public Singleton<Free_List>
     {
-        struct Node { Node* next = nullptr; };
-
         struct Storage
         {
             // Store internal Free_List pointers in a union with T
@@ -51,21 +58,21 @@ template <typename T, size_t N = 128> class Pool_Allocator
             }
         };
 
+        struct Node
+        {
+            Node* next = nullptr;
+        };
+
         std::forward_list<std::unique_ptr<Storage>> m_data;
         std::atomic<Node*> m_head;
 
-        void* next_storage_allocation()
-        {
-            static std::mutex new_mutex;
-            {
-                std::lock_guard<std::mutex> lock(new_mutex);
-                // Add the next Storage block to the Free_List
-                m_data.emplace_front(::new Storage);
-                return next();
-            }
-        }
+        // These are only used within the only critical section
+        std::size_t m_storage_allocations = 0;
+        std::size_t m_storage_factor = 1;
 
         public:
+
+#ifdef NANO_DEFINE_THREADSAFE_ALLOCATOR
 
         void* next()
         {
@@ -76,7 +83,23 @@ template <typename T, size_t N = 128> class Pool_Allocator
 
                 return reinterpret_cast<void*>(node);
             }
-            return next_storage_allocation();
+            static Mutex new_storage_mutex;
+            {
+                std::unique_lock<Mutex> unique_lock(new_storage_mutex);
+
+                // Prevent previously blocked threads from allocating Storage
+                if (!m_head)
+                {
+                    for (int i = m_storage_factor; i; --i, ++m_storage_allocations)
+                    {
+                        // Add the next Storage block to the Free_List
+                        m_data.emplace_front(std::make_unique<Storage>());
+                    }
+                    // Quadratic resizing (get to the watermark as soon as possible)
+                    m_storage_factor <<= (m_storage_factor >= m_storage_allocations ? 0 : 1);
+                }
+                return next();
+            }
         }
 
         void push(void* temp)
@@ -87,6 +110,34 @@ template <typename T, size_t N = 128> class Pool_Allocator
             while (!m_head.compare_exchange_weak(node->next, node,
                 std::memory_order_release, std::memory_order_relaxed));
         }
+
+#else
+
+        void* next()
+        {
+            if (Node* node = m_head)
+            {
+                m_head = node->next;
+                return reinterpret_cast<void*>(node);
+            }
+            for (int i = m_storage_factor; i; --i, ++m_storage_allocations)
+            {
+                // Add the next Storage block to the Free_List
+                m_data.emplace_front(std::make_unique<Storage>());
+            }
+            // Quadratic resizing (get to the watermark as soon as possible)
+            m_storage_factor <<= (m_storage_factor >= m_storage_allocations ? 0 : 1);
+        }
+
+        void push(void* temp)
+        {
+            Node* node = reinterpret_cast<Node*>(temp);
+            node->next = m_head;
+            m_head = node;
+        }
+
+#endif
+
     };
 
     public:
