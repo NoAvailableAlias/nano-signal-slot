@@ -1,11 +1,18 @@
-#include "../nano_signal_slot.hpp"
-
 #include <functional>
 #include <iostream>
 #include <vector>
 #include <cassert>
 
-//------------------------------------------------------------------------------
+// Nano::Observer will now use std::shared_mutex
+#define NANO_DEFINE_THREADSAFE_OBSERVER
+// Nano::Pool_Allocator will now use atomics and std::mutex
+#define NANO_DEFINE_THREADSAFE_ALLOCATOR
+
+// #include "nano_function.hpp"         // Nano::Function, Nano::DelegateKey
+// #include "nano_pool_allocator.hpp"   // Nano::Pool_Allocator
+// #include "nano_noop_mutex.hpp"       // Nano::Noop_Mutex
+// #include "nano_observer.hpp"         // Nano::Observer
+#include "nano_signal_slot.hpp"         // Nano::Signal / All the above
 
 // To utilize automatic disconnect you must inherit from Nano::Observer
 struct Foo : public Nano::Observer
@@ -57,7 +64,7 @@ int main()
     fo = [&](const char* sl, std::size_t ln)
     {
         std::cout << sl << " [on line: " << ln << "]" << std::endl;
-        // Test indirectly disconnecting the currently emitting slot
+        // Test indirectly disconnecting the currently firing slot
         signal_two.disconnect(fo);
         return true;
     };
@@ -79,13 +86,13 @@ int main()
         // Connect a free function
         signal_two.connect<handler_d>();
 
-        // Emit Signals
+        // Fire Signals
         signal_one.fire("we get signal");
         signal_two.fire("main screen turn on", __LINE__);
 
         std::vector<bool> status;
 
-        // Emit Signals and accumulate SRVs (signal return values)
+        // Fire Signals and accumulate SRVs (signal return values)
         signal_one.fire_accumulate([&](bool srv)
         {
             status.push_back(srv);
@@ -109,7 +116,7 @@ int main()
         // Connecting function objects (or any object defining a suitable operator())
         signal_two.connect(&fo);
 
-        // Test indirectly disconnecting the currently emitting slot
+        // Test indirectly disconnecting the currently firing slot
         signal_two.fire("indirect disconnect", __LINE__);
 
         // Disconnecting function objects (test convenience overload)

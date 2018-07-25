@@ -1,17 +1,19 @@
 nano-signal-slot
 ================
 
-Pure C++14 Signals and Slots
+Pure C++17 Signals and Slots
 
 #### Prerequisites
 
-_C++14 is now required for std::aligned_union._
+_*C++17 is now required for std::aligned_union and std::shared_mutex.*_
 
 #### Include
 ```
-// #include "nano_function.hpp" // Nano::Function, Nano::DelegateKey
-// #include "nano_observer.hpp" // Nano::Observer
-#include "nano_signal_slot.hpp" // Nano::Signal / All the above
+// #include "nano_function.hpp"         // Nano::Function, Nano::DelegateKey
+// #include "nano_pool_allocator.hpp"   // Nano::Pool_Allocator
+// #include "nano_noop_mutex.hpp"       // Nano::Noop_Mutex
+// #include "nano_observer.hpp"         // Nano::Observer
+#include "nano_signal_slot.hpp"         // Nano::Signal / All the above
 ```
 
 #### Declare
@@ -22,9 +24,8 @@ Nano::Signal<bool(const char*, std::size_t)> signal_two;
 ```
 
 #### Connect
-
 ```
-// Connect member functions to Nano::signals;
+// Connect member functions to Nano::Signals
 signal_one.connect<Foo, &Foo::handler_a>(&foo);
 signal_two.connect<Foo, &Foo::handler_b>(&foo);
 
@@ -35,17 +36,16 @@ signal_one.connect<Foo::handler_c>();
 signal_two.connect<handler_d>();
 ```
 
-#### Emit / Emit Accumulate
-
+#### Fire / Fire Accumulate
 ```
-// Emit Signals
-signal_one.emit("we get signal");
-signal_two.emit("main screen turn on", __LINE__);
+// Fire Signals
+signal_one.fire("we get signal");
+signal_two.fire("main screen turn on", __LINE__);
 
 std::vector<bool> status;
 
-// Emit Signals and accumulate SRVs (signal return values)
-signal_one.emit_accumulate([&](bool srv)
+// Fire Signals and accumulate SRVs (signal return values)
+signal_one.fire_accumulate([&](bool srv)
 {
     status.push_back(srv);
 }
@@ -106,7 +106,30 @@ signal_one.connect(&fo);
 signal_one.disconnect(fo);
 ```
 
+### Preprocessor Definitions
+```
+// Nano::Observer will now use std::shared_mutex
+#define NANO_DEFINE_THREADSAFE_OBSERVER
+// Nano::Pool_Allocator will now use atomics and std::mutex
+#define NANO_DEFINE_THREADSAFE_ALLOCATOR
+```
+
+#### IMPORTANT
+
+_Some aspects to consider when using nano-signal-slot._
+
+1. ONLY unique Delegates can be connected to a single Signal instance.
+  * _Attempting to connect the same Delegate to a Signal is not an error._  
+2. ORDER is not maintained when connecting Delegates to Signals.
+  * _Adding "fun_a" followed by "fun_b" could result in either being fired first._  
+3. DANGER awaits anyone attempting to remove Delegates from Signals from within a Delegate.
+  * _It is not nice to remove a connection as the connections are being iterated._  
+  * _Only a no cost mitigation is currently in nano-signal-slot to prevent this issue._  
+4. COPYING is weird. That is all.
+
 #### Links
+
+*Benchmarks contain both the old nano-signal-slot v1.x scores as well as the v2.x scores.*
 
 | [Performance](https://github.com/NoAvailableAlias/signal-slot-benchmarks/tree/master/#performance) | [Metrics](https://github.com/NoAvailableAlias/signal-slot-benchmarks/tree/master/#metrics) | [Benchmark Algorithms](https://github.com/NoAvailableAlias/signal-slot-benchmarks/tree/master/#benchmark-algorithms) |
 |:-------------------------------------------------------------------------------------------------- |:------------------------------------------------------------------------------------------:|:--------------------------------------------------------------------------------------------------------------------:|
