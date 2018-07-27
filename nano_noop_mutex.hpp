@@ -29,7 +29,7 @@ class Noop_Mutex
     
     constexpr void lock_shared()
     {
-        
+
     }
     
     constexpr bool try_lock_shared() const
@@ -39,7 +39,7 @@ class Noop_Mutex
     
     constexpr void unlock_shared()
     {
-        
+
     }
 };
 

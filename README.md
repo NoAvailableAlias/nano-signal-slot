@@ -5,7 +5,7 @@ Pure C++17 Signals and Slots
 
 #### Prerequisites
 
-_*C++17 is now required for std::aligned_union and std::shared_mutex.*_
+_*C++17 is now required for std::aligned_union and auto templates.*_
 
 #### Include
 ```
@@ -66,6 +66,9 @@ signal_one.disconnect<Foo::handler_c>();
 
 // Disconnect a free function
 signal_two.disconnect<handler_d>();
+
+// Disconnect all slots
+signal_two.remove_all();
 ```
 
 #### Connection Management
@@ -73,7 +76,7 @@ signal_two.disconnect<handler_d>();
 _To utilize automatic connection management you must inherit from Nano::Observer._
 
 ```
-struct Foo : public Nano::Observer
+struct Foo : public Nano::Observer<>
 {
     bool handler_a(const char* sl) const
     {
@@ -108,7 +111,7 @@ signal_one.disconnect(fo);
 
 ### Preprocessor Definitions
 ```
-// Nano::Observer will now use std::shared_mutex
+// Nano::Observer will now use std::recursive_mutex
 #define NANO_DEFINE_THREADSAFE_OBSERVER
 // Nano::Pool_Allocator will now use atomics and std::mutex
 #define NANO_DEFINE_THREADSAFE_ALLOCATOR
@@ -116,16 +119,15 @@ signal_one.disconnect(fo);
 
 #### IMPORTANT
 
-_Some aspects to consider when using nano-signal-slot._
-
-1. ONLY unique Delegates can be connected to a single Signal instance.
+1. ONLY unique Delegates can be connected to a Signal instance.
   * _Attempting to connect the same Delegate to a Signal is not an error._  
-2. ORDER is not maintained when connecting Delegates to Signals.
+2. ORDER of firing is not guaranteed when connecting Delegates to Signals.
   * _Adding "fun_a" followed by "fun_b" could result in either being fired first._  
-3. DANGER awaits anyone attempting to remove Delegates from Signals from within a Delegate.
-  * _It is not nice to remove a connection as the connections are being iterated._  
-  * _Only a no cost mitigation is currently in nano-signal-slot to prevent this issue._  
-4. COPYING is weird. That is all.
+3. *INVALIDATION* awaits anyone attempting to mutate "this" Signal within a firing "this" Signal.
+  * _It is not nice to remove a connection while connections are being iterated._  
+  * _Only a lame no cost mitigation is currently in nano-signal-slot to prevent this issue._  
+4. COPYING will remain implicitly deleted as the logistics is too much with thread safety.
+5. THREADING is too tough, too rough... recursive mutex white flag before it even began...
 
 #### Links
 

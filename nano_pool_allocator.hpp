@@ -6,6 +6,10 @@
 #include <memory>
 #include <forward_list>
 
+#pragma push_macro("new")
+#undef new
+#include <new>
+
 namespace Nano
 {
 
@@ -43,6 +47,11 @@ class Pool_Allocator
 {
     class Free_List : public Singleton<Free_List>
     {
+        struct Node
+        {
+            Node* next = nullptr;
+        };
+
         struct Storage
         {
             // Store internal Free_List pointers in a union with T
@@ -51,20 +60,15 @@ class Pool_Allocator
             Storage()
             {
                 // Add the newly allocated aligned_storage to the Free_List
-                for (auto const& free_storage_node : aligned_storage)
+                for (auto& free_storage_node : aligned_storage)
                 {
                     Free_List::instance().push(std::addressof(free_storage_node));
                 }
             }
         };
 
-        struct Node
-        {
-            Node* next = nullptr;
-        };
-
-        std::forward_list<std::unique_ptr<Storage>> m_data;
         std::atomic<Node*> m_head;
+        std::forward_list<std::unique_ptr<Storage>> m_data;
 
         // These are only used within the only critical section
         std::size_t m_storage_allocations = 0;
@@ -90,7 +94,7 @@ class Pool_Allocator
                 // Prevent previously blocked threads from allocating Storage
                 if (!m_head)
                 {
-                    for (int i = m_storage_factor; i; --i, ++m_storage_allocations)
+                    for (auto i = m_storage_factor; i; --i, ++m_storage_allocations)
                     {
                         // Add the next Storage block to the Free_List
                         m_data.emplace_front(std::make_unique<Storage>());
@@ -120,13 +124,14 @@ class Pool_Allocator
                 m_head = node->next;
                 return reinterpret_cast<void*>(node);
             }
-            for (int i = m_storage_factor; i; --i, ++m_storage_allocations)
+            for (auto i = m_storage_factor; i; --i, ++m_storage_allocations)
             {
                 // Add the next Storage block to the Free_List
                 m_data.emplace_front(std::make_unique<Storage>());
             }
             // Quadratic resizing (get to the watermark as soon as possible)
             m_storage_factor <<= (m_storage_factor >= m_storage_allocations ? 0 : 1);
+            return next();
         }
 
         void push(void* temp)
@@ -184,11 +189,7 @@ class Pool_Allocator
 
     pointer allocate(size_type n) const
     {
-        if (n > 1)
-        {
-            throw std::runtime_error("Pool_Allocator cannot allocate an array.");
-        }
-        return static_cast<pointer>(Free_List::instance().next());
+        return allocate(n, nullptr);
     }
     
     pointer allocate(size_type n, const void*) const
@@ -197,7 +198,13 @@ class Pool_Allocator
         {
             throw std::runtime_error("Pool_Allocator cannot allocate an array.");
         }
-        return static_cast<pointer>(Free_List::instance().next());
+        pointer ptr = static_cast<pointer>(Free_List::instance().next());
+
+        if (ptr == nullptr)
+        {
+            throw std::bad_alloc();
+        }
+        return ptr;
     }
     
     void deallocate(pointer ptr, size_type)
@@ -207,13 +214,13 @@ class Pool_Allocator
 
     void construct(pointer ptr, value_type const& value)
     {
-        ::new(ptr) value_type(value);
+        ::new(reinterpret_cast<void*>(ptr)) value_type(value);
     }
     
     template <typename U, typename... Args>
     void construct(U * ptr, Args&&... args)
     {
-        ::new(ptr) U(std::forward<Args>(args)...);
+        ::new(reinterpret_cast<void*>(ptr)) U(std::forward<Args>(args)...);
     }
     
     void destroy(pointer ptr)
@@ -233,6 +240,20 @@ class Pool_Allocator
     }
 };
 
+template <class T1, class T2>
+bool operator== (const Pool_Allocator<T1>& lhs, const Pool_Allocator<T2>& rhs)
+{
+    return std::is_same<T1, T2>::value;
+}
+
+template <class T1, class T2>
+bool operator!= (const Pool_Allocator<T1>& lhs, const Pool_Allocator<T2>& rhs)
+{
+    return std::is_same<T1, T2>::value == false;
+}
+
 } // namespace Nano ------------------------------------------------------------
+
+#pragma pop_macro("new")
 
 #endif // NANO_POOL_ALLOCATOR_HPP

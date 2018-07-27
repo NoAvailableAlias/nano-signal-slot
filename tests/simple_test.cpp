@@ -3,7 +3,7 @@
 #include <vector>
 #include <cassert>
 
-// Nano::Observer will now use std::shared_mutex
+// Nano::Observer will now use std::recursive_mutex
 #define NANO_DEFINE_THREADSAFE_OBSERVER
 // Nano::Pool_Allocator will now use atomics and std::mutex
 #define NANO_DEFINE_THREADSAFE_ALLOCATOR
@@ -12,10 +12,10 @@
 // #include "nano_pool_allocator.hpp"   // Nano::Pool_Allocator
 // #include "nano_noop_mutex.hpp"       // Nano::Noop_Mutex
 // #include "nano_observer.hpp"         // Nano::Observer
-#include "nano_signal_slot.hpp"         // Nano::Signal / All the above
+#include "../nano_signal_slot.hpp"      // Nano::Signal / All the above
 
 // To utilize automatic disconnect you must inherit from Nano::Observer
-struct Foo : public Nano::Observer
+struct Foo : public Nano::Observer<>
 {
     bool handler_a(const char* sl) const
     {
@@ -55,13 +55,13 @@ int main()
 
     // Test void slot types
     Nano::Signal<void()> signal_three;
-    signal_three.connect<handler_e>();
+    signal_three.connect<&handler_e>();
     signal_three.fire();
 
     // Test using function objects
     std::function<bool(const char*, std::size_t)> fo;
 
-    fo = [&](const char* sl, std::size_t ln)
+    std::function<bool(const char*, std::size_t)> fo2 = [&](const char* sl, std::size_t ln)
     {
         std::cout << sl << " [on line: " << ln << "]" << std::endl;
         // Test indirectly disconnecting the currently firing slot
@@ -73,18 +73,29 @@ int main()
     {
         Foo foo;
 
+        fo = [&](const char* sl, std::size_t ln)
+        {
+            std::cout << sl << " [on line: " << ln << "]" << std::endl;
+            // Test indirectly disconnecting the currently firing slot
+            signal_two.disconnect(fo);
+            // Test connecting slots as this slot is firing
+            signal_two.connect(&fo2);
+            signal_two.connect<&handler_d>();
+            return true;
+        };
+
         // Connect member functions to Nano::Signals
-        signal_one.connect<Foo, &Foo::handler_a>(&foo);
-        signal_two.connect<Foo, &Foo::handler_b>(&foo);
+        signal_one.connect<&Foo::handler_a>(&foo);
+        signal_two.connect<&Foo::handler_b>(&foo);
 
         // Signal one should not be empty
         assert(!signal_one.is_empty());
 
         // Connect a static member function
-        signal_one.connect<Foo::handler_c>();
+        signal_one.connect<&Foo::handler_c>();
 
         // Connect a free function
-        signal_two.connect<handler_d>();
+        signal_two.connect<&handler_d>();
 
         // Fire Signals
         signal_one.fire("we get signal");
@@ -100,14 +111,14 @@ int main()
         ,"how are you gentlemen");
 
         // Disconnect member functions from a Nano::Signal
-        signal_one.disconnect<Foo, &Foo::handler_a>(foo);
-        signal_two.disconnect<Foo, &Foo::handler_b>(foo);
+        signal_one.disconnect<&Foo::handler_a>(foo);
+        signal_two.disconnect<&Foo::handler_b>(foo);
 
         // Disconnect a static member function
-        signal_one.disconnect<Foo::handler_c>();
+        signal_one.disconnect<&Foo::handler_c>();
 
         // Disconnect a free function
-        signal_two.disconnect<handler_d>();
+        signal_two.disconnect<&handler_d>();
 
         // Emit again to test disconnects
         signal_one.fire("THIS SHOULD NOT APPEAR");
@@ -115,6 +126,7 @@ int main()
 
         // Connecting function objects (or any object defining a suitable operator())
         signal_two.connect(&fo);
+        signal_two.connect(&fo2);
 
         // Test indirectly disconnecting the currently firing slot
         signal_two.fire("indirect disconnect", __LINE__);
@@ -123,15 +135,19 @@ int main()
         signal_two.disconnect(fo);
 
         // Test auto disconnect
-        signal_one.connect<Foo, &Foo::handler_a>(foo);
+        signal_one.connect<&Foo::handler_a>(foo);
 
-        // Test copying (issue #15)
-        Nano::Signal<void()> signal_four = signal_three;
-        signal_four.fire();
+        // NEVERMIND COPYING WILL REMAIN DELETED
 
-        // Test remove_all()
-        signal_two.connect<Foo, &Foo::handler_b>(&foo);
+        //// Test copying (issue #15)
+        //Nano::Signal<void()> signal_four = signal_three;
+        //signal_four.fire();
+
+        // Disconnect all slots
+        signal_two.connect<&Foo::handler_b>(&foo);
         signal_two.remove_all();
+        // This should have no output
+        signal_two.fire("THIS SHOULD NOT APPEAR", __LINE__);
 
         // Test multiple explicit remove_all()
         signal_two.remove_all();
@@ -141,6 +157,8 @@ int main()
 
     // If this appears then automatic disconnect did not work
     signal_one.fire("THIS SHOULD NOT APPEAR");
+
+    std::cout << "TESTS COMPLETE" << std::endl;
 
     // Pause the screen
     std::cin.get();
