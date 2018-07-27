@@ -3,7 +3,6 @@
 
 #include <map>
 #include <mutex>
-#include <shared_mutex>
 
 #include "nano_function.hpp"
 #include "nano_noop_mutex.hpp"

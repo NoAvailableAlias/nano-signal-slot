@@ -26,14 +26,14 @@ Nano::Signal<bool(const char*, std::size_t)> signal_two;
 #### Connect
 ```
 // Connect member functions to Nano::Signals
-signal_one.connect<Foo, &Foo::handler_a>(&foo);
-signal_two.connect<Foo, &Foo::handler_b>(&foo);
+signal_one.connect<&Foo::handler_a>(&foo);
+signal_two.connect<&Foo::handler_b>(&foo);
 
 // Connect a static member function
-signal_one.connect<Foo::handler_c>();
+signal_one.connect<&Foo::handler_c>();
 
 // Connect a free function
-signal_two.connect<handler_d>();
+signal_two.connect<&handler_d>();
 ```
 
 #### Fire / Fire Accumulate
@@ -58,14 +58,14 @@ _Additionally test convenience overloads for references._
 
 ```
 // Disconnect member functions from Nano::Signals
-signal_one.disconnect<Foo, &Foo::handler_a>(foo);
-signal_two.disconnect<Foo, &Foo::handler_b>(foo);
+signal_one.disconnect<&Foo::handler_a>(foo);
+signal_two.disconnect<&Foo::handler_b>(foo);
 
 // Disconnect a static member function
-signal_one.disconnect<Foo::handler_c>();
+signal_one.disconnect<&Foo::handler_c>();
 
 // Disconnect a free function
-signal_two.disconnect<handler_d>();
+signal_two.disconnect<&handler_d>();
 
 // Disconnect all slots
 signal_two.remove_all();
@@ -123,11 +123,11 @@ signal_one.disconnect(fo);
   * _Attempting to connect the same Delegate to a Signal is not an error._  
 2. ORDER of firing is not guaranteed when connecting Delegates to Signals.
   * _Adding "fun_a" followed by "fun_b" could result in either being fired first._  
-3. *INVALIDATION* awaits anyone attempting to mutate "this" Signal within a firing "this" Signal.
-  * _It is not nice to remove a connection while connections are being iterated._  
-  * _Only a lame no cost mitigation is currently in nano-signal-slot to prevent this issue._  
-4. COPYING will remain implicitly deleted as the logistics is too much with thread safety.
-5. THREADING is too tough, too rough... recursive mutex white flag before it even began...
+3. *INVALIDATION* awaits anyone attempting to mutate the parent Signal within a firing slot.
+  * _The only safe remove operation from within a slot is if that exact slot is removing itself._  
+4. COPYING will remain implicitly deleted for now as that impacts thread safety efforts.
+5. THREADING has future optimization potential since std::recursive_mutex is used.
+  * _Use typedef to specialize Observer<> to use your desired mutex type._  
 
 #### Links
 

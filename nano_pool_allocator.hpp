@@ -241,13 +241,13 @@ class Pool_Allocator
 };
 
 template <class T1, class T2>
-bool operator== (const Pool_Allocator<T1>& lhs, const Pool_Allocator<T2>& rhs)
+bool operator== (Pool_Allocator<T1> const& lhs, Pool_Allocator<T2> const& rhs)
 {
     return std::is_same<T1, T2>::value;
 }
 
 template <class T1, class T2>
-bool operator!= (const Pool_Allocator<T1>& lhs, const Pool_Allocator<T2>& rhs)
+bool operator!= (Pool_Allocator<T1> const& lhs, Pool_Allocator<T2> const& rhs)
 {
     return std::is_same<T1, T2>::value == false;
 }

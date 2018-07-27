@@ -61,7 +61,7 @@ class Signal<RT(Args...)> : public Observer<>
     template <typename L>
     void connect(L* instance)
     {
-        Observer::insert(Delegate::template bind(instance), this);
+        Observer::insert(Delegate::template bind (instance), this);
     }
 
     template <typename L>

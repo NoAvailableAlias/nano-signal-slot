@@ -32,6 +32,10 @@ struct Foo : public Nano::Observer<>
         std::cout << sl << std::endl;
         return true;
     }
+    virtual void handler_f()
+    {
+        std::cout << __LINE__ << std::endl;
+    }
 };
 
 bool handler_d(const char* sl, std::size_t ln)
@@ -61,7 +65,7 @@ int main()
     // Test using function objects
     std::function<bool(const char*, std::size_t)> fo;
 
-    std::function<bool(const char*, std::size_t)> fo2 = [&](const char* sl, std::size_t ln)
+    auto fo2 = [&](const char* sl, std::size_t ln)
     {
         std::cout << sl << " [on line: " << ln << "]" << std::endl;
         // Test indirectly disconnecting the currently firing slot
@@ -150,7 +154,13 @@ int main()
         signal_two.fire("THIS SHOULD NOT APPEAR", __LINE__);
 
         // Test multiple explicit remove_all()
-        signal_two.remove_all();
+        signal_one.remove_all();
+
+        // Test virtual
+        signal_three.connect<&Foo::handler_f>(&foo);
+        signal_three.fire();
+        signal_three.disconnect<&Foo::handler_f>(&foo);
+        signal_three.fire();
     }
     // Signal one should be empty
     assert(signal_one.is_empty());
