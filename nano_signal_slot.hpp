@@ -40,10 +40,43 @@ class Signal<RT(Args...)> : public Observer<>
  
     //-------------------------------------------------------------------CONNECT
 
-    template <auto fun_ptr>
+    template <typename L>
+    void connect(L* instance)
+    {
+        Observer::insert(Delegate::template bind(instance), this);
+    }
+    template <typename L>
+    void connect(L& instance)
+    {
+        connect(std::addressof(instance));
+    }
+
+    template <RT(*fun_ptr)(Args...)>
     void connect()
     {
         Observer::insert(Delegate::template bind<fun_ptr>(), this);
+    }
+
+    template <typename T, RT(T::*mem_ptr)(Args...)>
+    void connect(T* instance)
+    {
+        insert_sfinae<T>(Delegate::template bind<mem_ptr>(instance), instance);
+    }
+    template <typename T, RT(T::*mem_ptr)(Args...) const>
+    void connect(T* instance)
+    {
+        insert_sfinae<T>(Delegate::template bind<mem_ptr>(instance), instance);
+    }
+
+    template <typename T, RT(T::*mem_ptr)(Args...)>
+    void connect(T& instance)
+    {
+        connect<mem_ptr, T>(std::addressof(instance));
+    }
+    template <typename T, RT(T::*mem_ptr)(Args...) const>
+    void connect(T& instance)
+    {
+        connect<mem_ptr, T>(std::addressof(instance));
     }
 
     template <auto mem_ptr, typename T>
@@ -58,24 +91,45 @@ class Signal<RT(Args...)> : public Observer<>
         connect<mem_ptr, T>(std::addressof(instance));
     }
 
-    template <typename L>
-    void connect(L* instance)
-    {
-        Observer::insert(Delegate::template bind (instance), this);
-    }
-
-    template <typename L>
-    void connect(L& instance)
-    {
-        connect(std::addressof(instance));
-    }
-
     //----------------------------------------------------------------DISCONNECT
 
-    template <auto fun_ptr>
+    template <typename L>
+    void disconnect(L* instance)
+    {
+        Observer::remove(Delegate::template bind(instance), this);
+    }
+    template <typename L>
+    void disconnect(L& instance)
+    {
+        disconnect(std::addressof(instance));
+    }
+
+    template <RT(*fun_ptr)(Args...)>
     void disconnect()
     {
         Observer::remove(Delegate::template bind<fun_ptr>(), this);
+    }
+
+    template <typename T, RT(T::*mem_ptr)(Args...)>
+    void disconnect(T* instance)
+    {
+        remove_sfinae<T>(Delegate::template bind<mem_ptr>(instance), instance);
+    }
+    template <typename T, RT(T::*mem_ptr)(Args...) const>
+    void disconnect(T* instance)
+    {
+        remove_sfinae<T>(Delegate::template bind<mem_ptr>(instance), instance);
+    }
+
+    template <typename T, RT(T::*mem_ptr)(Args...)>
+    void disconnect(T& instance)
+    {
+        disconnect<T, mem_ptr>(std::addressof(instance));
+    }
+    template <typename T, RT(T::*mem_ptr)(Args...) const>
+    void disconnect(T& instance)
+    {
+        disconnect<T, mem_ptr>(std::addressof(instance));
     }
 
     template <auto mem_ptr, typename T>
@@ -88,18 +142,6 @@ class Signal<RT(Args...)> : public Observer<>
     void disconnect(T& instance)
     {
         disconnect<mem_ptr, T>(std::addressof(instance));
-    }
-
-    template <typename L>
-    void disconnect(L* instance)
-    {
-        Observer::remove(Delegate::template bind (instance), this);
-    }
-
-    template <typename L>
-    void disconnect(L& instance)
-    {
-        disconnect(std::addressof(instance));
     }
 
     //----------------------------------------------------FIRE / FIRE ACCUMULATE

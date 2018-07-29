@@ -26,30 +26,29 @@ class Observer
         Observer*,
         std::less<DelegateKey>,
         Nano::Pool_Allocator<std::pair<const DelegateKey, Observer*>>
-    > m_connections;
+    > connections;
 
-    // Noop_Mutex will be optimized away
-    mutable Mutex m_this_mutex;
+    mutable Mutex mutex;
 
     void insert(DelegateKey const& key, Observer* observer)
     {
-        std::unique_lock<Mutex> lock(m_this_mutex);
-        m_connections.emplace(key, observer);
+        std::unique_lock<Mutex> lock(mutex);
+        connections.emplace(key, observer);
     }
 
     void remove(DelegateKey const& key, Observer* observer)
     {
-        std::unique_lock<Mutex> lock(m_this_mutex);
-        m_connections.erase(key);
+        std::unique_lock<Mutex> lock(mutex);
+        connections.erase(key);
     }
 
     template <typename Delegate, typename... Uref>
     void on_each(Uref&&... args)
     {
-        std::unique_lock<Mutex> lock(m_this_mutex);
+        std::unique_lock<Mutex> lock(mutex);
 
-        auto iter = m_connections.cbegin();
-        auto stop = m_connections.cend();
+        auto iter = connections.cbegin();
+        auto stop = connections.cend();
 
         while (iter != stop)
         {
@@ -64,10 +63,10 @@ class Observer
     template <typename Delegate, typename Accumulate, typename... Uref>
     void on_each_accumulate(Accumulate&& accumulate, Uref&&... args)
     {
-        std::unique_lock<Mutex> lock(m_this_mutex);
+        std::unique_lock<Mutex> lock(mutex);
 
-        auto iter = m_connections.cbegin();
-        auto stop = m_connections.cend();
+        auto iter = connections.cbegin();
+        auto stop = connections.cend();
 
         while (iter != stop)
         {
@@ -83,10 +82,10 @@ class Observer
 
     void remove_all()
     {
-        std::unique_lock<Mutex> lock(m_this_mutex);
+        std::unique_lock<Mutex> lock(mutex);
 
-        auto iter = m_connections.cbegin();
-        auto stop = m_connections.cend();
+        auto iter = connections.cbegin();
+        auto stop = connections.cend();
 
         while (iter != stop)
         {
@@ -102,13 +101,13 @@ class Observer
             }
         }
         // Then remove all this connections
-        m_connections.clear();
+        connections.clear();
     }
 
     bool is_empty() const
     {
-        std::unique_lock<Mutex> lock(m_this_mutex);
-        return m_connections.empty();
+        std::unique_lock<Mutex> lock(mutex);
+        return connections.empty();
     }
 
     protected:

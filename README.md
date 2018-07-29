@@ -42,12 +42,12 @@ signal_two.connect<&handler_d>();
 signal_one.fire("we get signal");
 signal_two.fire("main screen turn on", __LINE__);
 
-std::vector<bool> status;
+std::vector<bool> statuses;
 
 // Fire Signals and accumulate SRVs (signal return values)
 signal_one.fire_accumulate([&](bool srv)
 {
-    status.push_back(srv);
+    statuses.push_back(srv);
 }
 ,"how are you gentlemen");
 ```
@@ -123,11 +123,6 @@ signal_one.disconnect(fo);
   * _Attempting to connect the same Delegate to a Signal is not an error._  
 2. ORDER of firing is not guaranteed when connecting Delegates to Signals.
   * _Adding "fun_a" followed by "fun_b" could result in either being fired first._  
-3. *INVALIDATION* awaits anyone attempting to mutate the parent Signal within a firing slot.
-  * _The only safe remove operation from within a slot is if that exact slot is removing itself._  
-4. COPYING will remain implicitly deleted for now as that impacts thread safety efforts.
-5. THREADING has future optimization potential since std::recursive_mutex is used.
-  * _Use typedef to specialize Observer<> to use your desired mutex type._  
 
 #### Links
 
