@@ -19,9 +19,6 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\tests\simple_test.cpp" />
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="..\nano_function.hpp" />
     <ClInclude Include="..\nano_noop_mutex.hpp" />
     <ClInclude Include="..\nano_observer.hpp" />

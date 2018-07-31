@@ -63,6 +63,9 @@ namespace Nano_Tests
                 mo_signal_one.disconnect<Bar, &Bar::slot_virtual_member_function>(mo_bar);
             };
 
+            // TODO This should be failing but currently isn't...
+            // This should be causing iterator invalidation
+
             mo_signal_one.fire(__FILE__);
         }
 
@@ -123,6 +126,9 @@ namespace Nano_Tests
             fo1 = [&](const char* sl)
             {
                 // TODO Prevent this infinite loop
+                // This would require a custom data structure for Observer
+                // in order to realize a no-cost solution to this problem
+
                 //mo_signal_one.fire(__FILE__);
             };
 
