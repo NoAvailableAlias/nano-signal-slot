@@ -5,9 +5,8 @@ Pure C++17 Signals and Slots
 
 #### Include
 ```
-// #include "nano_function.hpp"         // Nano::Function, Nano::DelegateKey
-// #include "nano_pool_allocator.hpp"   // Nano::Pool_Allocator
-// #include "nano_noop_mutex.hpp"       // Nano::Noop_Mutex
+// #include "nano_function.hpp"         // Nano::Function, Nano::Delegate_Key
+// #include "nano_mutex.hpp"            // Nano::Noop_Mutex, Nano::Recursive_Mutex
 // #include "nano_observer.hpp"         // Nano::Observer
 #include "nano_signal_slot.hpp"         // Nano::Signal
 ```
@@ -88,7 +87,9 @@ struct Foo : public Nano::Observer<>
 
 #### Function Objects
 
-_*Connected function objects must live longer than the connected signal.*_
+**_Connected function objects must live longer than the connected signal._**
+<br/>
+_(be sure to disconnect the function object prior to it destructing)_
 
 ```
 auto fo = [&](const char* sl)
@@ -108,24 +109,10 @@ signal_one.connect(fo);
 signal_one.disconnect(fo);
 ```
 
-#### Preprocessor Definitions
-```
-// Nano::Observer will now use std::recursive_mutex
-#define NANO_DEFINE_THREADSAFE_OBSERVER
-// Nano::Pool_Allocator will now use atomics and std::mutex
-#define NANO_DEFINE_THREADSAFE_ALLOCATOR
-```
-
-### IMPORTANT
-
-1. ONLY unique Slots can be connected to a Signal instance.
-  * _Attempting to connect the same Slot to a Signal is not an error._  
-2. ORDER of firing is not guaranteed when connecting Slots to Signals.
-  * _Adding "slot_a" followed by "slot_b" could result in either being fired first._  
-
 #### Links
 
-*Benchmarks contain both the old nano-signal-slot v1.x scores as well as the v2.x scores.*
+*_Benchmarks contain both the old nano-signal-slot v1.x scores as well as the v2.x scores._
 
-| [Performance](https://github.com/NoAvailableAlias/signal-slot-benchmarks/tree/master/#performance) | [Metrics](https://github.com/NoAvailableAlias/signal-slot-benchmarks/tree/master/#metrics) | [Benchmark Algorithms](https://github.com/NoAvailableAlias/signal-slot-benchmarks/tree/master/#benchmark-algorithms) | [Unit Tests](https://github.com/NoAvailableAlias/nano-signal-slot/tree/master/tests/#unit-tests) |
-|:-------------------------------------------------------------------------------------------------- |:------------------------------------------------------------------------------------------:|:--------------------------------------------------------------------------------------------------------------------:|:------------------------------------------------------------------------------------------------:|
+| [Benchmark Results](https://github.com/NoAvailableAlias/signal-slot-benchmarks/tree/master/#tested-environments) | [Benchmark Algorithms](https://github.com/NoAvailableAlias/signal-slot-benchmarks/tree/master/#benchmark-algorithms) | [Unit Tests](https://github.com/NoAvailableAlias/nano-signal-slot/tree/master/tests/#unit-tests) |
+|:----------------------------------------------------------------------------------------------------------------:|:--------------------------------------------------------------------------------------------------------------------:|:------------------------------------------------------------------------------------------------:|
+<br/>
