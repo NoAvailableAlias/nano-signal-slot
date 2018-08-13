@@ -1,14 +1,10 @@
-#ifndef NANO_TEST_BASE_HPP
-#define NANO_TEST_BASE_HPP
+#pragma once
 
+#include <mutex>
 #include <functional>
 
 #include "../nano_signal_slot.hpp"
-
-// Nano::Observer will now use std::recursive_mutex
-#define NANO_DEFINE_THREADSAFE_OBSERVER
-// Nano::Pool_Allocator will now use atomics and std::mutex
-#define NANO_DEFINE_THREADSAFE_ALLOCATOR
+#include "../nano_mutex.hpp"
 
 namespace Nano_Tests
 {
@@ -21,13 +17,24 @@ namespace Nano_Tests
         }
     }
 
+#if defined(NANO_DEFINE_THREADSAFE_SIGNALS) || true
+
+    using Observer = Nano::Observer<Nano::Recursive_Mutex>;
+    using Signal_One = Nano::Signal<void(const char*), Nano::Recursive_Mutex>;
+    using Signal_Two = Nano::Signal<void(const char*, std::size_t), Nano::Recursive_Mutex>;
+
+#else
+
+    using Observer = Nano::Observer<>;
     using Signal_One = Nano::Signal<void(const char*)>;
     using Signal_Two = Nano::Signal<void(const char*, std::size_t)>;
 
-    using Observer = Nano::Observer<>;
+#endif
 
     using Delegate_One = std::function<void(const char*)>;
     using Delegate_Two = std::function<void(const char*, std::size_t)>;
+
+    //--------------------------------------------------------------------------
 
     class Foo : public Observer
     {
@@ -79,6 +86,8 @@ namespace Nano_Tests
         }
     };
 
+    //--------------------------------------------------------------------------
+
     class Bar : public Foo
     {
         public:
@@ -93,6 +102,8 @@ namespace Nano_Tests
         }
     };
 
+    //--------------------------------------------------------------------------
+
     static void slot_static_free_function(const char* sl)
     {
         anonymous_output(__FUNCTION__, sl, __LINE__);
@@ -104,5 +115,3 @@ namespace Nano_Tests
     }
 
 }
-
-#endif // NANO_TEST_BASE_HPP

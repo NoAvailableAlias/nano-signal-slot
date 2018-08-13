@@ -63,10 +63,9 @@ namespace Nano_Tests
                 mo_signal_one.disconnect<Bar, &Bar::slot_virtual_member_function>(mo_bar);
             };
 
-            // TODO This should be failing but currently isn't...
-            // This should be causing iterator invalidation
-
             mo_signal_one.fire(__FILE__);
+
+            Assert::IsTrue(mo_signal_one.is_empty(), L"A slot was found.");
         }
 
         TEST_METHOD(Test_Fire_Connects)
@@ -89,7 +88,7 @@ namespace Nano_Tests
             mo_signal_one.fire(__FILE__);
         }
 
-        TEST_METHOD(Test_Fire_Remove_All)
+        TEST_METHOD(Test_Fire_Disconnect_All)
         {
             Delegate_One fo1;
 
@@ -103,7 +102,7 @@ namespace Nano_Tests
 
             fo1 = [&](const char* sl)
             {
-                mo_signal_one.remove_all();
+                mo_signal_one.disconnect_all();
             };
 
             mo_signal_one.fire(__FILE__);

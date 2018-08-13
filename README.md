@@ -68,7 +68,7 @@ signal_one.disconnect<&Foo::slot_static_member_one>();
 signal_two.disconnect<&slot_free_function_one>();
 
 // Disconnect all slots
-signal_two.remove_all();
+signal_two.disconnect_all();
 ```
 
 #### Connection Management
@@ -120,7 +120,7 @@ signal_one.disconnect(fo);
 
 1. ONLY unique Slots can be connected to a Signal instance.
   * _Attempting to connect the same Slot to a Signal is not an error._  
-2. ORDER of firing is not guaranteed when connecting Delegates to Signals.
+2. ORDER of firing is not guaranteed when connecting Slots to Signals.
   * _Adding "slot_a" followed by "slot_b" could result in either being fired first._  
 
 #### Links

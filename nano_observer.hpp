@@ -1,49 +1,44 @@
-#ifndef NANO_OBSERVER_HPP
-#define NANO_OBSERVER_HPP
+#pragma once
 
-#include <map>
-#include <mutex>
+#include <forward_list>
+#include <memory>
 
 #include "nano_function.hpp"
-#include "nano_noop_mutex.hpp"
-#include "nano_pool_allocator.hpp"
+#include "nano_mutex.hpp"
 
 namespace Nano
 {
 
-#ifdef NANO_DEFINE_THREADSAFE_OBSERVER
-template <typename Mutex = std::recursive_mutex>
-#else
 template <typename Mutex = Noop_Mutex>
-#endif
 class Observer
 {
     // Only Nano::Signal is allowed access
-    template <typename> friend class Signal;
+    template <typename, typename> friend class Signal;
 
-    std::map<
-        DelegateKey,
-        Observer*,
-        std::less<DelegateKey>,
-        Nano::Pool_Allocator<std::pair<const DelegateKey, Observer*>>
-    > connections;
+    using Slot_Pair = std::pair<const Delegate_Key, Observer*>;
 
+    std::forward_list<std::unique_ptr<Slot_Pair>> connections;
     mutable Mutex mutex;
 
-    void insert(DelegateKey const& key, Observer* observer)
+    //--------------------------------------------------------------------------
+
+    void insert(Delegate_Key const& key, Observer* observer)
     {
         std::unique_lock<Mutex> lock(mutex);
-        connections.emplace(key, observer);
+        connections.emplace_front(std::make_unique<Slot_Pair>(key, observer));
     }
 
-    void remove(DelegateKey const& key, Observer* observer)
+    void remove(Delegate_Key const& key, Observer*)
     {
         std::unique_lock<Mutex> lock(mutex);
-        connections.erase(key);
+        connections.remove_if([&key](auto const& pair)
+        {
+            return pair->first == key;
+        });
     }
 
-    template <typename Delegate, typename... Uref>
-    void on_each(Uref&&... args)
+    template <typename Function, typename... Uref>
+    void for_each(Uref&&... args)
     {
         std::unique_lock<Mutex> lock(mutex);
 
@@ -52,16 +47,16 @@ class Observer
 
         while (iter != stop)
         {
-            auto const& delegate = iter->first;
+            auto const& delegate = (*iter)->first;
             std::advance(iter, 1);
 
             // Perfect forward and fire
-            Delegate::bind(delegate)(std::forward<Uref>(args)...);
+            Function::bind(delegate)(std::forward<Uref>(args)...);
         }
     }
 
-    template <typename Delegate, typename Accumulate, typename... Uref>
-    void on_each_accumulate(Accumulate&& accumulate, Uref&&... args)
+    template <typename Function, typename Accumulate, typename... Uref>
+    void for_each_accumulate(Accumulate&& accumulate, Uref&&... args)
     {
         std::unique_lock<Mutex> lock(mutex);
 
@@ -70,17 +65,17 @@ class Observer
 
         while (iter != stop)
         {
-            auto const& delegate = iter->first;
+            auto const& delegate = (*iter)->first;
             std::advance(iter, 1);
 
             // Perfect forward, fire, and accumulate the return value
-            accumulate(Delegate::bind(delegate)(std::forward<Uref>(args)...));
+            accumulate(Function::bind(delegate)(std::forward<Uref>(args)...));
         }
     }
 
     public:
 
-    void remove_all()
+    void disconnect_all()
     {
         std::unique_lock<Mutex> lock(mutex);
 
@@ -89,11 +84,11 @@ class Observer
 
         while (iter != stop)
         {
-            auto const& delegate = iter->first;
-            auto const& observer = iter->second;
+            auto const& delegate = (*iter)->first;
+            auto const& observer = (*iter)->second;
             std::advance(iter, 1);
 
-            // Instead of forcing tree adjustments
+            // Do not remove from this while iterating
             if (observer != this)
             {
                 // Remove the delegate from the observer
@@ -116,10 +111,8 @@ class Observer
     // either public and virtual, or protected and non-virtual.
     ~Observer()
     {
-        remove_all();
+        disconnect_all();
     }
 };
 
 } // namespace Nano ------------------------------------------------------------
-
-#endif // NANO_OBSERVER_HPP

@@ -1,7 +1,7 @@
 Unit Tests
 ==========
 
-Currently nano-signal-slot has replaced its previous single test with testing through Visual Studio.
+Currently nano-signal-slot now uses Visual Studio for all tests.
 
 | Test Class | Test Method | Status |
 |------------|-------------|-------------|
@@ -28,9 +28,9 @@ Currently nano-signal-slot has replaced its previous single test with testing th
 | | Test_Overloaded_Free_Function_Disconnect | PASS |
 | Test_Signal_Edge_Cases | | |
 | | Test_Fired_Disconnect | PASS |
-| | Test_Fire_Disconnects | &mdash; |
+| | Test_Fire_Disconnects | PASS |
 | | Test_Fire_Connects | PASS |
-| | Test_Fire_Remove_All | PASS |
+| | Test_Fire_Disconnect_All | PASS |
 | | Test_Fire_Recursive_Fire | &mdash; |
 | Test_Signal_Fire | | |
 | | Test_Member_Fire | PASS |

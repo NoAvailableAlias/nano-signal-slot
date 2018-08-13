@@ -1,5 +1,4 @@
-#ifndef NANO_FUNCTION_HPP
-#define NANO_FUNCTION_HPP
+#pragma once
 
 #include <cstdint>
 #include <array>
@@ -7,26 +6,18 @@
 namespace Nano
 {
 
-using DelegateKey = std::array<const std::uintptr_t, 2>;
+using Delegate_Key = std::array<const std::uintptr_t, 2>;
 
 template <typename RT> class Function;
 template <typename RT, typename... Args>
-class Function<RT(Args...)>
+class Function<RT(Args...)> final
 {
+    // Only Nano::Observer is allowed access
     template <typename> friend class Observer;
 
-    using Thunk = RT(*)(void*, Args...);
+    using Thunk = RT(*)(void*, Args&&...);
 
-    void* m_this_ptr; // instance pointer
-    Thunk m_stub_ptr; // free function pointer
-
-    Function(void* this_ptr, Thunk stub_ptr) :
-        m_this_ptr(this_ptr), m_stub_ptr(stub_ptr)
-    {
-
-    }
-
-    static inline Function bind(DelegateKey const& delegate_key)
+    static inline Function bind(Delegate_Key const& delegate_key)
     {
         return
         {
@@ -37,12 +28,15 @@ class Function<RT(Args...)>
 
     public:
 
+    void* instance_pointer;
+    const Thunk function_pointer;
+
     template <auto fun_ptr>
     static inline Function bind()
     {
         return
         {
-            nullptr, [](void* /*NULL*/, Args... args)
+            nullptr, [](void* /*NULL*/, Args&&... args)
             {
                 return (*fun_ptr)(std::forward<Args>(args)...);
             }
@@ -54,9 +48,9 @@ class Function<RT(Args...)>
     {
         return
         {
-            pointer, [](void* this_ptr, Args... args)
+            pointer, [](void* this_ptr, Args&&... args)
             {
-                return (static_cast<T*>(this_ptr)->*mem_ptr) (std::forward<Args>(args)...);
+                return (static_cast<T*>(this_ptr)->*mem_ptr)(std::forward<Args>(args)...);
             }
         };
     }
@@ -66,9 +60,9 @@ class Function<RT(Args...)>
     {
         return
         {
-            pointer, [](void *this_ptr, Args... args)
+            pointer, [](void *this_ptr, Args&&... args)
             {
-                return (static_cast<L*>(this_ptr)->operator()(std::forward<Args>(args)...));
+                return static_cast<L*>(this_ptr)->operator()(std::forward<Args>(args)...);
             }
         };
     }
@@ -76,19 +70,17 @@ class Function<RT(Args...)>
     template <typename... Uref>
     inline RT operator() (Uref&&... args)
     {
-        return (*m_stub_ptr)(m_this_ptr, std::forward<Uref>(args)...);
+        return (*function_pointer)(instance_pointer, std::forward<Uref>(args)...);
     }
 
-    inline operator DelegateKey() const
+    inline operator Delegate_Key() const
     {
         return
         {
-            reinterpret_cast<std::uintptr_t>(m_this_ptr),
-            reinterpret_cast<std::uintptr_t>(m_stub_ptr)
+            reinterpret_cast<std::uintptr_t>(instance_pointer),
+            reinterpret_cast<std::uintptr_t>(function_pointer)
         };
     }
 };
 
 } // namespace Nano ------------------------------------------------------------
-
-#endif // NANO_FUNCTION_HPP

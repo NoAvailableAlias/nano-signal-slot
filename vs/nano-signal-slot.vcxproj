@@ -20,9 +20,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\nano_function.hpp" />
-    <ClInclude Include="..\nano_noop_mutex.hpp" />
+    <ClInclude Include="..\nano_mutex.hpp" />
     <ClInclude Include="..\nano_observer.hpp" />
-    <ClInclude Include="..\nano_pool_allocator.hpp" />
     <ClInclude Include="..\nano_signal_slot.hpp" />
   </ItemGroup>
   <ItemGroup>

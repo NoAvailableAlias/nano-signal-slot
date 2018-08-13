@@ -24,13 +24,10 @@
     <ClInclude Include="..\nano_function.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\nano_noop_mutex.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\nano_observer.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\nano_pool_allocator.hpp">
+    <ClInclude Include="..\nano_mutex.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
