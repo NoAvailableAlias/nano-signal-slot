@@ -109,6 +109,12 @@ signal_one.connect(fo);
 signal_one.disconnect(fo);
 ```
 
+## Deadlock Disclaimer
+
+Currently nano-signal-slot is not reentrant safe and **does not support** any recursive Signal operations from within Slot emission.
+Doing so could cause a deadlock scenario if these operations are performed across threads.
+The [issue](https://github.com/NoAvailableAlias/nano-signal-slot/issues/22) will remain open until a suitable rework is ready.
+
 #### Links
 
 *_Benchmarks contain both the old nano-signal-slot v1.x scores as well as the v2.x scores._
