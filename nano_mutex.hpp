@@ -10,22 +10,13 @@ namespace Nano
 
 class Spin_Mutex
 {
-    std::atomic<std::thread::id> owner_thread_id = std::thread::id();
     std::atomic_flag lock_flag = ATOMIC_FLAG_INIT;
 
     public:
 
     bool try_lock()
     {
-        if (!lock_flag.test_and_set(std::memory_order_acquire))
-        {
-            owner_thread_id.store(std::this_thread::get_id(), std::memory_order_release);
-        }
-        else if (owner_thread_id.load(std::memory_order_acquire) != std::this_thread::get_id())
-        {
-            return false;
-        }
-        return true;
+        return !lock_flag.test_and_set(std::memory_order_acquire);
     }
 
     void lock()
@@ -38,8 +29,6 @@ class Spin_Mutex
 
     void unlock()
     {
-        assert(owner_thread_id.load(std::memory_order_acquire) == std::this_thread::get_id());
-        owner_thread_id.store(std::thread::id(), std::memory_order_release);
         lock_flag.clear(std::memory_order_release);
     }
 };

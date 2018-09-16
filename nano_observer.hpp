@@ -42,7 +42,7 @@ class Observer : private MT_Policy
 
         inline bool operator()(Connection const& lhs, Connection const& rhs) const
         {
-            return this->operator()(lhs.delegate, rhs.delegate);
+            return operator()(lhs.delegate, rhs.delegate);
         }
     };
 
