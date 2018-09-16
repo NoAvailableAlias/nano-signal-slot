@@ -22,7 +22,6 @@ class Observer : private MT_Policy
         Delegate_Key delegate;
         Observer* observer;
 
-        Connection() = default;
         Connection(Delegate_Key const& key) : delegate(key), observer(nullptr) {}
         Connection(Delegate_Key const& key, Observer* obs) : delegate(key), observer(obs) {}
     };
@@ -80,7 +79,7 @@ class Observer : private MT_Policy
 
         if (slot != stop)
         {
-            *slot = Connection();
+            *slot = { { 0, 0 }, nullptr };
             std::rotate(start, slot, slot + 1);
         }
     }
@@ -92,7 +91,7 @@ class Observer : private MT_Policy
     {
         auto lock = MT_Policy::get_lock_guard();
 
-        for (auto const& slot : MT_Policy::copy_or_ref(connections))
+        for (auto const& slot : MT_Policy::copy_or_ref(connections, lock))
         {
             if (slot.observer)
             {
@@ -106,7 +105,7 @@ class Observer : private MT_Policy
     {
         auto lock = MT_Policy::get_lock_guard();
 
-        for (auto const& slot : MT_Policy::copy_or_ref(connections))
+        for (auto const& slot : MT_Policy::copy_or_ref(connections, lock))
         {
             if (slot.observer)
             {
@@ -123,19 +122,11 @@ class Observer : private MT_Policy
     {
         auto lock = MT_Policy::get_lock_guard();
 
-        auto start = connections.cbegin();
-        auto stop = connections.cend();
-
-        while (start != stop)
+        for (auto const& slot : connections)
         {
-            auto const& delegate = start->delegate;
-            auto const& observer = start->observer;
-
-            std::advance(start, 1);
-
-            if (observer && observer != this)
+            if (slot.observer && slot.observer != this)
             {
-                observer->remove(delegate);
+                slot.observer->remove(slot.delegate);
             }
         }
         connections.clear();

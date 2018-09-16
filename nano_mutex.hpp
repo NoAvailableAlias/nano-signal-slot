@@ -95,15 +95,15 @@ class ST_Policy
 {
     public:
 
-    template <typename T>
-    static inline T const& copy_or_ref(T const& param)
+    template <typename T, typename L>
+    inline T const& copy_or_ref(T const& param, L&&) const
     {
         return param;
     }
 
-    constexpr void lock() const
+    constexpr bool get_lock_guard() const
     {
-
+        return false;
     }
 
     constexpr bool try_lock() const
@@ -111,33 +111,35 @@ class ST_Policy
         return true;
     }
 
-    constexpr void unlock() noexcept
+    constexpr void lock() const
     {
 
     }
 
-    constexpr bool get_lock_guard() const
+    constexpr void unlock() noexcept
     {
-        return false;
+
     }
 };
 
 template <typename Mutex = Spin_Mutex>
 class TS_Policy
 {
+    using Lock_Guard = std::lock_guard<TS_Policy>;
+
     mutable Mutex m_mutex;
 
     public:
 
-    template <typename T>
-    static inline T const& copy_or_ref(T const& param)
+    template <typename T, typename L>
+    inline T const& copy_or_ref(T const& param, L&&) const
     {
         return param;
     }
 
-    inline void lock() const
+    inline Lock_Guard get_lock_guard() const
     {
-        m_mutex.lock();
+        return Lock_Guard(*const_cast<TS_Policy*>(this));
     }
 
     inline bool try_lock() const
@@ -145,14 +147,14 @@ class TS_Policy
         return m_mutex.try_lock();
     }
 
+    inline void lock() const
+    {
+        m_mutex.lock();
+    }
+
     inline void unlock() noexcept
     {
         m_mutex.unlock();
-    }
-
-    inline std::lock_guard<TS_Policy> get_lock_guard() const
-    {
-        return std::lock_guard<TS_Policy>(*const_cast<TS_Policy*>(this));
     }
 };
 
@@ -162,15 +164,15 @@ class ST_Policy_Strict
 {
     public:
 
-    template <typename T>
-    static inline T const& copy_or_ref(T const& param)
+    template <typename T, typename L>
+    inline T copy_or_ref(T const& param, L&&) const
     {
         return param;
     }
 
-    constexpr void lock() const
+    constexpr bool get_lock_guard() const
     {
-
+        return false;
     }
 
     constexpr bool try_lock() const
@@ -178,33 +180,36 @@ class ST_Policy_Strict
         return true;
     }
 
-    constexpr void unlock() noexcept
+    constexpr void lock() const
     {
 
     }
 
-    constexpr bool get_lock_guard() const
+    constexpr void unlock() noexcept
     {
-        return false;
+
     }
 };
 
 template <typename Mutex = Recursive_Spin_Mutex>
 class TS_Policy_Strict
 {
+    using Lock_Guard = std::unique_lock<TS_Policy_Strict>;
+
     mutable Mutex m_mutex;
 
     public:
 
-    template <typename T>
-    static inline T const& copy_or_ref(T const& param)
+    template <typename T, typename L>
+    inline T copy_or_ref(T const& param, L&& lock) const
     {
+        Lock_Guard unlock_after_copy = std::move(lock);
         return param;
     }
 
-    inline void lock() const
+    inline Lock_Guard get_lock_guard() const
     {
-        m_mutex.lock();
+        return Lock_Guard(*const_cast<TS_Policy_Strict*>(this));
     }
 
     inline bool try_lock() const
@@ -212,14 +217,14 @@ class TS_Policy_Strict
         return m_mutex.try_lock();
     }
 
+    inline void lock() const
+    {
+        m_mutex.lock();
+    }
+
     inline void unlock() noexcept
     {
         m_mutex.unlock();
-    }
-
-    inline std::lock_guard<TS_Policy_Strict> get_lock_guard() const
-    {
-        return std::lock_guard<TS_Policy_Strict>(*const_cast<TS_Policy_Strict*>(this));
     }
 };
 
