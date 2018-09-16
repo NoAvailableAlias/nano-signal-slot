@@ -111,9 +111,9 @@ signal_one.disconnect(fo);
 
 ## Deadlock Disclaimer
 
-Currently nano-signal-slot is not reentrant safe and **does not support** any recursive Signal operations from within Slot emission.
-Doing so could cause a deadlock scenario if these operations are performed across threads.
-The [issue](https://github.com/NoAvailableAlias/nano-signal-slot/issues/22) will remain open until a suitable rework is ready.
+The Nano::TS_Policy available in nano-signal-slot is not reentrant safe and **does not support** recursive Signal operations.
+However, the Nano::TS_Policy_Strict policy allows for recursive Signal operations at the expense of a performance impact.
+The [issue](https://github.com/NoAvailableAlias/nano-signal-slot/issues/22) will remain open until the next release.
 
 #### Links
 

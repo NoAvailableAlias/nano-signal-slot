@@ -6,12 +6,12 @@
 namespace Nano
 {
 
-template <typename RT, typename Mutex = Noop_Mutex>
+template <typename RT, typename MT_Policy = ST_Policy>
 class Signal;
-template <typename RT, typename Mutex, typename... Args>
-class Signal<RT(Args...), Mutex> final : public Observer<Mutex>
+template <typename RT, typename MT_Policy, typename... Args>
+class Signal<RT(Args...), MT_Policy> final : public Observer<MT_Policy>
 {
-    using Observer = Observer<Mutex>;
+    using Observer = Observer<MT_Policy>;
     using Function = Function<RT(Args...)>;
 
     template <typename T>
@@ -23,8 +23,8 @@ class Signal<RT(Args...), Mutex> final : public Observer<Mutex>
     template <typename T>
     void remove_sfinae(Delegate_Key const& key, typename T::Observer* instance)
     {
-        Observer::remove(key, instance);
-        instance->remove(key, this);
+        Observer::remove(key);
+        instance->remove(key);
     }
     template <typename T>
     void insert_sfinae(Delegate_Key const& key, ...)
@@ -34,7 +34,7 @@ class Signal<RT(Args...), Mutex> final : public Observer<Mutex>
     template <typename T>
     void remove_sfinae(Delegate_Key const& key, ...)
     {
-        Observer::remove(key, this);
+        Observer::remove(key);
     }
 
     public:
@@ -96,7 +96,7 @@ class Signal<RT(Args...), Mutex> final : public Observer<Mutex>
     template <typename L>
     void disconnect(L* instance)
     {
-        Observer::remove(Function::template bind(instance), this);
+        Observer::remove(Function::template bind(instance));
     }
     template <typename L>
     void disconnect(L& instance)
@@ -107,7 +107,7 @@ class Signal<RT(Args...), Mutex> final : public Observer<Mutex>
     template <RT(*fun_ptr)(Args...)>
     void disconnect()
     {
-        Observer::remove(Function::template bind<fun_ptr>(), this);
+        Observer::remove(Function::template bind<fun_ptr>());
     }
 
     template <typename T, RT(T::*mem_ptr)(Args...)>
@@ -146,16 +146,16 @@ class Signal<RT(Args...), Mutex> final : public Observer<Mutex>
     //----------------------------------------------------FIRE / FIRE ACCUMULATE
 
     template <typename... Uref>
-    void fire(Uref&&... args)
+    void fire(Uref&&... args) const
     {
         Observer::template for_each<Function>(std::forward<Uref>(args)...);
     }
 
     template <typename Accumulate, typename... Uref>
-    void fire_accumulate(Accumulate&& accumulate, Uref&&... args)
+    void fire_accumulate(Accumulate&& accumulate, Uref&&... args) const
     {
-        Observer::template for_each_accumulate<Function, Accumulate>(
-            std::forward<Accumulate>(accumulate), std::forward<Uref>(args)...);
+        Observer::template for_each_accumulate<Function, Accumulate>
+            (std::forward<Accumulate>(accumulate), std::forward<Uref>(args)...);
     }
 };
 

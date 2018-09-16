@@ -15,6 +15,8 @@ namespace Nano_Tests
         Signal_One mo_signal_one;
         Signal_Two mo_signal_two;
 
+        Signal_One_STS mo_signal_one_sts;
+
         Foo mo_foo;
         Bar mo_bar;
 
@@ -114,24 +116,19 @@ namespace Nano_Tests
         {
             Delegate_One fo1;
 
-            mo_signal_one.connect(fo1);
-            mo_signal_one.connect<&Foo::slot_member_signature_one>(mo_foo);
-            mo_signal_one.connect<&Foo::slot_const_member_signature_one>(mo_foo);
-            mo_signal_one.connect<Foo, &Foo::slot_overloaded_member>(mo_foo);
-            mo_signal_one.connect<&Foo::slot_static_member_function>();
-            mo_signal_one.connect<Foo, &Foo::slot_virtual_member_function>(mo_foo);
-            mo_signal_one.connect<Bar, &Bar::slot_virtual_member_function>(mo_bar);
+            auto limit = 0;
+
+            mo_signal_one_sts.connect(fo1);
 
             fo1 = [&](const char* sl)
             {
-                // TODO Prevent this infinite loop
-                // This would require a custom data structure for Observer
-                // in order to realize a no-cost solution to this problem
-
-                //mo_signal_one.fire(__FILE__);
+                if (++limit > 2)
+                {
+                    Assert::Fail(L"This is not a supported use case.");
+                }
+                mo_signal_one_sts.fire(__FILE__);
             };
-
-            mo_signal_one.fire(__FILE__);
+            mo_signal_one_sts.fire(__FILE__);
         }
     };
 }

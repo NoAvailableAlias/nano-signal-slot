@@ -17,19 +17,23 @@ namespace Nano_Tests
         }
     }
 
-#if defined(NANO_DEFINE_THREADSAFE_SIGNALS) || true
-
-    using Observer = Nano::Observer<Nano::Recursive_Mutex>;
-    using Signal_One = Nano::Signal<void(const char*), Nano::Recursive_Mutex>;
-    using Signal_Two = Nano::Signal<void(const char*, std::size_t), Nano::Recursive_Mutex>;
-
-#else
-
     using Observer = Nano::Observer<>;
     using Signal_One = Nano::Signal<void(const char*)>;
     using Signal_Two = Nano::Signal<void(const char*, std::size_t)>;
 
-#endif
+    // TODO Add Policy related testing
+
+    //using Observer_TS = Nano::Observer<Nano::TS_Policy<>>;
+    //using Signal_One_TS = Nano::Signal<void(const char*), Nano::TS_Policy<>>;
+    //using Signal_Two_TS = Nano::Signal<void(const char*, std::size_t), Nano::TS_Policy<>>;
+
+    using Observer_STS = Nano::Observer<Nano::ST_Policy_Strict>;
+    using Signal_One_STS = Nano::Signal<void(const char*), Nano::ST_Policy_Strict>;
+    using Signal_Two_STS = Nano::Signal<void(const char*, std::size_t), Nano::ST_Policy_Strict>;
+
+    //using Observer_TSS = Nano::Observer<Nano::TS_Policy_Strict<>>;
+    //using Signal_One_TSS = Nano::Signal<void(const char*), Nano::TS_Policy_Strict<>>;
+    //using Signal_Two_TSS = Nano::Signal<void(const char*, std::size_t), Nano::TS_Policy_Strict<>>;
 
     using Delegate_One = std::function<void(const char*)>;
     using Delegate_Two = std::function<void(const char*, std::size_t)>;
