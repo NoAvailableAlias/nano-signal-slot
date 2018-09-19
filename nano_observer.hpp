@@ -1,8 +1,6 @@
 #pragma once
 
 #include <algorithm>
-#include <memory>
-#include <thread>
 #include <vector>
 
 #include "nano_function.hpp"
@@ -22,6 +20,7 @@ class Observer : private MT_Policy
         Delegate_Key delegate;
         Observer* observer;
 
+        Connection() noexcept = default;
         Connection(Delegate_Key const& key) : delegate(key), observer(nullptr) {}
         Connection(Delegate_Key const& key, Observer* obs) : delegate(key), observer(obs) {}
     };
@@ -59,7 +58,7 @@ class Observer : private MT_Policy
 
         if (start == stop || start->observer)
         {
-            connections.insert(std::upper_bound(start, stop, key, Z_Order()), { key, observer });
+            connections.emplace(std::upper_bound(start, stop, key, Z_Order()), key, observer);
         }
         else
         {
@@ -68,7 +67,7 @@ class Observer : private MT_Policy
         }
     }
 
-    void remove(Delegate_Key const& key)
+    void remove(Delegate_Key const& key) noexcept
     {
         auto lock = MT_Policy::get_lock_guard();
 
@@ -79,8 +78,8 @@ class Observer : private MT_Policy
 
         if (slot != stop)
         {
-            *slot = { { 0, 0 }, nullptr };
             std::rotate(start, slot, slot + 1);
+            connections[0] = {};
         }
     }
 
@@ -118,7 +117,7 @@ class Observer : private MT_Policy
 
     public:
 
-    void disconnect_all()
+    void disconnect_all() noexcept
     {
         auto lock = MT_Policy::get_lock_guard();
 
@@ -132,11 +131,11 @@ class Observer : private MT_Policy
         connections.clear();
     }
 
-    bool is_empty() const
+    bool is_empty() const noexcept
     {
         auto lock = MT_Policy::get_lock_guard();
 
-        return std::all_of(connections.cbegin(), connections.cend(), [](Connection const& slot)
+        return std::all_of(connections.cbegin(), connections.cend(), [](auto const& slot)
         {
             return slot.observer == nullptr;
         });

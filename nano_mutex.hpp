@@ -14,12 +14,12 @@ class Spin_Mutex
 
     public:
 
-    bool try_lock()
+    inline bool try_lock()
     {
         return !lock_flag.test_and_set(std::memory_order_acquire);
     }
 
-    void lock()
+    inline void lock()
     {
         while (!try_lock())
         {
@@ -27,7 +27,7 @@ class Spin_Mutex
         }
     }
 
-    void unlock()
+    inline void unlock()
     {
         lock_flag.clear(std::memory_order_release);
     }

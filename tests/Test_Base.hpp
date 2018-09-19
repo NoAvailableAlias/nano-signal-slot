@@ -1,7 +1,8 @@
 #pragma once
 
-#include <mutex>
+#include <iostream>
 #include <functional>
+#include <random>
 
 #include "../nano_signal_slot.hpp"
 #include "../nano_mutex.hpp"
@@ -17,23 +18,17 @@ namespace Nano_Tests
         }
     }
 
+    using Rng = std::minstd_rand;
+
     using Observer = Nano::Observer<>;
     using Signal_One = Nano::Signal<void(const char*)>;
     using Signal_Two = Nano::Signal<void(const char*, std::size_t)>;
 
-    // TODO Add Policy related testing
+    using Observer_TS = Nano::Observer<Nano::TS_Policy<>>;
+    using Signal_Rng_TS = Nano::Signal<void(Rng&), Nano::TS_Policy<>>;
 
-    //using Observer_TS = Nano::Observer<Nano::TS_Policy<>>;
-    //using Signal_One_TS = Nano::Signal<void(const char*), Nano::TS_Policy<>>;
-    //using Signal_Two_TS = Nano::Signal<void(const char*, std::size_t), Nano::TS_Policy<>>;
-
-    using Observer_STS = Nano::Observer<Nano::ST_Policy_Strict>;
-    using Signal_One_STS = Nano::Signal<void(const char*), Nano::ST_Policy_Strict>;
-    using Signal_Two_STS = Nano::Signal<void(const char*, std::size_t), Nano::ST_Policy_Strict>;
-
-    //using Observer_TSS = Nano::Observer<Nano::TS_Policy_Strict<>>;
-    //using Signal_One_TSS = Nano::Signal<void(const char*), Nano::TS_Policy_Strict<>>;
-    //using Signal_Two_TSS = Nano::Signal<void(const char*, std::size_t), Nano::TS_Policy_Strict<>>;
+    using Observer_TSS = Nano::Observer<Nano::TS_Policy_Strict<>>;
+    using Signal_Rng_TSS = Nano::Signal<void(Rng&), Nano::TS_Policy_Strict<>>;
 
     using Delegate_One = std::function<void(const char*)>;
     using Delegate_Two = std::function<void(const char*, std::size_t)>;
@@ -118,4 +113,16 @@ namespace Nano_Tests
         anonymous_output(__FUNCTION__, sl, ln);
     }
 
+    //--------------------------------------------------------------------------
+
+    template <typename T = Observer_TS>
+    class Moo : public T
+    {
+        public:
+
+        void slot_next_random(Rng& rng)
+        {
+            volatile std::size_t a = rng(); (void)a;
+        }
+    };
 }

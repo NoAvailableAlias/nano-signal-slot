@@ -15,8 +15,6 @@ namespace Nano_Tests
         Signal_One mo_signal_one;
         Signal_Two mo_signal_two;
 
-        Signal_One_STS mo_signal_one_sts;
-
         Foo mo_foo;
         Bar mo_bar;
 
@@ -118,7 +116,7 @@ namespace Nano_Tests
 
             auto limit = 0;
 
-            mo_signal_one_sts.connect(fo1);
+            mo_signal_one.connect(fo1);
 
             fo1 = [&](const char* sl)
             {
@@ -126,9 +124,9 @@ namespace Nano_Tests
                 {
                     Assert::Fail(L"This is not a supported use case.");
                 }
-                mo_signal_one_sts.fire(__FILE__);
+                mo_signal_one.fire(__FILE__);
             };
-            mo_signal_one_sts.fire(__FILE__);
+            mo_signal_one.fire(__FILE__);
         }
     };
 }
