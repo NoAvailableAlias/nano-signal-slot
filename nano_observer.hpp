@@ -135,10 +135,7 @@ class Observer : private MT_Policy
     {
         auto lock = MT_Policy::get_lock_guard();
 
-        return std::all_of(connections.cbegin(), connections.cend(), [](auto const& slot)
-        {
-            return slot.observer == nullptr;
-        });
+        return connections.empty() || connections.back().observer == nullptr;
     }
 
     protected:
