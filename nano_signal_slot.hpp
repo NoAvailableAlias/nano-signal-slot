@@ -146,13 +146,13 @@ class Signal<RT(Args...), MT_Policy> final : public Observer<MT_Policy>
     //----------------------------------------------------FIRE / FIRE ACCUMULATE
 
     template <typename... Uref>
-    void fire(Uref&&... args) const
+    void fire(Uref&&... args)
     {
         Observer::template for_each<Function>(std::forward<Uref>(args)...);
     }
 
     template <typename Accumulate, typename... Uref>
-    void fire_accumulate(Accumulate&& accumulate, Uref&&... args) const
+    void fire_accumulate(Accumulate&& accumulate, Uref&&... args)
     {
         Observer::template for_each_accumulate<Function, Accumulate>
             (std::forward<Accumulate>(accumulate), std::forward<Uref>(args)...);

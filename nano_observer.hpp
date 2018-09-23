@@ -86,7 +86,7 @@ class Observer : private MT_Policy
     //--------------------------------------------------------------------------
 
     template <typename Function, typename... Uref>
-    void for_each(Uref&&... args) const
+    void for_each(Uref&&... args)
     {
         auto lock = MT_Policy::get_lock_guard();
 
@@ -100,7 +100,7 @@ class Observer : private MT_Policy
     }
 
     template <typename Function, typename Accumulate, typename... Uref>
-    void for_each_accumulate(Accumulate&& accumulate, Uref&&... args) const
+    void for_each_accumulate(Accumulate&& accumulate, Uref&&... args)
     {
         auto lock = MT_Policy::get_lock_guard();
 

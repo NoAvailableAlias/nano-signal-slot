@@ -180,7 +180,7 @@ class ST_Policy_Strict
     }
 };
 
-template <typename Mutex = Recursive_Spin_Mutex>
+template <typename Mutex = Spin_Mutex>
 class TS_Policy_Strict
 {
     using Lock_Guard = std::unique_lock<TS_Policy_Strict>;
