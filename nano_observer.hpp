@@ -58,10 +58,12 @@ class Observer : private MT_Policy
 
         if (start == stop || start->observer)
         {
+            // No empty slot can be reused so binary emplace to the correct index
             connections.emplace(std::upper_bound(start, stop, key, Z_Order()), key, observer);
         }
         else
         {
+            // Reuse an empty slot and optimize sort to the correct order
             connections[0] = { key, observer };
             std::sort(start, std::lower_bound(start, stop, key, Z_Order()), Z_Order());
         }
@@ -78,6 +80,7 @@ class Observer : private MT_Policy
 
         if (slot != stop)
         {
+            // Rotate slot to the front and zero out the slot
             std::rotate(start, slot, slot + 1);
             connections[0] = {};
         }

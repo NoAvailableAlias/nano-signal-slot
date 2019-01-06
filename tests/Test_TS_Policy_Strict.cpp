@@ -1,4 +1,5 @@
 #include <future>
+#include <list>
 
 #include "CppUnitTest.h"
 
@@ -24,7 +25,7 @@ namespace Nano_Tests
 
                 for (; count < 32; ++count)
                 {
-                    std::vector<Moo_TSS> moo(32);
+                    std::list<Moo_TSS> moo(32);
 
                     for (auto& moo_instance : moo)
                     {
