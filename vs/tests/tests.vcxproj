@@ -195,7 +195,7 @@
     <ClCompile Include="..\..\tests\Test_Signal_Edge_Cases.cpp" />
     <ClCompile Include="..\..\tests\Test_Signal_Fire.cpp" />
     <ClCompile Include="..\..\tests\Test_TS_Policy.cpp" />
-    <ClCompile Include="..\..\tests\Test_TS_Policy_Strict.cpp" />
+    <ClCompile Include="..\..\tests\Test_TS_Policy_Safe.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\tests\Test_Base.hpp" />

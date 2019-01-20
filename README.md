@@ -5,10 +5,10 @@ Pure C++17 Signals and Slots
 
 #### Include
 ```
-// #include "nano_function.hpp"         // Nano::Function, Nano::Delegate_Key
-// #include "nano_mutex.hpp"            // Nano::Noop_Mutex, Nano::Recursive_Mutex
-// #include "nano_observer.hpp"         // Nano::Observer
-#include "nano_signal_slot.hpp"         // Nano::Signal
+// #include "nano_function.hpp"         // Nano::Function<>, Nano::Delegate_Key
+// #include "nano_mutex.hpp"            // Nano::Spin_Mutex, Nano::Spin_Mutex_Recursive, all policies
+// #include "nano_observer.hpp"         // Nano::Observer<>
+#include "nano_signal_slot.hpp"         // Nano::Signal<>
 ```
 
 #### Declare
@@ -109,11 +109,20 @@ signal_one.connect(fo);
 signal_one.disconnect(fo);
 ```
 
-## Deadlock Disclaimer
+#### Policies
 
-The Nano::TS_Policy available in nano-signal-slot is not reentrant safe and **could deadlock** for recursive Signal operations.
-However, the Nano::TS_Policy_Strict policy allows for recursive Signal operations at the expense of a performance impact.
-The [issue](https://github.com/NoAvailableAlias/nano-signal-slot/issues/22) will remain open until the next release.
+Nano-signal-slot has 4 threading policies available for use:
+
+| &nbsp; | ST_Policy | TS_Policy | ST_Policy_Safe | TS_Policy_Safe |
+|:------:|:---------:|:---------:|:--------------:|:--------------:|
+| Single threading only | X | - | X | - |
+| Thread safe using mutex | - | X | - | X |
+| Reentrant safe* | - | - | X | ! |
+
+_*Reentrant safety achieved using emission list copying and connection lifetime tracking._
+_!There is an open issue concerning a potential data race in emission when using this policy._
+<br />
+**When using a non-default Policy you must make sure that both Nano::Signal and Observer use the same policy.**
 
 #### Links
 

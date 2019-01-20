@@ -9,7 +9,7 @@ using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 namespace Nano_Tests
 {
-    TEST_CLASS(Test_TS_Policy_Strict)
+    TEST_CLASS(Test_TS_Policy_Safe)
     {
         using Moo_TSS = Moo<Observer_TSS>;
 

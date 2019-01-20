@@ -27,8 +27,8 @@ namespace Nano_Tests
     using Observer_TS = Nano::Observer<Nano::TS_Policy<>>;
     using Signal_Rng_TS = Nano::Signal<void(Rng&), Nano::TS_Policy<>>;
 
-    using Observer_TSS = Nano::Observer<Nano::TS_Policy_Strict<>>;
-    using Signal_Rng_TSS = Nano::Signal<void(Rng&), Nano::TS_Policy_Strict<>>;
+    using Observer_TSS = Nano::Observer<Nano::TS_Policy_Safe<>>;
+    using Signal_Rng_TSS = Nano::Signal<void(Rng&), Nano::TS_Policy_Safe<>>;
 
     using Delegate_One = std::function<void(const char*)>;
     using Delegate_Two = std::function<void(const char*, std::size_t)>;

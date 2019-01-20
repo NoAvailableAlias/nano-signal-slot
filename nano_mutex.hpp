@@ -35,7 +35,7 @@ class Spin_Mutex
 
 //------------------------------------------------------------------------------
 
-class Recursive_Spin_Mutex
+class Spin_Mutex_Recursive
 {
     std::atomic<std::thread::id> owner_thread_id = std::thread::id();
     std::uint64_t recursive_counter = 0;
@@ -43,7 +43,7 @@ class Recursive_Spin_Mutex
 
     public:
 
-    bool try_lock()
+    inline bool try_lock()
     {
         if (!lock_flag.test_and_set(std::memory_order_acquire))
         {
@@ -57,7 +57,7 @@ class Recursive_Spin_Mutex
         return true;
     }
 
-    void lock()
+    inline void lock()
     {
         while (!try_lock())
         {
@@ -65,7 +65,7 @@ class Recursive_Spin_Mutex
         }
     }
 
-    void unlock()
+    inline void unlock()
     {
         assert(owner_thread_id.load(std::memory_order_acquire) == std::this_thread::get_id());
         assert(recursive_counter > 0);
@@ -93,11 +93,6 @@ class ST_Policy
     constexpr bool get_lock_guard() const
     {
         return false;
-    }
-
-    constexpr bool try_lock() const
-    {
-        return true;
     }
 
     constexpr void lock() const
@@ -131,11 +126,6 @@ class TS_Policy
         return Lock_Guard(*const_cast<TS_Policy*>(this));
     }
 
-    inline bool try_lock() const
-    {
-        return m_mutex.try_lock();
-    }
-
     inline void lock() const
     {
         m_mutex.lock();
@@ -149,7 +139,7 @@ class TS_Policy
 
 //------------------------------------------------------------------------------
 
-class ST_Policy_Strict
+class ST_Policy_Safe
 {
     public:
 
@@ -164,11 +154,6 @@ class ST_Policy_Strict
         return false;
     }
 
-    constexpr bool try_lock() const
-    {
-        return true;
-    }
-
     constexpr void lock() const
     {
 
@@ -181,9 +166,9 @@ class ST_Policy_Strict
 };
 
 template <typename Mutex = Spin_Mutex>
-class TS_Policy_Strict
+class TS_Policy_Safe
 {
-    using Lock_Guard = std::unique_lock<TS_Policy_Strict>;
+    using Lock_Guard = std::unique_lock<TS_Policy_Safe>;
 
     mutable Mutex m_mutex;
 
@@ -198,12 +183,7 @@ class TS_Policy_Strict
 
     inline Lock_Guard get_lock_guard() const
     {
-        return Lock_Guard(*const_cast<TS_Policy_Strict*>(this));
-    }
-
-    inline bool try_lock() const
-    {
-        return m_mutex.try_lock();
+        return Lock_Guard(*const_cast<TS_Policy_Safe*>(this));
     }
 
     inline void lock() const
