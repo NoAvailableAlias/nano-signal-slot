@@ -109,24 +109,40 @@ signal_one.connect(fo);
 signal_one.disconnect(fo);
 ```
 
-#### Policies
+#### Threading Policies
 
 Nano-signal-slot has 4 threading policies available for use:
 
 | &nbsp; | ST_Policy | TS_Policy | ST_Policy_Safe | TS_Policy_Safe |
-|:------:|:---------:|:---------:|:--------------:|:--------------:|
+|:-------|:---------:|:---------:|:--------------:|:--------------:|
 | Single threading only | X | - | X | - |
 | Thread safe using mutex | - | X | - | X |
 | Reentrant safe* | - | - | X | ! |
 
-_*Reentrant safety achieved using emission list copying and connection lifetime tracking._
-_!There is an open issue concerning a potential data race in emission when using this policy._
+_* Reentrant safety achieved using emission list copying and connection lifetime tracking._
+<br />
+_! There is an [open issue](https://github.com/NoAvailableAlias/nano-signal-slot/issues/22) concerning a potential data race in emission when using this policy._
+
+#### Threading Policies - Continued
+
+When integrating nano-signal-slot, it is recommended to alias the Nano::Signal and Nano::Observer template classes.
 <br />
 **When using a non-default Policy you must make sure that both Nano::Signal and Observer use the same policy.**
 
-#### Links
+```
+namespace Your_Namespace
+{
 
-*_Benchmarks contain both the old nano-signal-slot v1.x scores as well as the v2.x scores._
+// Creating aliases when using nano-signal-slot will increase the maintainability of your code
+// especially if you are choosing to use the alternative policies.
+template <typename Signatue>
+using Your_Signal<Signature> = Nano::Signal<Signature, Nano::TS_Policy_Safe>;
+using Your_Observer = Nano::Observer<Nano::TS_Policy_Safe>;
+
+}
+```
+
+#### Links
 
 | [Benchmark Results](https://github.com/NoAvailableAlias/signal-slot-benchmarks/tree/master/#signal-slot-benchmarks) | [Benchmark Algorithms](https://github.com/NoAvailableAlias/signal-slot-benchmarks/tree/master/#benchmark-algorithms) | [Unit Tests](https://github.com/NoAvailableAlias/nano-signal-slot/tree/master/tests/#unit-tests) |
 |:-------------------------------------------------------------------------------------------------------------------:|:--------------------------------------------------------------------------------------------------------------------:|:------------------------------------------------------------------------------------------------:|
