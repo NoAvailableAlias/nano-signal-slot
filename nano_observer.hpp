@@ -53,37 +53,21 @@ class Observer : private MT_Policy
     {
         auto lock = MT_Policy::get_lock_guard();
 
-        auto start = connections.begin();
-        auto stop = connections.end();
+        auto begin = std::begin(connections);
+        auto end = std::end(connections);
 
-        if (start == stop || start->observer)
-        {
-            // No empty slot can be reused so binary emplace to the correct index
-            connections.emplace(std::upper_bound(start, stop, key, Z_Order()), key, observer);
-        }
-        else
-        {
-            // Reuse an empty slot and optimize sort to the correct order
-            connections[0] = { key, observer };
-            std::sort(start, std::lower_bound(start, stop, key, Z_Order()), Z_Order());
-        }
+        connections.emplace(std::upper_bound(begin, end, key, Z_Order()), key, observer);
     }
 
     void remove(Delegate_Key const& key) noexcept
     {
         auto lock = MT_Policy::get_lock_guard();
 
-        auto start = connections.begin();
-        auto stop = connections.end();
+        auto begin = std::begin(connections);
+        auto end = std::end(connections);
 
-        auto slot = std::lower_bound(start, stop, key, Z_Order());
-
-        if (slot != stop)
-        {
-            // Rotate slot to the front and zero out the slot
-            std::rotate(start, slot, slot + 1);
-            connections[0] = {};
-        }
+        auto slots = std::equal_range(begin, end, key, Z_Order());
+        connections.erase(slots.first, slots.second);
     }
 
     //--------------------------------------------------------------------------
@@ -95,10 +79,7 @@ class Observer : private MT_Policy
 
         for (auto const& slot : MT_Policy::copy_or_ref(connections, lock))
         {
-            if (slot.observer)
-            {
-                Function::bind(slot.delegate)(std::forward<Uref>(args)...);
-            }
+            Function::bind(slot.delegate)(std::forward<Uref>(args)...);
         }
     }
 
@@ -109,10 +90,7 @@ class Observer : private MT_Policy
 
         for (auto const& slot : MT_Policy::copy_or_ref(connections, lock))
         {
-            if (slot.observer)
-            {
-                accumulate(Function::bind(slot.delegate)(std::forward<Uref>(args)...));
-            }
+            accumulate(Function::bind(slot.delegate)(std::forward<Uref>(args)...));
         }
     }
 
@@ -126,7 +104,7 @@ class Observer : private MT_Policy
 
         for (auto const& slot : connections)
         {
-            if (slot.observer && slot.observer != this)
+            if (slot.observer != this)
             {
                 slot.observer->remove(slot.delegate);
             }
@@ -138,7 +116,7 @@ class Observer : private MT_Policy
     {
         auto lock = MT_Policy::get_lock_guard();
 
-        return connections.empty() || connections.back().observer == nullptr;
+        return connections.empty();
     }
 
     protected:

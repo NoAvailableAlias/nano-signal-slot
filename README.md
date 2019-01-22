@@ -111,7 +111,7 @@ signal_one.disconnect(fo);
 
 #### Threading Policies
 
-Nano-signal-slot has 4 threading policies available for use:
+Nano-signal-slot has the following threading policies available for use:
 
 | &nbsp; | ST_Policy | TS_Policy | ST_Policy_Safe | TS_Policy_Safe |
 |:-------|:---------:|:---------:|:--------------:|:--------------:|
@@ -136,8 +136,8 @@ namespace Your_Namespace
 // Creating aliases when using nano-signal-slot will increase the maintainability of your code
 // especially if you are choosing to use the alternative policies.
 template <typename Signatue>
-using Your_Signal<Signature> = Nano::Signal<Signature, Nano::TS_Policy_Safe>;
-using Your_Observer = Nano::Observer<Nano::TS_Policy_Safe>;
+using Your_Signal<Signature> = Nano::Signal<Signature, Nano::TS_Policy_Safe<>>;
+using Your_Observer = Nano::Observer<Nano::TS_Policy_Safe<>>;
 
 }
 ```
