@@ -40,7 +40,7 @@ class ST_Policy
         return param;
     }
 
-    constexpr bool get_lock_guard() const
+    constexpr bool lock_guard() const
     {
         return false;
     }
@@ -59,9 +59,7 @@ class ST_Policy
 template <typename Mutex = Spin_Mutex>
 class TS_Policy
 {
-    using Lock_Guard = std::lock_guard<TS_Policy>;
-
-    mutable Mutex m_mutex;
+    mutable Mutex mutex;
 
     public:
 
@@ -71,19 +69,19 @@ class TS_Policy
         return param;
     }
 
-    inline Lock_Guard get_lock_guard() const
+    inline std::lock_guard<TS_Policy> lock_guard() const
     {
-        return Lock_Guard(*const_cast<TS_Policy*>(this));
+        return std::lock_guard<TS_Policy>(*const_cast<TS_Policy*>(this));
     }
 
     inline void lock() const
     {
-        m_mutex.lock();
+        mutex.lock();
     }
 
     inline void unlock() noexcept
     {
-        m_mutex.unlock();
+        mutex.unlock();
     }
 };
 
@@ -99,7 +97,7 @@ class ST_Policy_Safe
         return param;
     }
 
-    constexpr bool get_lock_guard() const
+    constexpr bool lock_guard() const
     {
         return false;
     }
@@ -118,32 +116,30 @@ class ST_Policy_Safe
 template <typename Mutex = Spin_Mutex>
 class TS_Policy_Safe
 {
-    using Lock_Guard = std::unique_lock<TS_Policy_Safe>;
-
-    mutable Mutex m_mutex;
+    mutable Mutex mutex;
 
     public:
 
     template <typename T, typename L>
     inline T copy_or_ref(T const& param, L&& lock) const
     {
-        Lock_Guard unlock_after_copy = std::move(lock);
+        std::unique_lock<TS_Policy_Safe> unlock_after_copy = std::move(lock);
         return param;
     }
 
-    inline Lock_Guard get_lock_guard() const
+    inline std::unique_lock<TS_Policy_Safe> lock_guard() const
     {
-        return Lock_Guard(*const_cast<TS_Policy_Safe*>(this));
+        return std::unique_lock<TS_Policy_Safe>(*const_cast<TS_Policy_Safe*>(this));
     }
 
     inline void lock() const
     {
-        m_mutex.lock();
+        mutex.lock();
     }
 
     inline void unlock() noexcept
     {
-        m_mutex.unlock();
+        mutex.unlock();
     }
 };
 

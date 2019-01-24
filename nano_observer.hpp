@@ -31,12 +31,8 @@ class Observer : private MT_Policy
         {
             std::size_t x = lhs[0] ^ rhs[0];
             std::size_t y = lhs[1] ^ rhs[1];
-
-            if ((x < y) && (x < (x ^ y)))
-            {
-                return lhs[1] < rhs[1];
-            }
-            return lhs[0] < rhs[0];
+            auto k = (x < y) && x < (x ^ y);
+            return lhs[k] < rhs[k];
         }
 
         inline bool operator()(Connection const& lhs, Connection const& rhs) const
@@ -51,7 +47,7 @@ class Observer : private MT_Policy
 
     void insert(Delegate_Key const& key, Observer* observer)
     {
-        auto lock = MT_Policy::get_lock_guard();
+        auto lock = MT_Policy::lock_guard();
 
         auto begin = std::begin(connections);
         auto end = std::end(connections);
@@ -61,7 +57,7 @@ class Observer : private MT_Policy
 
     void remove(Delegate_Key const& key) noexcept
     {
-        auto lock = MT_Policy::get_lock_guard();
+        auto lock = MT_Policy::lock_guard();
 
         auto begin = std::begin(connections);
         auto end = std::end(connections);
@@ -75,7 +71,7 @@ class Observer : private MT_Policy
     template <typename Function, typename... Uref>
     void for_each(Uref&&... args)
     {
-        auto lock = MT_Policy::get_lock_guard();
+        auto lock = MT_Policy::lock_guard();
 
         for (auto const& slot : MT_Policy::copy_or_ref(connections, lock))
         {
@@ -86,7 +82,7 @@ class Observer : private MT_Policy
     template <typename Function, typename Accumulate, typename... Uref>
     void for_each_accumulate(Accumulate&& accumulate, Uref&&... args)
     {
-        auto lock = MT_Policy::get_lock_guard();
+        auto lock = MT_Policy::lock_guard();
 
         for (auto const& slot : MT_Policy::copy_or_ref(connections, lock))
         {
@@ -100,7 +96,7 @@ class Observer : private MT_Policy
 
     void disconnect_all() noexcept
     {
-        auto lock = MT_Policy::get_lock_guard();
+        auto lock = MT_Policy::lock_guard();
 
         for (auto const& slot : connections)
         {
@@ -114,7 +110,7 @@ class Observer : private MT_Policy
 
     bool is_empty() const noexcept
     {
-        auto lock = MT_Policy::get_lock_guard();
+        auto lock = MT_Policy::lock_guard();
 
         return connections.empty();
     }
@@ -127,6 +123,10 @@ class Observer : private MT_Policy
     {
         disconnect_all();
     }
+
+    Observer() = default;
+    Observer(Observer const&) = delete;
+    Observer& operator= (Observer const&) = delete;
 };
 
 } // namespace Nano ------------------------------------------------------------
