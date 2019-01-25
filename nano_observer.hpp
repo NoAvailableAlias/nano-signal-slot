@@ -18,11 +18,11 @@ class Observer : private MT_Policy
     struct Connection
     {
         Delegate_Key delegate;
-        Observer* observer;
+        typename MT_Policy::Weak_Ptr observer;
 
         Connection() noexcept = default;
-        Connection(Delegate_Key const& key) : delegate(key), observer(nullptr) {}
-        Connection(Delegate_Key const& key, Observer* obs) : delegate(key), observer(obs) {}
+        Connection(Delegate_Key const& key) : delegate(key) {}
+        Connection(Delegate_Key const& key, Observer* obs) : delegate(key), observer(obs->weak_ptr()) {}
     };
 
     struct Z_Order
@@ -75,7 +75,10 @@ class Observer : private MT_Policy
 
         for (auto const& slot : MT_Policy::copy_or_ref(connections, lock))
         {
-            Function::bind(slot.delegate)(std::forward<Uref>(args)...);
+            if (auto observer = MT_Policy::observed(slot.observer))
+            {
+                Function::bind(slot.delegate)(std::forward<Uref>(args)...);
+            }
         }
     }
 
@@ -86,7 +89,10 @@ class Observer : private MT_Policy
 
         for (auto const& slot : MT_Policy::copy_or_ref(connections, lock))
         {
-            accumulate(Function::bind(slot.delegate)(std::forward<Uref>(args)...));
+            if (auto observer = MT_Policy::observed(slot.observer))
+            {
+                accumulate(Function::bind(slot.delegate)(std::forward<Uref>(args)...));
+            }
         }
     }
 
@@ -100,9 +106,9 @@ class Observer : private MT_Policy
 
         for (auto const& slot : connections)
         {
-            if (slot.observer != this)
+            if (auto observer = MT_Policy::visiting(slot.observer))
             {
-                slot.observer->remove(slot.delegate);
+                MT_Policy::static_pointer_cast<Observer>(observer)->remove(slot.delegate);
             }
         }
         connections.clear();
@@ -121,6 +127,8 @@ class Observer : private MT_Policy
     // either public and virtual, or protected and non-virtual.
     ~Observer()
     {
+        MT_Policy::before_disconnect_all();
+
         disconnect_all();
     }
 

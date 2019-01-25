@@ -117,11 +117,9 @@ Nano-signal-slot has the following threading policies available for use:
 |:-------|:---------:|:---------:|:--------------:|:--------------:|
 | Single threading only | X | - | X | - |
 | Thread safe using mutex | - | X | - | X |
-| Reentrant safe* | - | - | X | ! |
+| Reentrant safe* | - | - | X | X |
 
-_* Reentrant safety achieved using emission list copying and connection lifetime tracking._
-<br />
-_! There is an [open issue](https://github.com/NoAvailableAlias/nano-signal-slot/issues/22) concerning a potential data race in emission when using this policy._
+_* Reentrant safety achieved using emission list copying and reference counting._
 
 #### Threading Policies - Continued
 

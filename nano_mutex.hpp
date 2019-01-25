@@ -2,6 +2,7 @@
 
 #include <cassert>
 #include <atomic>
+#include <memory>
 #include <mutex>
 #include <thread>
 
@@ -40,21 +41,43 @@ class ST_Policy
         return param;
     }
 
-    constexpr bool lock_guard() const
+    constexpr auto lock_guard() const
     {
         return false;
     }
 
-    constexpr void lock() const
-    {
+    protected:
 
+    using Weak_Ptr = ST_Policy*;
+
+    constexpr auto weak_ptr()
+    {
+        return this;
     }
 
-    constexpr void unlock() noexcept
+    constexpr auto observed(Weak_Ptr) const
+    {
+        return true;
+    }
+
+    constexpr auto visiting(Weak_Ptr observer) const
+    {
+        return (observer == this ? nullptr : observer);
+    }
+
+    template <typename T>
+    constexpr auto static_pointer_cast(Weak_Ptr observer) const
+    {
+        return (T*)observer;
+    }
+
+    constexpr void before_disconnect_all() const
     {
 
     }
 };
+
+//------------------------------------------------------------------------------
 
 template <typename Mutex = Spin_Mutex>
 class TS_Policy
@@ -69,7 +92,7 @@ class TS_Policy
         return param;
     }
 
-    inline std::lock_guard<TS_Policy> lock_guard() const
+    inline auto lock_guard() const
     {
         return std::lock_guard<TS_Policy>(*const_cast<TS_Policy*>(this));
     }
@@ -82,6 +105,36 @@ class TS_Policy
     inline void unlock() noexcept
     {
         mutex.unlock();
+    }
+
+    protected:
+
+    using Weak_Ptr = TS_Policy*;
+
+    constexpr auto weak_ptr()
+    {
+        return this;
+    }
+
+    constexpr auto observed(Weak_Ptr) const
+    {
+        return true;
+    }
+
+    constexpr auto visiting(Weak_Ptr observer) const
+    {
+        return (observer == this ? nullptr : observer);
+    }
+
+    template <typename T>
+    constexpr auto static_pointer_cast(Weak_Ptr observer) const
+    {
+        return (T*)observer;
+    }
+
+    constexpr void before_disconnect_all() const
+    {
+
     }
 };
 
@@ -97,25 +150,50 @@ class ST_Policy_Safe
         return param;
     }
 
-    constexpr bool lock_guard() const
+    constexpr auto lock_guard() const
     {
         return false;
     }
 
-    constexpr void lock() const
-    {
+    protected:
 
+    using Weak_Ptr = ST_Policy_Safe*;
+
+    constexpr auto weak_ptr()
+    {
+        return this;
     }
 
-    constexpr void unlock() noexcept
+    constexpr auto observed(Weak_Ptr) const
+    {
+        return true;
+    }
+
+    constexpr auto visiting(Weak_Ptr observer) const
+    {
+        return (observer == this ? nullptr : observer);
+    }
+
+    template <typename T>
+    constexpr auto static_pointer_cast(Weak_Ptr observer) const
+    {
+        return (T*)observer;
+    }
+
+    constexpr void before_disconnect_all() const
     {
 
     }
 };
 
+//------------------------------------------------------------------------------
+
 template <typename Mutex = Spin_Mutex>
 class TS_Policy_Safe
 {
+    using Shared_Ptr = std::shared_ptr<TS_Policy_Safe>;
+
+    Shared_Ptr tracker { this, [](...){} };
     mutable Mutex mutex;
 
     public:
@@ -127,7 +205,7 @@ class TS_Policy_Safe
         return param;
     }
 
-    inline std::unique_lock<TS_Policy_Safe> lock_guard() const
+    inline auto lock_guard() const
     {
         return std::unique_lock<TS_Policy_Safe>(*const_cast<TS_Policy_Safe*>(this));
     }
@@ -140,6 +218,45 @@ class TS_Policy_Safe
     inline void unlock() noexcept
     {
         mutex.unlock();
+    }
+
+    protected:
+
+    using Weak_Ptr = std::weak_ptr<TS_Policy_Safe>;
+
+    inline Weak_Ptr weak_ptr()
+    {
+        return tracker;
+    }
+
+    inline Shared_Ptr observed(Weak_Ptr observer)
+    {
+        return observer.lock();
+    }
+
+    inline Shared_Ptr visiting(Weak_Ptr observer)
+    {
+        // If this tracker isn't this observer then lock
+        return observer.owner_before(tracker)
+            || tracker.owner_before(observer) ? observer.lock() : nullptr;
+    }
+
+    template <typename T>
+    inline auto static_pointer_cast(Shared_Ptr& observer)
+    {
+        return std::static_pointer_cast<T>(observer);
+    }
+
+    inline void before_disconnect_all()
+    {
+        Weak_Ptr ping { tracker };
+        // Reset the tracker and then ping for any lingering references
+        tracker.reset();
+        // Wait for all shared pointers to release
+        while (ping.lock())
+        {
+            std::this_thread::yield();
+        }
     }
 };
 
