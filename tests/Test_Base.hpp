@@ -24,6 +24,12 @@ namespace Nano_Tests
     using Signal_One = Nano::Signal<void(const char*)>;
     using Signal_Two = Nano::Signal<void(const char*, std::size_t)>;
 
+    using Observer_ST = Nano::Observer<Nano::ST_Policy>;
+    using Signal_Rng_ST = Nano::Signal<void(Rng&), Nano::ST_Policy>;
+
+    using Observer_STS = Nano::Observer<Nano::ST_Policy_Safe>;
+    using Signal_Rng_STS = Nano::Signal<void(Rng&), Nano::ST_Policy_Safe>;
+
     using Observer_TS = Nano::Observer<Nano::TS_Policy<>>;
     using Signal_Rng_TS = Nano::Signal<void(Rng&), Nano::TS_Policy<>>;
 

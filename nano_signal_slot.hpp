@@ -11,30 +11,30 @@ class Signal;
 template <typename RT, typename MT_Policy, typename... Args>
 class Signal<RT(Args...), MT_Policy> final : public Observer<MT_Policy>
 {
-    using Observer = Observer<MT_Policy>;
-    using Function = Function<RT(Args...)>;
+    using observer = Observer<MT_Policy>;
+    using function = Function<RT(Args...)>;
 
     template <typename T>
     void insert_sfinae(Delegate_Key const& key, typename T::Observer* instance)
     {
-        Observer::insert(key, instance);
+        observer::insert(key, instance);
         instance->insert(key, this);
     }
     template <typename T>
     void remove_sfinae(Delegate_Key const& key, typename T::Observer* instance)
     {
-        Observer::remove(key);
+        observer::remove(key);
         instance->remove(key);
     }
     template <typename T>
     void insert_sfinae(Delegate_Key const& key, ...)
     {
-        Observer::insert(key, this);
+        observer::insert(key, this);
     }
     template <typename T>
     void remove_sfinae(Delegate_Key const& key, ...)
     {
-        Observer::remove(key);
+        observer::remove(key);
     }
 
     public:
@@ -44,7 +44,7 @@ class Signal<RT(Args...), MT_Policy> final : public Observer<MT_Policy>
     template <typename L>
     void connect(L* instance)
     {
-        Observer::insert(Function::template bind(instance), this);
+        observer::insert(function::template bind(instance), this);
     }
     template <typename L>
     void connect(L& instance)
@@ -55,18 +55,18 @@ class Signal<RT(Args...), MT_Policy> final : public Observer<MT_Policy>
     template <RT(*fun_ptr)(Args...)>
     void connect()
     {
-        Observer::insert(Function::template bind<fun_ptr>(), this);
+        observer::insert(function::template bind<fun_ptr>(), this);
     }
 
     template <typename T, RT(T::*mem_ptr)(Args...)>
     void connect(T* instance)
     {
-        insert_sfinae<T>(Function::template bind<mem_ptr>(instance), instance);
+        insert_sfinae<T>(function::template bind<mem_ptr>(instance), instance);
     }
     template <typename T, RT(T::*mem_ptr)(Args...) const>
     void connect(T* instance)
     {
-        insert_sfinae<T>(Function::template bind<mem_ptr>(instance), instance);
+        insert_sfinae<T>(function::template bind<mem_ptr>(instance), instance);
     }
 
     template <typename T, RT(T::*mem_ptr)(Args...)>
@@ -83,7 +83,7 @@ class Signal<RT(Args...), MT_Policy> final : public Observer<MT_Policy>
     template <auto mem_ptr, typename T>
     void connect(T* instance)
     {
-        insert_sfinae<T>(Function::template bind<mem_ptr>(instance), instance);
+        insert_sfinae<T>(function::template bind<mem_ptr>(instance), instance);
     }
     template <auto mem_ptr, typename T>
     void connect(T& instance)
@@ -96,7 +96,7 @@ class Signal<RT(Args...), MT_Policy> final : public Observer<MT_Policy>
     template <typename L>
     void disconnect(L* instance)
     {
-        Observer::remove(Function::template bind(instance));
+        observer::remove(function::template bind(instance));
     }
     template <typename L>
     void disconnect(L& instance)
@@ -107,18 +107,18 @@ class Signal<RT(Args...), MT_Policy> final : public Observer<MT_Policy>
     template <RT(*fun_ptr)(Args...)>
     void disconnect()
     {
-        Observer::remove(Function::template bind<fun_ptr>());
+        observer::remove(function::template bind<fun_ptr>());
     }
 
     template <typename T, RT(T::*mem_ptr)(Args...)>
     void disconnect(T* instance)
     {
-        remove_sfinae<T>(Function::template bind<mem_ptr>(instance), instance);
+        remove_sfinae<T>(function::template bind<mem_ptr>(instance), instance);
     }
     template <typename T, RT(T::*mem_ptr)(Args...) const>
     void disconnect(T* instance)
     {
-        remove_sfinae<T>(Function::template bind<mem_ptr>(instance), instance);
+        remove_sfinae<T>(function::template bind<mem_ptr>(instance), instance);
     }
 
     template <typename T, RT(T::*mem_ptr)(Args...)>
@@ -135,7 +135,7 @@ class Signal<RT(Args...), MT_Policy> final : public Observer<MT_Policy>
     template <auto mem_ptr, typename T>
     void disconnect(T* instance)
     {
-        remove_sfinae<T>(Function::template bind<mem_ptr>(instance), instance);
+        remove_sfinae<T>(function::template bind<mem_ptr>(instance), instance);
     }
     template <auto mem_ptr, typename T>
     void disconnect(T& instance)
@@ -148,13 +148,13 @@ class Signal<RT(Args...), MT_Policy> final : public Observer<MT_Policy>
     template <typename... Uref>
     void fire(Uref&&... args)
     {
-        Observer::template for_each<Function>(std::forward<Uref>(args)...);
+        observer::template for_each<function>(std::forward<Uref>(args)...);
     }
 
     template <typename Accumulate, typename... Uref>
     void fire_accumulate(Accumulate&& accumulate, Uref&&... args)
     {
-        Observer::template for_each_accumulate<Function, Accumulate>
+        observer::template for_each_accumulate<function, Accumulate>
             (std::forward<Accumulate>(accumulate), std::forward<Uref>(args)...);
     }
 };

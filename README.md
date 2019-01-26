@@ -5,10 +5,10 @@ Pure C++17 Signals and Slots
 
 #### Include
 ```
-// #include "nano_function.hpp"         // Nano::Function<>, Nano::Delegate_Key
+// #include "nano_function.hpp"         // Nano::Function, Nano::Delegate_Key
 // #include "nano_mutex.hpp"            // Nano::Spin_Mutex, Nano::Spin_Mutex_Recursive, all policies
-// #include "nano_observer.hpp"         // Nano::Observer<>
-#include "nano_signal_slot.hpp"         // Nano::Signal<>
+// #include "nano_observer.hpp"         // Nano::Observer
+#include "nano_signal_slot.hpp"         // Nano::Signal
 ```
 
 #### Declare
@@ -125,7 +125,7 @@ _* Reentrant safety achieved using emission list copying and reference counting.
 
 When integrating nano-signal-slot, it is recommended to alias the Nano::Signal and Nano::Observer template classes.
 <br />
-**When using a non-default Policy you must make sure that both Nano::Signal and Observer use the same policy.**
+**When using a non-default Policy you must make sure that both Signal and Observer use the same policy.**
 
 ```
 namespace Your_Namespace
@@ -139,6 +139,13 @@ using Your_Observer = Nano::Observer<Nano::TS_Policy_Safe<>>;
 
 }
 ```
+
+## Deadlock Disclaimer
+
+The TS_Policy does not mitigate any deadlocks that could occur due to slot emissions fiddling with their signals.
+Additionally, when using this policy, it is not safe to destruct connected Nano::Observers from different threads.
+Generally if the threading posture in your application allows for it then use the TS_Policy for the performance.
+If the lifetimes of Signals vs Observers is unknown or if the slots could be hostile then use the TS_Policy_Safe.
 
 #### Links
 

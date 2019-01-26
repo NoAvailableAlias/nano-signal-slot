@@ -1,6 +1,5 @@
 #pragma once
 
-#include <cassert>
 #include <atomic>
 #include <memory>
 #include <mutex>
@@ -15,7 +14,7 @@ class Spin_Mutex
 
     public:
 
-    inline void lock()
+    inline void lock() noexcept
     {
         while (lock_flag.test_and_set(std::memory_order_acquire))
         {
@@ -23,10 +22,14 @@ class Spin_Mutex
         }
     }
 
-    inline void unlock()
+    inline void unlock() noexcept
     {
         lock_flag.clear(std::memory_order_release);
     }
+
+    Spin_Mutex() = default;
+    Spin_Mutex(Spin_Mutex const&) = delete;
+    Spin_Mutex& operator= (Spin_Mutex const&) = delete;
 };
 
 //------------------------------------------------------------------------------
@@ -68,7 +71,7 @@ class ST_Policy
     template <typename T>
     constexpr auto static_pointer_cast(Weak_Ptr observer) const
     {
-        return (T*)observer;
+        return static_cast<T*>(observer);
     }
 
     constexpr void before_disconnect_all() const
@@ -129,7 +132,7 @@ class TS_Policy
     template <typename T>
     constexpr auto static_pointer_cast(Weak_Ptr observer) const
     {
-        return (T*)observer;
+        return static_cast<T*>(observer);
     }
 
     constexpr void before_disconnect_all() const
@@ -177,7 +180,7 @@ class ST_Policy_Safe
     template <typename T>
     constexpr auto static_pointer_cast(Weak_Ptr observer) const
     {
-        return (T*)observer;
+        return static_cast<T*>(observer);
     }
 
     constexpr void before_disconnect_all() const
@@ -244,7 +247,7 @@ class TS_Policy_Safe
     template <typename T>
     inline auto static_pointer_cast(Shared_Ptr& observer)
     {
-        return std::static_pointer_cast<T>(observer);
+        return static_cast<T*>(observer.get());
     }
 
     inline void before_disconnect_all()

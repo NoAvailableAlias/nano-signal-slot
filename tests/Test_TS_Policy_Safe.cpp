@@ -11,11 +11,14 @@ namespace Nano_Tests
 {
     TEST_CLASS(Test_TS_Policy_Safe)
     {
-        using Moo_TSS = Moo<Observer_TSS>;
+        const int N = 64;
+
+        using Moo_T = Moo<Observer_TSS>;
+        using Subject = Signal_Rng_TSS;
 
         TEST_METHOD(Test_Shared_Signal)
         {
-            Signal_Rng_TSS subject;
+            Subject subject;
 
             auto context = [&]()
             {
@@ -23,13 +26,13 @@ namespace Nano_Tests
 
                 Rng rng;
 
-                for (; count < 32; ++count)
+                for (; count < N; ++count)
                 {
-                    std::list<Moo_TSS> moo(32);
+                    std::list<Moo_T> moo(N);
 
                     for (auto& moo_instance : moo)
                     {
-                        subject.connect<&Moo_TSS::slot_next_random>(moo_instance);
+                        subject.connect<&Moo_T::slot_next_random>(moo_instance);
                     }
                     subject.fire(rng);
                 }

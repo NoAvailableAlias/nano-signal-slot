@@ -45,14 +45,14 @@ class Observer : private MT_Policy
 
     //--------------------------------------------------------------------------
 
-    void insert(Delegate_Key const& key, Observer* observer)
+    void insert(Delegate_Key const& key, Observer* obs)
     {
         auto lock = MT_Policy::lock_guard();
 
         auto begin = std::begin(connections);
         auto end = std::end(connections);
 
-        connections.emplace(std::upper_bound(begin, end, key, Z_Order()), key, observer);
+        connections.emplace(std::upper_bound(begin, end, key, Z_Order()), key, obs);
     }
 
     void remove(Delegate_Key const& key) noexcept
