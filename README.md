@@ -6,7 +6,7 @@ Pure C++17 Signals and Slots
 #### Include
 ```
 // #include "nano_function.hpp"         // Nano::Function, Nano::Delegate_Key
-// #include "nano_mutex.hpp"            // Nano::Spin_Mutex, Nano::Spin_Mutex_Recursive, all policies
+// #include "nano_mutex.hpp"            // Nano::Spin_Mutex, all threading policies
 // #include "nano_observer.hpp"         // Nano::Observer
 #include "nano_signal_slot.hpp"         // Nano::Signal
 ```

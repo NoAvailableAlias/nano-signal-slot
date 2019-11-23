@@ -67,10 +67,9 @@ class Function<RT(Args...)> final
         };
     }
 
-    template <typename... Uref>
-    inline RT operator() (Uref&&... args)
+    inline RT operator() (Args... args)
     {
-        return (*function_pointer)(instance_pointer, std::forward<Uref>(args)...);
+        return (*function_pointer)(instance_pointer, std::forward<Args>(args)...);
     }
 
     inline operator Delegate_Key() const

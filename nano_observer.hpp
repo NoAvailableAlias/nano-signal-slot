@@ -21,7 +21,7 @@ class Observer : private MT_Policy
         typename MT_Policy::Weak_Ptr observer;
 
         Connection() noexcept = default;
-        Connection(Delegate_Key const& key) : delegate(key) {}
+        Connection(Delegate_Key const& key) : delegate(key), observer() {}
         Connection(Delegate_Key const& key, Observer* obs) : delegate(key), observer(obs->weak_ptr()) {}
     };
 

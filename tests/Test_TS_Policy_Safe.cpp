@@ -11,7 +11,8 @@ namespace Nano_Tests
 {
     TEST_CLASS(Test_TS_Policy_Safe)
     {
-        const int N = 64;
+        const int N = 64; // 4 seconds
+        //const int N = 256; // 4 minutes
 
         using Moo_T = Moo<Observer_TSS>;
         using Subject = Signal_Rng_TSS;
