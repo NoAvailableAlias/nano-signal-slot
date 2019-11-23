@@ -279,7 +279,14 @@ class TS_Policy_Safe
         // Reset the tracker and then ping for any lingering refs
         tracker.reset();
         // Wait for all visitors to finish their emissions
-        while (!ping.expired());
+        do
+        {
+            while (!ping.expired())
+            {
+                std::this_thread::yield();
+            }
+        }
+        while (ping.lock());
     }
 };
 
