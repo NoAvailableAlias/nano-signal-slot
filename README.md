@@ -6,7 +6,7 @@ Pure C++17 Signals and Slots
 #### Include
 ```
 // #include "nano_function.hpp"         // Nano::Function, Nano::Delegate_Key
-// #include "nano_mutex.hpp"            // Nano::Noop_Mutex, Nano::Recursive_Mutex
+// #include "nano_mutex.hpp"            // Nano::Spin_Mutex, all threading policies
 // #include "nano_observer.hpp"         // Nano::Observer
 #include "nano_signal_slot.hpp"         // Nano::Signal
 ```
@@ -109,15 +109,45 @@ signal_one.connect(fo);
 signal_one.disconnect(fo);
 ```
 
+#### Threading Policies
+
+Nano-signal-slot has the following threading policies available for use:
+
+| &nbsp; | ST_Policy | TS_Policy | ST_Policy_Safe | TS_Policy_Safe |
+|:-------|:---------:|:---------:|:--------------:|:--------------:|
+| Single threading only | X | - | X | - |
+| Thread safe using mutex | - | X | - | X |
+| Reentrant safe* | - | - | X | X |
+
+_* Reentrant safety achieved using emission list copying and reference counting._
+
+#### Threading Policies - Continued
+
+When integrating nano-signal-slot, it is recommended to alias the Nano::Signal and Nano::Observer template classes.
+<br />
+**When using a non-default Policy you must make sure that both Signal and Observer use the same policy.**
+
+```
+namespace Your_Namespace
+{
+
+// Creating aliases when using nano-signal-slot will increase the maintainability of your code
+// especially if you are choosing to use the alternative policies.
+template <typename Signatue>
+using Your_Signal<Signature> = Nano::Signal<Signature, Nano::TS_Policy_Safe<>>;
+using Your_Observer = Nano::Observer<Nano::TS_Policy_Safe<>>;
+
+}
+```
+
 ## Deadlock Disclaimer
 
-Currently nano-signal-slot is not reentrant safe and **does not support** any recursive Signal operations from within Slot emission.
-Doing so could cause a deadlock scenario if these operations are performed across threads.
-The [issue](https://github.com/NoAvailableAlias/nano-signal-slot/issues/22) will remain open until a suitable rework is ready.
+The TS_Policy does not mitigate any deadlocks that could occur due to slot emissions fiddling with their signals.
+Additionally, when using this policy, it is not safe to destruct connected Nano::Observers from different threads.
+Generally if the threading posture in your application allows for it then use the TS_Policy for the performance.
+If the lifetimes of Signals vs Observers is unknown or if the slots could be hostile then use the TS_Policy_Safe.
 
 #### Links
-
-*_Benchmarks contain both the old nano-signal-slot v1.x scores as well as the v2.x scores._
 
 | [Benchmark Results](https://github.com/NoAvailableAlias/signal-slot-benchmarks/tree/master/#signal-slot-benchmarks) | [Benchmark Algorithms](https://github.com/NoAvailableAlias/signal-slot-benchmarks/tree/master/#benchmark-algorithms) | [Unit Tests](https://github.com/NoAvailableAlias/nano-signal-slot/tree/master/tests/#unit-tests) |
 |:-------------------------------------------------------------------------------------------------------------------:|:--------------------------------------------------------------------------------------------------------------------:|:------------------------------------------------------------------------------------------------:|

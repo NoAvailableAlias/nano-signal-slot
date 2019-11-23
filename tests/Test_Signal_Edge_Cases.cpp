@@ -114,24 +114,38 @@ namespace Nano_Tests
         {
             Delegate_One fo1;
 
+            auto limit = 0;
+
             mo_signal_one.connect(fo1);
-            mo_signal_one.connect<&Foo::slot_member_signature_one>(mo_foo);
-            mo_signal_one.connect<&Foo::slot_const_member_signature_one>(mo_foo);
-            mo_signal_one.connect<Foo, &Foo::slot_overloaded_member>(mo_foo);
-            mo_signal_one.connect<&Foo::slot_static_member_function>();
-            mo_signal_one.connect<Foo, &Foo::slot_virtual_member_function>(mo_foo);
-            mo_signal_one.connect<Bar, &Bar::slot_virtual_member_function>(mo_bar);
 
             fo1 = [&](const char* sl)
             {
-                // TODO Prevent this infinite loop
-                // This would require a custom data structure for Observer
-                // in order to realize a no-cost solution to this problem
-
-                //mo_signal_one.fire(__FILE__);
+                if (++limit > 2)
+                {
+                    Assert::Fail(L"This is not a supported use case.");
+                }
+                mo_signal_one.fire(__FILE__);
             };
-
             mo_signal_one.fire(__FILE__);
+        }
+
+        TEST_METHOD(Test_Signal_Copy)
+        {
+            Assert::Fail(L"This is not a supported capability.");
+
+            //{
+            //    mo_signal_one.connect<&Foo::slot_member_signature_one>(mo_foo);
+
+            //    auto copy = Signal_One(mo_signal_one);
+
+            //    Assert::IsFalse(copy.is_empty(), L"Copy did not copy a slot.");
+
+            //    mo_signal_one.disconnect<&Foo::slot_member_signature_one>(mo_foo);
+
+            //    Assert::IsFalse(copy.is_empty(), L"Copy had a slot disconnected.");
+            //    Assert::IsFalse(mo_foo.is_empty(), L"Copy no longer has an observer.");
+            //}
+            //Assert::IsTrue(mo_foo.is_empty(), L"Copy did not disconnect from Observer.");
         }
     };
 }

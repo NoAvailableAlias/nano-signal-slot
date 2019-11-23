@@ -6,13 +6,13 @@
 namespace Nano
 {
 
-using Delegate_Key = std::array<const std::uintptr_t, 2>;
+using Delegate_Key = std::array<std::uintptr_t, 2>;
 
 template <typename RT> class Function;
 template <typename RT, typename... Args>
 class Function<RT(Args...)> final
 {
-    // Only Nano::Observer is allowed access
+    // Only Nano::Observer is allowed private access
     template <typename> friend class Observer;
 
     using Thunk = RT(*)(void*, Args&&...);
@@ -28,7 +28,7 @@ class Function<RT(Args...)> final
 
     public:
 
-    void* instance_pointer;
+    void* const instance_pointer;
     const Thunk function_pointer;
 
     template <auto fun_ptr>
@@ -67,10 +67,9 @@ class Function<RT(Args...)> final
         };
     }
 
-    template <typename... Uref>
-    inline RT operator() (Uref&&... args)
+    inline RT operator() (Args... args)
     {
-        return (*function_pointer)(instance_pointer, std::forward<Uref>(args)...);
+        return (*function_pointer)(instance_pointer, std::forward<Args>(args)...);
     }
 
     inline operator Delegate_Key() const

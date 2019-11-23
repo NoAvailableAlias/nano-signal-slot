@@ -1,0 +1,53 @@
+#include <future>
+#include <list>
+
+#include "CppUnitTest.h"
+
+#include "Test_Base.hpp"
+
+using namespace Microsoft::VisualStudio::CppUnitTestFramework;
+
+namespace Nano_Tests
+{
+    TEST_CLASS(Test_TS_Policy_Safe)
+    {
+        const int N = 64; // 4 seconds
+        //const int N = 256; // 4 minutes
+
+        using Moo_T = Moo<Observer_TSS>;
+        using Subject = Signal_Rng_TSS;
+
+        TEST_METHOD(Test_Shared_Signal)
+        {
+            Subject subject;
+
+            auto context = [&]()
+            {
+                std::size_t count = 0;
+
+                Rng rng;
+
+                for (; count < N; ++count)
+                {
+                    std::list<Moo_T> moo(N);
+
+                    for (auto& moo_instance : moo)
+                    {
+                        subject.connect<&Moo_T::slot_next_random>(moo_instance);
+                    }
+                    subject.fire(rng);
+                }
+            };
+            std::vector<std::future<void>> future_results;
+            for (std::size_t i = std::thread::hardware_concurrency(); i > 0; --i)
+            {
+                future_results.emplace_back(std::async(std::launch::async, context));
+            }
+            for (auto& future_result : future_results)
+            {
+                future_result.get();
+            }
+            Assert::IsTrue(subject.is_empty(), L"A signal was found not empty.");
+        }
+    };
+}
