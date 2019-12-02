@@ -132,20 +132,6 @@ namespace Nano_Tests
         TEST_METHOD(Test_Signal_Copy)
         {
             Assert::Fail(L"This is not a supported capability.");
-
-            //{
-            //    mo_signal_one.connect<&Foo::slot_member_signature_one>(mo_foo);
-
-            //    auto copy = Signal_One(mo_signal_one);
-
-            //    Assert::IsFalse(copy.is_empty(), L"Copy did not copy a slot.");
-
-            //    mo_signal_one.disconnect<&Foo::slot_member_signature_one>(mo_foo);
-
-            //    Assert::IsFalse(copy.is_empty(), L"Copy had a slot disconnected.");
-            //    Assert::IsFalse(mo_foo.is_empty(), L"Copy no longer has an observer.");
-            //}
-            //Assert::IsTrue(mo_foo.is_empty(), L"Copy did not disconnect from Observer.");
         }
     };
 }

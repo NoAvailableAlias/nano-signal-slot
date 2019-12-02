@@ -36,6 +36,9 @@ signal_two.connect<&slot_free_function_one>();
 ```
 
 #### Fire / Fire Accumulate
+
+_Slot emission is not guaranteed to be in the order of connection._
+
 ```
 // Fire Signals
 signal_one.fire("we get signal");
@@ -57,7 +60,7 @@ signal_one.fire_accumulate(accumulator, "how are you gentlemen");
 signal_one.disconnect<&Foo::slot_member_one>(foo);
 signal_two.disconnect<&Foo::slot_member_two>(foo);
 
-// Connect overloaded member functions (required template syntax)
+// Disconnect overloaded member functions (required template syntax)
 signal_one.disconnect<Foo, &Foo::slot_overloaded_member>(foo);
 
 // Disconnect a static member function
@@ -119,12 +122,12 @@ Nano-signal-slot has the following threading policies available for use:
 | Thread safe using mutex | - | X | - | X |
 | Reentrant safe* | - | - | X | X |
 
-_* Reentrant safety achieved using emission list copying and reference counting._
+_* Reentrant safety achieved using emission copying and reference counting._
 
-#### Threading Policies - Continued
+#### Threading Policies - Aliases
 
 When integrating nano-signal-slot, it is recommended to alias the Nano::Signal and Nano::Observer template classes.
-<br />
+<br/>
 **When using a non-default Policy you must make sure that both Signal and Observer use the same policy.**
 
 ```
@@ -138,6 +141,16 @@ using Your_Signal<Signature> = Nano::Signal<Signature, Nano::TS_Policy_Safe<>>;
 using Your_Observer = Nano::Observer<Nano::TS_Policy_Safe<>>;
 
 }
+```
+
+#### Threading Policies - Mutex Policy
+
+Both the TS_Policy and TS_Policy_Safe allow for a provided mutex type if non-trivial locking is desired.
+<br/>
+_The provided mutex type only needs to implement the BasicLockable requirement._
+
+```
+using Your_Policy = Nano::TS_Policy<Your_Mutex>;
 ```
 
 ## Deadlock Disclaimer
