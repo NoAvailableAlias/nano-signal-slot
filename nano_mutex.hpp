@@ -76,10 +76,9 @@ class ST_Policy
         return (observer == this ? nullptr : observer);
     }
 
-    template <typename T>
-    constexpr auto static_pointer_cast(Weak_Ptr observer) const
+    constexpr auto unmask(Weak_Ptr observer) const
     {
-        return static_cast<T*>(observer);
+        return observer;
     }
 
     constexpr void before_disconnect_all() const
@@ -142,10 +141,9 @@ class TS_Policy
         return (observer == this ? nullptr : observer);
     }
 
-    template <typename T>
-    constexpr auto static_pointer_cast(Weak_Ptr observer) const
+    constexpr auto unmask(Weak_Ptr observer) const
     {
-        return static_cast<T*>(observer);
+        return observer;
     }
 
     constexpr void before_disconnect_all() const
@@ -194,10 +192,9 @@ class ST_Policy_Safe
         return (observer == this ? nullptr : observer);
     }
 
-    template <typename T>
-    constexpr auto static_pointer_cast(Weak_Ptr observer) const
+    constexpr auto unmask(Weak_Ptr observer) const
     {
-        return static_cast<T*>(observer);
+        return observer;
     }
 
     constexpr void before_disconnect_all() const
@@ -249,27 +246,26 @@ class TS_Policy_Safe
 
     using Weak_Ptr = std::weak_ptr<TS_Policy_Safe>;
 
-    inline Weak_Ptr weak_ptr()
+    inline Weak_Ptr weak_ptr() const
     {
         return tracker;
     }
 
-    inline Shared_Ptr observed(Weak_Ptr observer)
+    inline Shared_Ptr observed(Weak_Ptr observer) const
     {
         return observer.lock();
     }
 
-    inline Shared_Ptr visiting(Weak_Ptr observer)
+    inline Shared_Ptr visiting(Weak_Ptr observer) const
     {
         // Lock the observer if it isn't "this"
         return observer.owner_before(tracker)
             || tracker.owner_before(observer) ? observer.lock() : nullptr;
     }
 
-    template <typename T>
-    inline auto static_pointer_cast(Shared_Ptr& observer)
+    inline auto unmask(Shared_Ptr& observer) const
     {
-        return static_cast<T*>(observer.get());
+        return observer.get();
     }
 
     inline void before_disconnect_all()

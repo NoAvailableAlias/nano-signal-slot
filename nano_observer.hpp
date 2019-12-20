@@ -108,7 +108,7 @@ class Observer : private MT_Policy
         {
             if (auto observer = MT_Policy::visiting(slot.observer))
             {
-                MT_Policy::static_pointer_cast<Observer>(observer)->remove(slot.delegate);
+                static_cast<Observer*>(MT_Policy::unmask(observer))->remove(slot.delegate);
             }
         }
         connections.clear();
