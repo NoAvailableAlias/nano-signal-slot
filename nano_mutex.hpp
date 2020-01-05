@@ -251,16 +251,16 @@ class TS_Policy_Safe
         return tracker;
     }
 
-    inline Shared_Ptr observed(Weak_Ptr observer) const
+    inline Shared_Ptr observed(Weak_Ptr const& observer) const
     {
-        return observer.lock();
+        return std::move(observer.lock());
     }
 
-    inline Shared_Ptr visiting(Weak_Ptr observer) const
+    inline Shared_Ptr visiting(Weak_Ptr const& observer) const
     {
-        // Lock the observer if it isn't "this"
+        // Lock the observer if the observer isn't tracker
         return observer.owner_before(tracker)
-            || tracker.owner_before(observer) ? observer.lock() : nullptr;
+            || tracker.owner_before(observer) ? std::move(observer.lock()) : nullptr;
     }
 
     inline auto unmask(Shared_Ptr& observer) const
@@ -271,7 +271,7 @@ class TS_Policy_Safe
     inline void before_disconnect_all()
     {
         // Immediately create a weak ptr so we can "ping" for expiration
-        Weak_Ptr ping { tracker };
+        auto ping = weak_ptr();
         // Reset the tracker and then ping for any lingering refs
         tracker.reset();
         // Wait for all visitors to finish their emissions
