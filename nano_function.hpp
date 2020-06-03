@@ -1,6 +1,5 @@
 #pragma once
 
-#include <cstdint>
 #include <array>
 
 namespace Nano
@@ -60,16 +59,17 @@ class Function<RT(Args...)> final
     {
         return
         {
-            pointer, [](void *this_ptr, Args&&... args)
+            pointer, [](void* this_ptr, Args&&... args)
             {
                 return static_cast<L*>(this_ptr)->operator()(std::forward<Args>(args)...);
             }
         };
     }
 
-    inline RT operator() (Args... args)
+    template <typename... Uref>
+    inline RT operator() (Uref&&... args) const
     {
-        return (*function_pointer)(instance_pointer, std::forward<Args>(args)...);
+        return (*function_pointer)(instance_pointer, static_cast<Args&&>(args)...);
     }
 
     inline operator Delegate_Key() const

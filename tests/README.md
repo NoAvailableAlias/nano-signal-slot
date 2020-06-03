@@ -41,6 +41,9 @@ Currently nano-signal-slot now uses Visual Studio for all tests.
 | | Test_Overloaded_Virtual_Member_Fire | PASS |
 | | Test_Overloaded_Virtual_Derived_Member_Fire | PASS |
 | | Test_Fire_Accumulate | PASS |
+| | Test_Fire_Single_Copy | PASS |
+| | Test_Fire_LValue_Copy | PASS |
+| | Test_Fire_RValue_Copy | PASS |
 | Test_ST_Policy | | |
 | | Test_Global_Signal | PASS |
 | Test_ST_Policy_Safe | | |

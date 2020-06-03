@@ -131,4 +131,24 @@ namespace Nano_Tests
             volatile std::size_t a = rng(); (void)a;
         }
     };
+
+    //--------------------------------------------------------------------------
+
+    class Copy_Count
+    {
+        public:
+
+        std::size_t count = 0;
+
+        Copy_Count() = default;
+        Copy_Count(Copy_Count const& other) : count(other.count + 1)
+        {
+
+        }
+        Copy_Count& operator= (Copy_Count const& other)
+        {
+            count = other.count + 1;
+            return *this;
+        }
+    };
 }

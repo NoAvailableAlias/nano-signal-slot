@@ -77,7 +77,7 @@ class Observer : private MT_Policy
         {
             if (auto observer = MT_Policy::observed(slot.observer))
             {
-                Function::bind(slot.delegate)(std::forward<Uref>(args)...);
+                Function::bind(slot.delegate)(args...);
             }
         }
     }
@@ -91,7 +91,7 @@ class Observer : private MT_Policy
         {
             if (auto observer = MT_Policy::observed(slot.observer))
             {
-                accumulate(Function::bind(slot.delegate)(std::forward<Uref>(args)...));
+                accumulate(Function::bind(slot.delegate)(args...));
             }
         }
     }

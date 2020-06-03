@@ -103,5 +103,74 @@ namespace Nano_Tests
 
             Assert::IsTrue(signal_return_values.size() == 10, L"An SRV was found missing.");
         }
+
+        //----------------------------------------------------------------------
+
+        TEST_METHOD(Test_Fire_Single_Copy)
+        {
+            Nano::Signal<void(Copy_Count)> signal_one;
+
+            auto slot_one = [](Copy_Count cc)
+            {
+                Assert::IsTrue(cc.count == 1, L"A parameter was copied more than once.");
+            };
+
+            signal_one.connect(slot_one);
+
+            auto slot_two = [](Copy_Count cc)
+            {
+                Assert::IsTrue(cc.count == 1, L"A parameter was copied more than once.");
+            };
+
+            signal_one.connect(slot_two);
+
+            Copy_Count cc;
+
+            signal_one.fire(cc);
+        }
+
+        TEST_METHOD(Test_Fire_LValue_Copy)
+        {
+            Nano::Signal<void(Copy_Count&)> signal_one;
+
+            auto slot_one = [](Copy_Count& cc)
+            {
+                Assert::IsTrue(cc.count == 0, L"A reference parameter was copied.");
+            };
+
+            signal_one.connect(slot_one);
+
+            auto slot_two = [](Copy_Count& cc)
+            {
+                Assert::IsTrue(cc.count == 0, L"A reference parameter was copied.");
+            };
+
+            signal_one.connect(slot_two);
+
+            Copy_Count cc;
+
+            signal_one.fire(cc);
+        }
+
+        TEST_METHOD(Test_Fire_RValue_Copy)
+        {
+            Nano::Signal<void(Copy_Count)> signal_one;
+
+            auto slot_one = [](Copy_Count cc)
+            {
+                Assert::IsTrue(cc.count == 1, L"An rvalue parameter wasn't copied once.");
+            };
+
+            signal_one.connect(slot_one);
+
+            auto slot_two = [](Copy_Count cc)
+            {
+                Assert::IsTrue(cc.count == 1, L"An rvalue parameter wasn't copied once.");
+            };
+
+            signal_one.connect(slot_two);
+
+            signal_one.fire(Copy_Count());
+        }
     };
 }
