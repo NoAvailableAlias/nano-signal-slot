@@ -48,5 +48,23 @@ namespace Nano_Tests
             }
             Assert::IsTrue(subject.is_empty(), L"A signal was found not empty.");
         }
+
+        //----------------------------------------------------------------------
+
+        TEST_METHOD(Test_Signal_Move)
+        {
+            Moo_T foo;
+
+            Subject signal_one;
+
+            signal_one.connect<&Moo_T::slot_next_random>(foo);
+
+            {
+                Subject signal_two = std::move(signal_one);
+            }
+
+            Assert::IsTrue(foo.is_empty(), L"Signal failed to sink.");
+            Assert::IsTrue(signal_one.is_empty(), L"Signal failed to sink.");
+        }
     };
 }

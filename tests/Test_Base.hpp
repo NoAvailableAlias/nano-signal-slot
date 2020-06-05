@@ -121,7 +121,7 @@ namespace Nano_Tests
 
     //--------------------------------------------------------------------------
 
-    template <typename T = Observer_TS>
+    template <typename T>
     class Moo : public T
     {
         public:

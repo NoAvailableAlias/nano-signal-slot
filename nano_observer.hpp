@@ -132,9 +132,14 @@ class Observer : private MT_Policy
         disconnect_all();
     }
 
-    Observer() = default;
-    Observer(Observer const&) = delete;
-    Observer& operator= (Observer const&) = delete;
+    Observer() noexcept = default;
+
+    Observer(Observer&& other) noexcept : MT_Policy(std::move(other))
+    {
+        auto lock = other.lock_guard();
+
+        connections = std::move(other.connections);
+    }
 };
 
 } // namespace Nano ------------------------------------------------------------
