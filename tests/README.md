@@ -41,7 +41,7 @@ _Built using c++17 conformance mode (/permissive-)_
 | | Test_Fire_RValue_Copy | PASS |
 | Test_ST_Policy | | |
 | | Test_Global_Signal | PASS |
-| | Test_Signal_Move | PASS |
+| | Test_Signal_Move | &mdash; |
 | | Test_Fire_Disconnect | &mdash; |
 | | Test_Fire_Disconnects | &mdash; |
 | | Test_Fire_Connects | &mdash; |
@@ -49,7 +49,7 @@ _Built using c++17 conformance mode (/permissive-)_
 | | Test_Fire_Fire | &mdash; |
 | Test_ST_Policy_Safe | | |
 | | Test_Global_Signal | PASS |
-| | Test_Signal_Move | PASS |
+| | Test_Signal_Move | &mdash; |
 | | Test_Fire_Disconnect | PASS |
 | | Test_Fire_Disconnects | PASS |
 | | Test_Fire_Connects | PASS |
@@ -57,7 +57,7 @@ _Built using c++17 conformance mode (/permissive-)_
 | | Test_Fire_Fire | PASS |
 | Test_TS_Policy | | |
 | | Test_Shared_Signal | PASS |
-| | Test_Signal_Move | PASS |
+| | Test_Signal_Move | &mdash; |
 | | Test_Fire_Disconnect | &mdash; |
 | | Test_Fire_Disconnects | &mdash; |
 | | Test_Fire_Connects | &mdash; |
@@ -65,7 +65,7 @@ _Built using c++17 conformance mode (/permissive-)_
 | | Test_Fire_Fire | &mdash; |
 | Test_TS_Policy_Safe | | |
 | | Test_Shared_Signal | PASS |
-| | Test_Signal_Move | PASS |
+| | Test_Signal_Move | &mdash; |
 | | Test_Fire_Disconnect | PASS |
 | | Test_Fire_Disconnects | PASS |
 | | Test_Fire_Connects | PASS |
