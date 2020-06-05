@@ -51,20 +51,27 @@ namespace Nano_Tests
 
         //----------------------------------------------------------------------
 
-        TEST_METHOD(Test_Signal_Move)
-        {
-            Moo_T foo;
+        //TEST_METHOD(Test_Signal_Move)
+        //{
+        //    Moo_T foo;
 
-            Subject signal_one;
+        //    Subject* signal_one = new Subject();
 
-            signal_one.connect<&Moo_T::slot_next_random>(foo);
+        //    signal_one->connect<&Moo_T::slot_next_random>(foo);
 
-            {
-                Subject signal_two = std::move(signal_one);
-            }
+        //    {
+        //        Subject signal_two = std::move(*signal_one);
 
-            Assert::IsTrue(foo.is_empty(), L"Signal failed to sink.");
-            Assert::IsTrue(signal_one.is_empty(), L"Signal failed to sink.");
-        }
+        //        Assert::IsTrue(signal_one->is_empty(), L"Signal failed to sink.");
+
+        //        delete signal_one;
+
+        //        signal_two.fire(Rng());
+
+        //        foo.disconnect_all();
+        //    }
+
+        //    Assert::IsTrue(foo.is_empty(), L"Signal failed to sink.");
+        //}
     };
 }

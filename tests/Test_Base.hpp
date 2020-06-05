@@ -128,7 +128,7 @@ namespace Nano_Tests
 
         void slot_next_random(Rng& rng)
         {
-            volatile std::size_t a = rng(); (void)a;
+            rng.discard(1);
         }
     };
 

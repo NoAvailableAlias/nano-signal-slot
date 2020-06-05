@@ -124,9 +124,6 @@ class TS_Policy
 
     protected:
 
-    TS_Policy() noexcept = default;
-    TS_Policy(TS_Policy&&) noexcept {}
-
     using Weak_Ptr = TS_Policy*;
 
     constexpr auto weak_ptr()
@@ -248,7 +245,6 @@ class TS_Policy_Safe
     protected:
 
     TS_Policy_Safe() noexcept = default;
-    TS_Policy_Safe(TS_Policy_Safe&& other) noexcept : tracker(std::move(other.tracker)) {}
 
     using Weak_Ptr = std::weak_ptr<TS_Policy_Safe>;
 
