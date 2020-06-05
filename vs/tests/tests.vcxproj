@@ -194,7 +194,6 @@
     <ClCompile Include="..\..\tests\Test_Observer_Destruction.cpp" />
     <ClCompile Include="..\..\tests\Test_Signal_Connect.cpp" />
     <ClCompile Include="..\..\tests\Test_Signal_Disconnect.cpp" />
-    <ClCompile Include="..\..\tests\Test_Signal_Edge_Cases.cpp" />
     <ClCompile Include="..\..\tests\Test_Signal_Fire.cpp" />
     <ClCompile Include="..\..\tests\Test_ST_Policy.cpp" />
     <ClCompile Include="..\..\tests\Test_ST_Policy_Safe.cpp" />

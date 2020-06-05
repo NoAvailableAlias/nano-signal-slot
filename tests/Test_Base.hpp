@@ -121,14 +121,34 @@ namespace Nano_Tests
 
     //--------------------------------------------------------------------------
 
-    template <typename T = Observer_TS>
+    template <typename T>
     class Moo : public T
     {
         public:
 
         void slot_next_random(Rng& rng)
         {
-            volatile std::size_t a = rng(); (void)a;
+            rng.discard(1);
+        }
+    };
+
+    //--------------------------------------------------------------------------
+
+    class Copy_Count
+    {
+        public:
+
+        std::size_t count = 0;
+
+        Copy_Count() = default;
+        Copy_Count(Copy_Count const& other) : count(other.count + 1)
+        {
+
+        }
+        Copy_Count& operator= (Copy_Count const& other)
+        {
+            count = other.count + 1;
+            return *this;
         }
     };
 }

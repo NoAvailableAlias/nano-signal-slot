@@ -31,9 +31,6 @@
     <ClCompile Include="..\..\tests\Test_Signal_Fire.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\tests\Test_Signal_Edge_Cases.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\tests\Test_Observer_Destruction.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

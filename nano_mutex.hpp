@@ -31,7 +31,7 @@ class Spin_Mutex
         locked.store(false, std::memory_order_release);
     }
 
-    Spin_Mutex() = default;
+    Spin_Mutex() noexcept = default;
     Spin_Mutex(Spin_Mutex const&) = delete;
     Spin_Mutex& operator= (Spin_Mutex const&) = delete;
 };
@@ -243,6 +243,8 @@ class TS_Policy_Safe
     }
 
     protected:
+
+    TS_Policy_Safe() noexcept = default;
 
     using Weak_Ptr = std::weak_ptr<TS_Policy_Safe>;
 

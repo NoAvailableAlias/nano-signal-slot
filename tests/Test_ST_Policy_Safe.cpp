@@ -35,5 +35,150 @@ namespace Nano_Tests
             }
             Assert::IsTrue(subject.is_empty(), L"A signal was found not empty.");
         }
+
+        //----------------------------------------------------------------------
+
+        //TEST_METHOD(Test_Signal_Move)
+        //{
+        //    Moo_T foo;
+
+        //    Subject* signal_one = new Subject();
+
+        //    signal_one->connect<&Moo_T::slot_next_random>(foo);
+
+        //    {
+        //        Subject signal_two = std::move(*signal_one);
+
+        //        Assert::IsTrue(signal_one->is_empty(), L"Signal failed to sink.");
+
+        //        delete signal_one;
+
+        //        signal_two.fire(Rng());
+
+        //        foo.disconnect_all();
+        //    }
+
+        //    Assert::IsTrue(foo.is_empty(), L"Signal failed to sink.");
+        //}
+
+        //----------------------------------------------------------------------
+
+        TEST_METHOD(Test_Fire_Disconnect)
+        {
+            Moo_T foo;
+
+            Subject signal;
+
+            signal.connect<&Moo_T::slot_next_random>(foo);
+
+            std::function<void(Rng&)> test;
+
+            test = [&](Rng&)
+            {
+                signal.disconnect(test);
+            };
+
+            signal.connect(test);
+
+            signal.fire(Rng());
+        }
+
+        TEST_METHOD(Test_Fire_Disconnects)
+        {
+            Moo_T foo;
+
+            Subject signal;
+
+            signal.connect<&Moo_T::slot_next_random>(foo);
+
+            std::function<void(Rng&)> test;
+
+            test = [&](Rng&)
+            {
+                signal.disconnect<&Moo_T::slot_next_random>(foo);
+                signal.disconnect(test);
+            };
+
+            signal.connect(test);
+
+            signal.fire(Rng());
+
+            Assert::IsTrue(foo.is_empty(), L"An observer was not disconnected.");
+            Assert::IsTrue(signal.is_empty(), L"A slot was not disconnected.");
+        }
+
+        TEST_METHOD(Test_Fire_Connects)
+        {
+            Moo_T foo;
+
+            Subject signal;
+
+            std::function<void(Rng&)> test;
+
+            test = [&](Rng& rng)
+            {
+                signal.connect<&Moo_T::slot_next_random>(foo);
+                foo.slot_next_random(rng);
+            };
+
+            signal.connect(test);
+
+            Rng rng_1;
+            Rng rng_2;
+            rng_2.discard(3);
+
+            signal.fire(rng_1);
+            signal.fire(rng_1);
+
+            Assert::IsTrue(rng_1 == rng_2, L"A slot was not connected.");
+        }
+
+        TEST_METHOD(Test_Fire_Disconnect_All)
+        {
+            Moo_T foo;
+
+            Subject signal;
+
+            signal.connect<&Moo_T::slot_next_random>(foo);
+
+            std::function<void(Rng&)> test;
+
+            test = [&](Rng&)
+            {
+                signal.disconnect_all();
+            };
+
+            signal.connect(test);
+
+            signal.fire(Rng());
+
+            Assert::IsTrue(foo.is_empty(), L"An observer was not disconnected.");
+            Assert::IsTrue(signal.is_empty(), L"A slot was not disconnected.");
+        }
+
+        TEST_METHOD(Test_Fire_Fire)
+        {
+            Moo_T foo;
+
+            Subject signal;
+
+            std::function<void(Rng&)> test;
+
+            Rng stop;
+            stop.discard(16);
+
+            test = [&](Rng& rng)
+            {
+                if (rng != stop)
+                {
+                    rng.discard(1);
+                    signal.fire(rng);
+                }
+            };
+
+            signal.connect(test);
+
+            signal.fire(Rng());
+        }
     };
 }
