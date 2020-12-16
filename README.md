@@ -136,11 +136,17 @@ namespace Your_Namespace
 
 // Creating aliases when using nano-signal-slot will increase the maintainability of your code
 // especially if you are choosing to use the alternative policies.
-template <typename Signatue>
-using Your_Signal<Signature> = Nano::Signal<Signature, Nano::TS_Policy_Safe<>>;
-using Your_Observer = Nano::Observer<Nano::TS_Policy_Safe<>>;
+using NanoPolicy = Nano::TS_Policy_Safe<>;
+
+template <typename Signature>
+using Signal = Nano::Signal<Signature, NanoPolicy>;
+
+using Observer = Nano::Observer<NanoPolicy>;
 
 }
+
+// Then use it via your namespace
+Your_Namespace::Signal<bool(const char*)> signal_one;
 ```
 
 #### Threading Policies - Mutex Policy
