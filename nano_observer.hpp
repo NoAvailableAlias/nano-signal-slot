@@ -133,8 +133,13 @@ class Observer : private MT_Policy
     }
 
     Observer() noexcept = default;
-    Observer(Observer const&) = delete;
-    Observer& operator= (Observer const&) = delete;
+
+    // Observer may be movable depending on policy, but should never be copied
+    Observer(Observer const&) noexcept = delete;
+    Observer& operator= (Observer const&) noexcept = delete;
+
+    Observer(Observer&&) noexcept = default;
+    Observer& operator=(Observer&&) noexcept = default;
 };
 
 } // namespace Nano ------------------------------------------------------------

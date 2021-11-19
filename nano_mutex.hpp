@@ -32,8 +32,14 @@ class Spin_Mutex
     }
 
     Spin_Mutex() noexcept = default;
-    Spin_Mutex(Spin_Mutex const&) = delete;
-    Spin_Mutex& operator= (Spin_Mutex const&) = delete;
+    virtual ~Spin_Mutex() noexcept = default;
+
+    // Not copyable or movable due to owning an atomic_bool
+    Spin_Mutex(Spin_Mutex const&) noexcept = delete;
+    Spin_Mutex& operator= (Spin_Mutex const&) noexcept = delete;
+
+    Spin_Mutex(Spin_Mutex&&) noexcept = delete;
+    Spin_Mutex& operator= (Spin_Mutex&&) noexcept = delete;
 };
 
 //------------------------------------------------------------------------------
@@ -58,6 +64,15 @@ class ST_Policy
     }
 
     protected:
+
+    ST_Policy() noexcept = default;
+    ~ST_Policy() noexcept = default;
+
+    ST_Policy(const ST_Policy&) noexcept = default;
+    ST_Policy& operator=(const ST_Policy&) noexcept = default;
+
+    ST_Policy(ST_Policy&&) noexcept = default;
+    ST_Policy& operator=(ST_Policy&&) noexcept = default;
 
     using Weak_Ptr = ST_Policy*;
 
@@ -124,6 +139,15 @@ class TS_Policy
 
     protected:
 
+    TS_Policy() noexcept = default;
+    ~TS_Policy() noexcept = default;
+
+    TS_Policy(TS_Policy const&) noexcept = delete;
+    TS_Policy& operator= (TS_Policy const&) noexcept = delete;
+
+    TS_Policy(TS_Policy&&) noexcept = delete;
+    TS_Policy& operator= (TS_Policy&&) noexcept = delete;
+
     using Weak_Ptr = TS_Policy*;
 
     constexpr auto weak_ptr()
@@ -174,6 +198,15 @@ class ST_Policy_Safe
     }
 
     protected:
+
+    ST_Policy_Safe() noexcept = default;
+    ~ST_Policy_Safe() noexcept = default;
+
+    ST_Policy_Safe(ST_Policy_Safe const&) noexcept = default;
+    ST_Policy_Safe& operator= (ST_Policy_Safe const&) noexcept = default;
+
+    ST_Policy_Safe(ST_Policy_Safe&&) noexcept = default;
+    ST_Policy_Safe& operator= (ST_Policy_Safe&&) noexcept = default;
 
     using Weak_Ptr = ST_Policy_Safe*;
 
@@ -245,6 +278,13 @@ class TS_Policy_Safe
     protected:
 
     TS_Policy_Safe() noexcept = default;
+    ~TS_Policy_Safe() noexcept = default;
+
+    TS_Policy_Safe(TS_Policy_Safe const&) noexcept = delete;
+    TS_Policy_Safe& operator= (TS_Policy_Safe const&) noexcept = delete;
+
+    TS_Policy_Safe(TS_Policy_Safe&&) noexcept = delete;
+    TS_Policy_Safe& operator= (TS_Policy_Safe&&) noexcept = delete;
 
     using Weak_Ptr = std::weak_ptr<TS_Policy_Safe>;
 
