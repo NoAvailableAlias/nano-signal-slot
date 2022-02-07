@@ -42,7 +42,6 @@ class Observer : private MT_Policy
     };
 
     std::vector<Connection> connections;
-    bool movedFrom = false;
 
     //--------------------------------------------------------------------------
 
@@ -159,8 +158,7 @@ class Observer : private MT_Policy
     {
         MT_Policy::before_disconnect_all();
 
-        if (!movedFrom)
-            disconnect_all();
+        disconnect_all();
     }
 
     Observer() noexcept = default;
@@ -173,13 +171,11 @@ class Observer : private MT_Policy
     Observer(Observer&& other) noexcept
     {
         move_connections_from(&other);
-        other.movedFrom = true;
     }
 
     Observer& operator=(Observer&& other) noexcept
     {
         move_connections_from(&other);
-        other.movedFrom = true;
         return *this;
     }
 };
