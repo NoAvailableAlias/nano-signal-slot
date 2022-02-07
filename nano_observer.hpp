@@ -46,14 +46,19 @@ class Observer : private MT_Policy
 
     //--------------------------------------------------------------------------
 
-    void insert(Delegate_Key const& key, Observer* obs)
+    void insertInternal(Delegate_Key const& key, Observer* obs)
     {
-        [[maybe_unused]] auto lock = MT_Policy::lock_guard();
-
         auto begin = std::begin(connections);
         auto end = std::end(connections);
 
         connections.emplace(std::upper_bound(begin, end, key, Z_Order()), key, obs);
+    }
+
+    void insert(Delegate_Key const& key, Observer* obs)
+    {
+        [[maybe_unused]] auto lock = MT_Policy::lock_guard();
+
+        insertInternal(key, obs);
     }
 
     void remove(Delegate_Key const& key) noexcept
@@ -113,7 +118,8 @@ class Observer : private MT_Policy
                 obsPtr->remove(slot.delegate);
                 obsPtr->insert(slot.delegate, this);
 
-                insert(slot.delegate, obsPtr);
+                // We already have a lock, don't try to lock again
+                insertInternal(slot.delegate, obsPtr);
             }
         }
 
