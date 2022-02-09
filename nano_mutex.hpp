@@ -8,7 +8,7 @@
 namespace Nano
 {
 
-class Spin_Mutex
+class Spin_Mutex final
 {
     std::atomic_bool locked = { false };
 
@@ -32,7 +32,7 @@ class Spin_Mutex
     }
 
     Spin_Mutex() noexcept = default;
-    virtual ~Spin_Mutex() noexcept = default;
+    ~Spin_Mutex() noexcept = default;
 
     // Because all we own is a trivially-copyable atomic_bool, we can manually move/copy
     Spin_Mutex(Spin_Mutex const& other) noexcept : locked{other.locked.load()} {}
