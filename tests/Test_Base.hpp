@@ -130,7 +130,17 @@ namespace Nano_Tests
         {
             rng.discard(1);
         }
+
+        static void slot_static_next_random(Rng& rng)
+        {
+            rng.discard(1);
+        }
     };
+
+    static void slot_next_random_free_function(Rng& rng)
+    {
+        rng.discard(1);
+    }
 
     //--------------------------------------------------------------------------
 

@@ -45,7 +45,7 @@ class Observer : private MT_Policy
 
     //--------------------------------------------------------------------------
 
-    void insertInternal(Delegate_Key const& key, Observer* obs)
+    void nolock_insert(Delegate_Key const& key, Observer* obs)
     {
         auto begin = std::begin(connections);
         auto end = std::end(connections);
@@ -55,14 +55,16 @@ class Observer : private MT_Policy
 
     void insert(Delegate_Key const& key, Observer* obs)
     {
-        [[maybe_unused]] auto lock = MT_Policy::lock_guard();
+        [[maybe_unused]]
+        auto lock = MT_Policy::lock_guard();
 
-        insertInternal(key, obs);
+        nolock_insert(key, obs);
     }
 
     void remove(Delegate_Key const& key) noexcept
     {
-        [[maybe_unused]] auto lock = MT_Policy::lock_guard();
+        [[maybe_unused]]
+        auto lock = MT_Policy::lock_guard();
 
         auto begin = std::begin(connections);
         auto end = std::end(connections);
@@ -76,6 +78,7 @@ class Observer : private MT_Policy
     template <typename Function, typename... Uref>
     void for_each(Uref&&... args)
     {
+        [[maybe_unused]]
         auto lock = MT_Policy::lock_guard();
 
         for (auto const& slot : MT_Policy::copy_or_ref(connections, lock))
@@ -90,6 +93,7 @@ class Observer : private MT_Policy
     template <typename Function, typename Accumulate, typename... Uref>
     void for_each_accumulate(Accumulate&& accumulate, Uref&&... args)
     {
+        [[maybe_unused]]
         auto lock = MT_Policy::lock_guard();
 
         for (auto const& slot : MT_Policy::copy_or_ref(connections, lock))
@@ -101,24 +105,44 @@ class Observer : private MT_Policy
         }
     }
 
-    void move_connections_from(Observer* other) noexcept
+    //--------------------------------------------------------------------------
+
+    void nolock_disconnect_all() noexcept
     {
-        [[maybe_unused]] auto lock = MT_Policy::lock_guard();
-        [[maybe_unused]] auto otherLock = other->lock_guard();
+        for (auto const& slot : connections)
+        {
+            if (auto observed = MT_Policy::visiting(slot.observer))
+            {
+                auto ptr = static_cast<Observer*>(MT_Policy::unmask(observed));
+                ptr->remove(slot.delegate);
+            }
+        }
 
         connections.clear();
+    }
 
-        // Disconnect other from everyone else, and connect them to us instead
+    void move_connections_from(Observer* other) noexcept
+    {
+        [[maybe_unused]]
+        auto lock = MT_Policy::scoped_lock(other);
+
+        // Make sure this is disconnected and ready to receive
+        nolock_disconnect_all();
+
+        // Disconnect other from everyone else and connect them to this
         for (auto const& slot : other->connections)
         {
-            if (auto observer = MT_Policy::visiting(slot.observer))
+            if (auto observed = other->visiting(slot.observer))
             {
-                auto obsPtr = static_cast<Observer*>(MT_Policy::unmask(observer));
-                obsPtr->remove(slot.delegate);
-                obsPtr->insert(slot.delegate, this);
-
-                // We already have a lock, don't try to lock again
-                insertInternal(slot.delegate, obsPtr);
+                auto ptr = static_cast<Observer*>(MT_Policy::unmask(observed));
+                ptr->remove(slot.delegate);
+                ptr->insert(slot.delegate, this);
+                nolock_insert(slot.delegate, ptr);
+            }
+            // Connect free functions and function objects
+            else
+            {
+                nolock_insert(slot.delegate, this);
             }
         }
 
@@ -131,20 +155,15 @@ class Observer : private MT_Policy
 
     void disconnect_all() noexcept
     {
-        [[maybe_unused]] auto lock = MT_Policy::lock_guard();
+        [[maybe_unused]]
+        auto lock = MT_Policy::lock_guard();
 
-        for (auto const& slot : connections)
-        {
-            if (auto observer = MT_Policy::visiting(slot.observer))
-            {
-                static_cast<Observer*>(MT_Policy::unmask(observer))->remove(slot.delegate);
-            }
-        }
-        connections.clear();
+        nolock_disconnect_all();
     }
 
     bool is_empty() const noexcept
     {
+        [[maybe_unused]]
         auto lock = MT_Policy::lock_guard();
 
         return connections.empty();
@@ -170,12 +189,12 @@ class Observer : private MT_Policy
     // When moving an observer, make sure everyone it's connected to knows about it
     Observer(Observer&& other) noexcept
     {
-        move_connections_from(&other);
+        move_connections_from(std::addressof(other));
     }
 
     Observer& operator=(Observer&& other) noexcept
     {
-        move_connections_from(&other);
+        move_connections_from(std::addressof(other));
         return *this;
     }
 };

@@ -53,25 +53,45 @@ namespace Nano_Tests
 
         TEST_METHOD(Test_Signal_Move)
         {
-            Moo_T foo;
+            Moo_T foo1;
+            Moo_T foo2;
 
-            Subject* signal_one = new Subject();
+            auto rng1 = Rng();
+            auto rng2 = Rng();
 
-            signal_one->connect<&Moo_T::slot_next_random>(foo);
+            auto sig1 = new Subject();
+            auto sig2 = new Subject();
+
+            auto fun1 = [](Rng& rng) { rng.discard(1); };
+
+            sig1->connect<&Moo_T::slot_next_random>(foo1);
+            sig1->connect(fun1);
+            sig1->connect<&Moo_T::slot_static_next_random>();
+            sig1->connect<&slot_next_random_free_function>();
+
+            sig2->connect<&Moo_T::slot_next_random>(foo2);
+            sig2->connect(fun1);
+            sig2->connect<&Moo_T::slot_static_next_random>();
+            sig2->connect<&slot_next_random_free_function>();
 
             {
-                Subject signal_two = std::move(*signal_one);
+                // This should remove all connections from sig2 and add all sig1 connections
+                *sig2 = std::move(*sig1);
+                Assert::IsTrue(sig1->is_empty(), L"Signal failed to remove connections during move.");
+                Assert::IsTrue(foo2.is_empty(), L"Signal failed to remove connections prior to move.");
+                Assert::IsFalse(foo1.is_empty(), L"Signal failed to move subject connections to target.");
+                Assert::IsFalse(sig2->is_empty(), L"Signal failed to move signal connections to target.");
 
-                Assert::IsTrue(signal_one->is_empty(), L"Signal failed to sink.");
+                // Should have four connections
+                sig2->fire(rng1);
+                rng2.discard(4);
+                Assert::IsTrue(rng1 == rng2, L"Signal failed to move all connections.");
 
-                delete signal_one;
-
-                signal_two.fire(Rng());
-
-                foo.disconnect_all();
+                delete sig2;
             }
 
-            Assert::IsTrue(foo.is_empty(), L"Signal failed to sink.");
+            Assert::IsTrue(foo1.is_empty(), L"Signal failed to dispose connections.");
+            Assert::IsTrue(foo2.is_empty(), L"Signal failed to dispose connections.");
         }
     };
 }
