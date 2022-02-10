@@ -45,14 +45,19 @@ class Observer : private MT_Policy
 
     //--------------------------------------------------------------------------
 
-    void insert(Delegate_Key const& key, Observer* obs)
+    void insertInternal(Delegate_Key const& key, Observer* obs)
     {
-        [[maybe_unused]] auto lock = MT_Policy::lock_guard();
-
         auto begin = std::begin(connections);
         auto end = std::end(connections);
 
         connections.emplace(std::upper_bound(begin, end, key, Z_Order()), key, obs);
+    }
+
+    void insert(Delegate_Key const& key, Observer* obs)
+    {
+        [[maybe_unused]] auto lock = MT_Policy::lock_guard();
+
+        insertInternal(key, obs);
     }
 
     void remove(Delegate_Key const& key) noexcept
@@ -96,6 +101,30 @@ class Observer : private MT_Policy
         }
     }
 
+    void move_connections_from(Observer* other) noexcept
+    {
+        [[maybe_unused]] auto lock = MT_Policy::lock_guard();
+        [[maybe_unused]] auto otherLock = other->lock_guard();
+
+        connections.clear();
+
+        // Disconnect other from everyone else, and connect them to us instead
+        for (auto const& slot : other->connections)
+        {
+            if (auto observer = MT_Policy::visiting(slot.observer))
+            {
+                auto obsPtr = static_cast<Observer*>(MT_Policy::unmask(observer));
+                obsPtr->remove(slot.delegate);
+                obsPtr->insert(slot.delegate, this);
+
+                // We already have a lock, don't try to lock again
+                insertInternal(slot.delegate, obsPtr);
+            }
+        }
+
+        other->connections.clear();
+    }
+
     //--------------------------------------------------------------------------
 
     public:
@@ -133,8 +162,22 @@ class Observer : private MT_Policy
     }
 
     Observer() noexcept = default;
-    Observer(Observer const&) = delete;
-    Observer& operator= (Observer const&) = delete;
+
+    // Observer may be movable depending on policy, but should never be copied
+    Observer(Observer const&) noexcept = delete;
+    Observer& operator= (Observer const&) noexcept = delete;
+
+    // When moving an observer, make sure everyone it's connected to knows about it
+    Observer(Observer&& other) noexcept
+    {
+        move_connections_from(&other);
+    }
+
+    Observer& operator=(Observer&& other) noexcept
+    {
+        move_connections_from(&other);
+        return *this;
+    }
 };
 
 } // namespace Nano ------------------------------------------------------------

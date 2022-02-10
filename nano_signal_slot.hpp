@@ -38,7 +38,7 @@ class Signal<RT(Args...), MT_Policy> final : public Observer<MT_Policy>
     }
 
     public:
- 
+
     //-------------------------------------------------------------------CONNECT
 
     template <typename L>
@@ -157,6 +157,15 @@ class Signal<RT(Args...), MT_Policy> final : public Observer<MT_Policy>
         observer::template for_each_accumulate<function, Accumulate>
             (std::forward<Accumulate>(accumulate), std::forward<Uref>(args)...);
     }
+
+    Signal() noexcept = default;
+    ~Signal() noexcept = default;
+
+    Signal(Signal const&) noexcept = delete;
+    Signal& operator= (Signal const&) noexcept = delete;
+
+    Signal(Signal&&) noexcept = default;
+    Signal& operator=(Signal&&) noexcept = default;
 };
 
 } // namespace Nano ------------------------------------------------------------
