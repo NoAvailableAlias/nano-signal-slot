@@ -1,5 +1,7 @@
 #include <future>
 #include <list>
+#include <thread>
+#include <vector>
 
 #include <catch2/catch.hpp>
 

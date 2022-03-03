@@ -18,7 +18,14 @@ add_executable(
   Test_Signal_Fire.cpp
   Test_TS_Policy_Safe.cpp
 )
+
 target_link_libraries(
   Test_Observer_Destruction PRIVATE project_warnings project_options catch_main
 )
+
+if(NOT MSVC)
+  #NOTE: instead of target_compile_options(Test_Observer_Destruction PRIVATE -Wno-unused-function)
+  set_target_properties(Test_Observer_Destruction PROPERTIES UNITY_BUILD ON)
+endif()
+
 add_test(NAME Test_Observer_Destruction COMMAND Test_Observer_Destruction)
