@@ -1,21 +1,20 @@
 #include <list>
 
-#include "CppUnitTest.h"
+#include <catch2/catch.hpp>
 
 #include "Test_Base.hpp"
 
-using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 namespace Nano_Tests
 {
-    TEST_CLASS(Test_ST_Policy_Safe)
+    TEST_CASE("Test_ST_Policy_Safe")
     {
         const int N = 64;
 
         using Moo_T = Moo<Observer_STS>;
         using Subject = Signal_Rng_STS;
 
-        TEST_METHOD(Test_Global_Signal)
+        SECTION("Test_Global_Signal")
         {
             Subject subject;
 
@@ -33,12 +32,12 @@ namespace Nano_Tests
                 }
                 subject.fire(rng);
             }
-            Assert::IsTrue(subject.is_empty(), L"A signal was found not empty.");
+            REQUIRE(subject.is_empty()); //L"A signal was found not empty.");
         }
 
         //----------------------------------------------------------------------
 
-        TEST_METHOD(Test_Signal_Move)
+        SECTION("Test_Signal_Move")
         {
             Moo_T foo1;
             Moo_T foo2;
@@ -64,26 +63,26 @@ namespace Nano_Tests
             {
                 // This should remove all connections from sig2 and add all sig1 connections
                 *sig2 = std::move(*sig1);
-                Assert::IsTrue(sig1->is_empty(), L"Signal failed to remove connections during move.");
-                Assert::IsTrue(foo2.is_empty(), L"Signal failed to remove connections prior to move.");
-                Assert::IsFalse(foo1.is_empty(), L"Signal failed to move subject connections to target.");
-                Assert::IsFalse(sig2->is_empty(), L"Signal failed to move signal connections to target.");
+                REQUIRE(sig1->is_empty()); //L"Signal failed to remove connections during move.");
+                REQUIRE(foo2.is_empty()); //L"Signal failed to remove connections prior to move.");
+                REQUIRE(!foo1.is_empty()); //L"Signal failed to move subject connections to target.");
+                REQUIRE(!sig2->is_empty()); //L"Signal failed to move signal connections to target.");
 
                 // Should have four connections
                 sig2->fire(rng1);
                 rng2.discard(4);
-                Assert::IsTrue(rng1 == rng2, L"Signal failed to move all connections.");
+                REQUIRE(rng1 == rng2); //L"Signal failed to move all connections.");
 
                 delete sig2;
             }
 
-            Assert::IsTrue(foo1.is_empty(), L"Signal failed to dispose connections.");
-            Assert::IsTrue(foo2.is_empty(), L"Signal failed to dispose connections.");
+            REQUIRE(foo1.is_empty()); //L"Signal failed to dispose connections.");
+            REQUIRE(foo2.is_empty()); //L"Signal failed to dispose connections.");
         }
 
         //----------------------------------------------------------------------
 
-        TEST_METHOD(Test_Fire_Disconnect)
+        SECTION("Test_Fire_Disconnect")
         {
             Moo_T foo;
 
@@ -103,7 +102,7 @@ namespace Nano_Tests
             signal.fire(Rng());
         }
 
-        TEST_METHOD(Test_Fire_Disconnects)
+        SECTION("Test_Fire_Disconnects")
         {
             Moo_T foo;
 
@@ -123,11 +122,11 @@ namespace Nano_Tests
 
             signal.fire(Rng());
 
-            Assert::IsTrue(foo.is_empty(), L"An observer was not disconnected.");
-            Assert::IsTrue(signal.is_empty(), L"A slot was not disconnected.");
+            REQUIRE(foo.is_empty()); //L"An observer was not disconnected.");
+            REQUIRE(signal.is_empty()); //L"A slot was not disconnected.");
         }
 
-        TEST_METHOD(Test_Fire_Connects)
+        SECTION("Test_Fire_Connects")
         {
             Moo_T foo;
 
@@ -150,10 +149,10 @@ namespace Nano_Tests
             signal.fire(rng_1);
             signal.fire(rng_1);
 
-            Assert::IsTrue(rng_1 == rng_2, L"A slot was not connected.");
+            REQUIRE(rng_1 == rng_2); //L"A slot was not connected.");
         }
 
-        TEST_METHOD(Test_Fire_Disconnect_All)
+        SECTION("Test_Fire_Disconnect_All")
         {
             Moo_T foo;
 
@@ -172,11 +171,11 @@ namespace Nano_Tests
 
             signal.fire(Rng());
 
-            Assert::IsTrue(foo.is_empty(), L"An observer was not disconnected.");
-            Assert::IsTrue(signal.is_empty(), L"A slot was not disconnected.");
+            REQUIRE(foo.is_empty()); //L"An observer was not disconnected.");
+            REQUIRE(signal.is_empty()); //L"A slot was not disconnected.");
         }
 
-        TEST_METHOD(Test_Fire_Fire)
+        SECTION("Test_Fire_Fire")
         {
             Moo_T foo;
 
