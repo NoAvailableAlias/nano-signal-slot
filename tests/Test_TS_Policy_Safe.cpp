@@ -215,5 +215,5 @@ namespace Nano_Tests
 
             signal.fire(Rng());
         }
-    };
+    }
 }

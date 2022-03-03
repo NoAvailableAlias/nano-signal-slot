@@ -65,6 +65,6 @@ namespace Nano_Tests
             REQUIRE(mo_signal_one.is_empty()); // , L"A slot was found.");
             REQUIRE(mo_signal_two.is_empty()); // , L"A slot was found.");
         }
-    };
+    }
 }
 

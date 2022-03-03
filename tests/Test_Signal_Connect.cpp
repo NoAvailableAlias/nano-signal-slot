@@ -94,5 +94,5 @@ namespace Nano_Tests
             mo_signal_two.connect<&slot_static_free_function>();
             REQUIRE(!mo_signal_two.is_empty()); //L"A slot was found missing.");
         }
-    };
+    }
 }

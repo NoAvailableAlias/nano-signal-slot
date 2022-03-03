@@ -79,5 +79,5 @@ namespace Nano_Tests
             REQUIRE(foo1.is_empty()); //L"Signal failed to dispose connections.");
             REQUIRE(foo2.is_empty()); //L"Signal failed to dispose connections.");
         }
-    };
+    }
 }

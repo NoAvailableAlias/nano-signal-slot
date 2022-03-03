@@ -190,5 +190,5 @@ namespace Nano_Tests
             REQUIRE(mo_foo.is_empty()); //L"A slot was found.");
             REQUIRE(mo_bar.is_empty()); //L"A slot was found.");
         }
-    };
+    }
 }

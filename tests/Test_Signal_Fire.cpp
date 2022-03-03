@@ -170,5 +170,5 @@ namespace Nano_Tests
 
             signal_one.fire(Copy_Count());
         }
-    };
+    }
 }
