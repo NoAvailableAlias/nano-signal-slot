@@ -1,0 +1,79 @@
+---
+name: Continuous Integration
+
+on: [push, pull_request]
+
+env:
+  CTEST_OUTPUT_ON_FAILURE: 1
+  CPM_SOURCE_CACHE: ${{ github.workspace }}/cpm_modules
+
+jobs:
+  test:
+    strategy:
+      fail-fast: false
+
+      matrix:
+        # XXX type: [static, shared]
+
+        os: [macos, ubuntu, windows]
+
+        include:
+          - {type: static, build: NO}
+          - {type: shared, build: YES}
+
+    runs-on: ${{ matrix.os }}-latest
+
+    steps:
+      - uses: actions/checkout@v1
+
+      - uses: actions/cache@v2
+        with:
+          path: "**/cpm_modules"
+          key: ${{ github.workflow }}-cpm-modules-${{ hashFiles('**/CMakeLists.txt', '**/*.cmake') }}
+
+
+      - name: Install llvm-12 Ubuntu Host
+        if: startsWith(matrix.os, 'ubuntu')
+        shell: bash
+        run: |
+          sudo apt-get install \
+            llvm-12 clang-12 libclang-12-dev clang-tidy-12 ||
+              echo IGNORED
+
+      - name: Configure
+        run: cmake -S . -B build -D CMAKE_BUILD_TYPE=Release  # XXX -D BUILD_SHARED_LIBS=${{ matrix.build }}
+
+      - name: Build
+        run: cmake --build build --config Release -j 4
+
+      - name: Test
+        working-directory: build
+        run: ctest -C Release --output-on-failure
+
+      # - name: Install
+      #   run: cmake --install build --config Release --prefix stage
+
+      # - name: BuildWithInstalledVersion
+      #   shell: bash
+      #   run: |
+      #     cmake -S examples -B build/test -D CMAKE_PREFIX_PATH=$PWD/stage -D CMAKE_EXPORT_COMPILE_COMMANDS=1
+      #     cmake --build build/test --config Release -j 4
+
+      # - name: TestWithInstalledVersion
+      #   working-directory: build/test
+      #   run: ctest -C Release --output-on-failure
+
+      - name: Run clang-tidy on MacOS Host
+        if: startsWith(matrix.os, 'macos')
+        shell: bash
+        run: |
+          export PATH=/usr/local/opt/llvm/bin/:${PATH}
+          perl -i.bak -pe 's#-I($CPM_SOURCE_CACHE)#-isystem $1#g' build/compile_commands.json
+          run-clang-tidy -p build tests
+
+      - name: Run clang-tidy on Ubuntu Host
+        if: startsWith(matrix.os, 'ubuntu')
+        shell: bash
+        run: |
+          perl -i.bak -pe 's#-I($CPM_SOURCE_CACHE)#-isystem $1#g' build/compile_commands.json
+          run-clang-tidy-12 -p build tests
