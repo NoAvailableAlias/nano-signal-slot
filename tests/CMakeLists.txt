@@ -3,6 +3,8 @@
 
 CPMAddPackage("gh:catchorg/Catch2@2.13.7")
 
+find_package(Threads REQUIRED)
+
 add_library(catch_main OBJECT catch_main.cpp)
 target_link_libraries(catch_main PUBLIC Catch2::Catch2)
 target_link_libraries(catch_main PRIVATE project_options)
@@ -20,7 +22,7 @@ add_executable(
 )
 
 target_link_libraries(
-  Test_Observer_Destruction PRIVATE project_warnings project_options catch_main
+  Test_Observer_Destruction PRIVATE project_warnings project_options catch_main Threads::Threads
 )
 
 if(NOT MSVC)
