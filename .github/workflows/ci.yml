@@ -41,7 +41,7 @@ jobs:
               echo IGNORED
 
       - name: Configure
-        run: cmake -S . -B build -D CMAKE_BUILD_TYPE=Release  # XXX -D BUILD_SHARED_LIBS=${{ matrix.build }}
+        run: cmake -S . -B build -D CMAKE_BUILD_TYPE=Release -D ENABLE_DEVELOPER_MODE=NO  # XXX -D BUILD_SHARED_LIBS=${{ matrix.build }}
 
       - name: Build
         run: cmake --build build --config Release -j 4
