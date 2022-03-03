@@ -37,8 +37,9 @@ jobs:
         shell: bash
         run: |
           sudo apt-get install \
-            llvm-12 clang-12 libclang-12-dev clang-tidy-12 ||
+            gcc-10 llvm-12 clang-12 libclang-12-dev clang-tidy-12 ||
               echo IGNORED
+            CXX=g++-10 cmake -S . -B build -D CMAKE_BUILD_TYPE=Release -D ENABLE_DEVELOPER_MODE=NO  # XXX -D BUILD_SHARED_LIBS=${{ matrix.build }}
 
       - name: Configure
         run: cmake -S . -B build -D CMAKE_BUILD_TYPE=Release -D ENABLE_DEVELOPER_MODE=NO  # XXX -D BUILD_SHARED_LIBS=${{ matrix.build }}
