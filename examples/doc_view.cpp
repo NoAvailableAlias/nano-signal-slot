@@ -11,10 +11,10 @@
 #include "nano_observer.hpp"     // Nano::Observer
 #include "nano_signal_slot.hpp"  // Nano::Signal
 
-#include <chrono>
+//XXX #include <chrono>
 #include <iostream>
 #include <string>
-#include <thread>
+//XXX #include <thread>
 
 namespace {
 
@@ -84,7 +84,7 @@ class HexView : public Observer {
 
 /// document_view_main_code_snippet
 int main(int argc, char* argv[]) {
-  using namespace std::chrono_literals;
+  //XXX using namespace std::chrono_literals;
 
   try {
     Document doc;
@@ -94,7 +94,7 @@ int main(int argc, char* argv[]) {
       doc.append(argc == 2 ? argv[1] : " Hello world!");
     }
 
-    std::this_thread::sleep_for(123us);
+    //XXX std::this_thread::sleep_for(123us);
     doc.append(" ... Again, but without HexView!");
   } catch (const std::exception& ex) {
     std::cerr << ex.what() << std::endl;
