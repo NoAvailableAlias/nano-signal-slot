@@ -30,7 +30,7 @@ using Observer = Nano::Observer<NanoPolicy>;
 /// document_def_code_snippet
 class Document {
  public:
-  typedef Signal<void()> signal_t;
+  using signal_t = Signal<void()>;
 
   Document() = default;
 
