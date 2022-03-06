@@ -108,14 +108,14 @@ namespace Nano_Tests
         {
             Nano::Signal<void(Copy_Count)> signal_one;
 
-            auto slot_one = [](Copy_Count cc)
+            auto slot_one = [](Copy_Count cc) // NOLINT(performance-unnecessary-value-param)
             {
                 REQUIRE(cc.count == 1); //L"A parameter was copied more than once.");
             };
 
             signal_one.connect(slot_one);
 
-            auto slot_two = [](Copy_Count cc)
+            auto slot_two = [](Copy_Count cc) // NOLINT(performance-unnecessary-value-param)
             {
                 REQUIRE(cc.count == 1); //L"A parameter was copied more than once.");
             };
@@ -154,14 +154,14 @@ namespace Nano_Tests
         {
             Nano::Signal<void(Copy_Count)> signal_one;
 
-            auto slot_one = [](Copy_Count cc)
+            auto slot_one = [](Copy_Count cc) // NOLINT(performance-unnecessary-value-param)
             {
                 REQUIRE(cc.count == 1); //L"An rvalue parameter wasn't copied once.");
             };
 
             signal_one.connect(slot_one);
 
-            auto slot_two = [](Copy_Count cc)
+            auto slot_two = [](Copy_Count cc) // NOLINT(performance-unnecessary-value-param)
             {
                 REQUIRE(cc.count == 1); //L"An rvalue parameter wasn't copied once.");
             };
