@@ -94,9 +94,10 @@ target_compile_features(project_options INTERFACE cxx_std_${CMAKE_CXX_STANDARD})
 # configure files based on CMake configuration options
 #TODO add_subdirectory(configured_files)
 #TODO target_include_directories(project_options INTERFACE "${CMAKE_BINARY_DIR}")
+target_include_directories(project_options INTERFACE include)
 
 # Adding the examples:
-#TODO add_subdirectory(examples)
+add_subdirectory(examples)
 
 # Adding the tests:
 option(ENABLE_TESTING "Enable the tests" ON)

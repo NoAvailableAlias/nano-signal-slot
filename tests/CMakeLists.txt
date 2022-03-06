@@ -10,7 +10,8 @@ target_link_libraries(catch_main PUBLIC Catch2::Catch2)
 target_link_libraries(catch_main PRIVATE project_options)
 
 add_executable(
-  Test_Observer_Destruction
+  Test_Program
+  Test_Base.hpp
   Test_Observer_Destruction.cpp
   Test_ST_Policy_Safe.cpp
   Test_Signal_Disconnect.cpp
@@ -22,12 +23,12 @@ add_executable(
 )
 
 target_link_libraries(
-  Test_Observer_Destruction PRIVATE project_warnings project_options catch_main Threads::Threads
+  Test_Program PRIVATE project_warnings project_options catch_main Threads::Threads
 )
 
 if(NOT MSVC)
-  #NOTE: instead of target_compile_options(Test_Observer_Destruction PRIVATE -Wno-unused-function)
-  set_target_properties(Test_Observer_Destruction PROPERTIES UNITY_BUILD ON)
+  #NOTE: instead of target_compile_options(Test_Program PRIVATE -Wno-unused-function)
+  set_target_properties(Test_Program PROPERTIES UNITY_BUILD ON)
 endif()
 
-add_test(NAME Test_Observer_Destruction COMMAND Test_Observer_Destruction)
+add_test(NAME Test_Program COMMAND Test_Program)

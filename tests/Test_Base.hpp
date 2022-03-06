@@ -4,8 +4,8 @@
 #include <functional>
 #include <random>
 
-#include "../nano_signal_slot.hpp"
-#include "../nano_mutex.hpp"
+#include "nano_signal_slot.hpp"
+#include "nano_mutex.hpp"
 
 namespace Nano_Tests
 {
@@ -101,6 +101,7 @@ namespace Nano_Tests
         {
             anonymous_output(__FUNCTION__, sl, __LINE__);
         }
+
         void slot_virtual_member_function(const char* sl, std::size_t ln) override
         {
             anonymous_output(__FUNCTION__, sl, ln);
@@ -151,10 +152,12 @@ namespace Nano_Tests
         std::size_t count = 0;
 
         Copy_Count() = default;
+
         Copy_Count(Copy_Count const& other) : count(other.count + 1)
         {
 
         }
+
         Copy_Count& operator= (Copy_Count const& other)
         {
             count = other.count + 1;
