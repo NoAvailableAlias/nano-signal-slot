@@ -8,7 +8,7 @@
 namespace Nano
 {
 
-class Spin_Mutex
+class Spin_Mutex final
 {
     std::atomic_bool locked = { false };
 
@@ -26,21 +26,44 @@ class Spin_Mutex
         while (locked.exchange(true, std::memory_order_acquire));
     }
 
+    inline bool try_lock() noexcept
+    {
+        return !locked.load(std::memory_order_relaxed) &&
+            !locked.exchange(true, std::memory_order_acquire);
+    }
+
     inline void unlock() noexcept
     {
         locked.store(false, std::memory_order_release);
     }
 
+    //--------------------------------------------------------------------------
+
     Spin_Mutex() noexcept = default;
-    Spin_Mutex(Spin_Mutex const&) = delete;
-    Spin_Mutex& operator= (Spin_Mutex const&) = delete;
+    ~Spin_Mutex() noexcept = default;
+
+    // Because all we own is a trivially-copyable atomic_bool, we can manually move/copy
+    Spin_Mutex(Spin_Mutex const& other) noexcept : locked(other.locked.load()) {}
+    Spin_Mutex& operator= (Spin_Mutex const& other) noexcept
+    {
+        locked = other.locked.load();
+        return *this;
+    }
+
+    Spin_Mutex(Spin_Mutex&& other) noexcept : locked(other.locked.load()) {}
+    Spin_Mutex& operator= (Spin_Mutex&& other) noexcept
+    {
+        locked = other.locked.load();
+        return *this;
+    }
 };
 
 //------------------------------------------------------------------------------
 
-// Single Thread Policy
-// Use this policy when you DO want performance but NO thread-safety!
-
+/// <summary>
+/// Single Thread Policy
+/// Use this policy when you DO want performance but NO thread-safety!
+/// </summary>
 class ST_Policy
 {
     public:
@@ -57,7 +80,23 @@ class ST_Policy
         return false;
     }
 
+    constexpr auto scoped_lock(ST_Policy*) const
+    {
+        return false;
+    }
+
     protected:
+
+    ST_Policy() noexcept = default;
+    ~ST_Policy() noexcept = default;
+
+    ST_Policy(const ST_Policy&) noexcept = default;
+    ST_Policy& operator=(const ST_Policy&) noexcept = default;
+
+    ST_Policy(ST_Policy&&) noexcept = default;
+    ST_Policy& operator=(ST_Policy&&) noexcept = default;
+
+    //--------------------------------------------------------------------------
 
     using Weak_Ptr = ST_Policy*;
 
@@ -89,9 +128,11 @@ class ST_Policy
 
 //------------------------------------------------------------------------------
 
-// Thread Safe Policy
-// Use this policy when you DO want thread-safety but NO reentrancy!
-
+/// <summary>
+/// Thread Safe Policy
+/// Use this policy when you DO want thread-safety but NO reentrancy!
+/// </summary>
+/// <typeparam name="Mutex">Defaults to Spin_Mutex</typeparam>
 template <typename Mutex = Spin_Mutex>
 class TS_Policy
 {
@@ -112,9 +153,20 @@ class TS_Policy
         return std::lock_guard<TS_Policy>(*const_cast<TS_Policy*>(this));
     }
 
+    inline auto scoped_lock(TS_Policy* other) const
+    {
+        return std::scoped_lock<TS_Policy, TS_Policy>(
+            *const_cast<TS_Policy*>(this), *const_cast<TS_Policy*>(other));
+    }
+
     inline void lock() const
     {
         mutex.lock();
+    }
+
+    inline bool try_lock() noexcept
+    {
+        return mutex.try_lock();
     }
 
     inline void unlock() noexcept
@@ -123,6 +175,17 @@ class TS_Policy
     }
 
     protected:
+
+    TS_Policy() noexcept = default;
+    ~TS_Policy() noexcept = default;
+
+    TS_Policy(TS_Policy const&) noexcept = default;
+    TS_Policy& operator= (TS_Policy const&) noexcept = default;
+
+    TS_Policy(TS_Policy&&) noexcept = default;
+    TS_Policy& operator= (TS_Policy&&) noexcept = default;
+
+    //--------------------------------------------------------------------------
 
     using Weak_Ptr = TS_Policy*;
 
@@ -154,9 +217,10 @@ class TS_Policy
 
 //------------------------------------------------------------------------------
 
-// Single Thread Policy "Safe"
-// Use this policy when you DO want reentrancy but NO thread-safety!
-
+/// <summary>
+/// Single Thread Policy "Safe"
+/// Use this policy when you DO want reentrancy but NO thread-safety!
+/// </summary>
 class ST_Policy_Safe
 {
     public:
@@ -173,7 +237,23 @@ class ST_Policy_Safe
         return false;
     }
 
+    constexpr auto scoped_lock(ST_Policy_Safe*) const
+    {
+        return false;
+    }
+
     protected:
+
+    ST_Policy_Safe() noexcept = default;
+    ~ST_Policy_Safe() noexcept = default;
+
+    ST_Policy_Safe(ST_Policy_Safe const&) noexcept = default;
+    ST_Policy_Safe& operator= (ST_Policy_Safe const&) noexcept = default;
+
+    ST_Policy_Safe(ST_Policy_Safe&&) noexcept = default;
+    ST_Policy_Safe& operator= (ST_Policy_Safe&&) noexcept = default;
+
+    //--------------------------------------------------------------------------
 
     using Weak_Ptr = ST_Policy_Safe*;
 
@@ -205,9 +285,11 @@ class ST_Policy_Safe
 
 //------------------------------------------------------------------------------
 
-// Thread Safe Policy "Safe"
-// Use this policy when you DO want thread-safety AND reentrancy!
-
+/// <summary>
+/// Thread Safe Policy "Safe"
+/// Use this policy when you DO want thread-safety AND reentrancy!
+/// </summary>
+/// <typeparam name="Mutex">Defaults to Spin_Mutex</typeparam>
 template <typename Mutex = Spin_Mutex>
 class TS_Policy_Safe
 {
@@ -232,9 +314,20 @@ class TS_Policy_Safe
         return std::unique_lock<TS_Policy_Safe>(*const_cast<TS_Policy_Safe*>(this));
     }
 
+    inline auto scoped_lock(TS_Policy_Safe* other) const
+    {
+        return std::scoped_lock<TS_Policy_Safe, TS_Policy_Safe>(
+            *const_cast<TS_Policy_Safe*>(this), *const_cast<TS_Policy_Safe*>(other));
+    }
+
     inline void lock() const
     {
         mutex.lock();
+    }
+
+    inline bool try_lock() noexcept
+    {
+        return mutex.try_lock();
     }
 
     inline void unlock() noexcept
@@ -245,6 +338,15 @@ class TS_Policy_Safe
     protected:
 
     TS_Policy_Safe() noexcept = default;
+    ~TS_Policy_Safe() noexcept = default;
+
+    TS_Policy_Safe(TS_Policy_Safe const&) noexcept = default;
+    TS_Policy_Safe& operator= (TS_Policy_Safe const&) noexcept = default;
+
+    TS_Policy_Safe(TS_Policy_Safe&&) noexcept = default;
+    TS_Policy_Safe& operator= (TS_Policy_Safe&&) noexcept = default;
+
+    //--------------------------------------------------------------------------
 
     using Weak_Ptr = std::weak_ptr<TS_Policy_Safe>;
 
