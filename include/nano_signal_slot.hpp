@@ -40,7 +40,7 @@ class Signal<RT(Args...), MT_Policy> final : public Observer<MT_Policy>
     public:
 
     Signal() noexcept = default;
-    ~Signal() noexcept = default;
+    ~Signal() noexcept override = default;
 
     Signal(Signal const&) noexcept = delete;
     Signal& operator= (Signal const&) noexcept = delete;

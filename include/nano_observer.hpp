@@ -173,7 +173,7 @@ class Observer : private MT_Policy
 
     // Guideline #4: A base class destructor should be
     // either public and virtual, or protected and non-virtual.
-    ~Observer()
+    virtual ~Observer()
     {
         MT_Policy::before_disconnect_all();
 
@@ -183,8 +183,8 @@ class Observer : private MT_Policy
     Observer() noexcept = default;
 
     // Observer may be movable depending on policy, but should never be copied
-    Observer(Observer const&) noexcept = delete;
-    Observer& operator= (Observer const&) noexcept = delete;
+    Observer(Observer const&) noexcept = delete; // NOLINT(modernize-use-equals-delete)
+    Observer& operator= (Observer const&) noexcept = delete; // NOLINT(modernize-use-equals-delete)
 
     // When moving an observer, make sure everyone it's connected to knows about it
     Observer(Observer&& other) noexcept
